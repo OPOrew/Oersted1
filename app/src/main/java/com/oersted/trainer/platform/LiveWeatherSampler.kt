@@ -20,7 +20,8 @@ object LiveWeatherSampler {
     private const val DEFAULT_HOST = "https://tilecache.rainviewer.com"
 
     /** Returns the analysis, or null when any step fails (the caller keeps its previous weather). */
-    fun sample(lat: Double, lon: Double, lastMetar: String): LiveWeather.Analysis? = try {
+    fun sample(lat: Double, lon: Double, lastMetar: String): LiveWeather.Analysis? {
+        return try {
         val maps = JSONObject(get(MAPS_URL) ?: return null)
         val frames = maps.optJSONObject("radar")?.optJSONArray("past") ?: return null
         if (frames.length() == 0) return null
@@ -36,8 +37,9 @@ object LiveWeatherSampler {
             val c = px[y * 64 + x]
             Triple((c shr 16) and 0xFF, (c shr 8) and 0xFF, c and 0xFF)
         }, lastMetar)
-    } catch (e: Exception) {
-        null
+        } catch (e: Exception) {
+            null
+        }
     }
 
     private fun get(url: String): String? = getBytes(url)?.toString(Charsets.UTF_8)
