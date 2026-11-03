@@ -1,0 +1,178 @@
+{
+ "fields": [
+  "hydALow",
+  "hydBLow",
+  "hydBPump1Low",
+  "hydBPump2Low",
+  "masterCaution"
+ ],
+ "scenarios": [
+  {
+   "name": "hyd_quiet_default",
+   "ov": {
+    "battery": true
+   },
+   "expected": {
+    "hydALow": false,
+    "hydBLow": false,
+    "hydBPump1Low": false,
+    "hydBPump2Low": false,
+    "masterCaution": false
+   }
+  },
+  {
+   "name": "hydA_pump1_low_pressure",
+   "ov": {
+    "battery": true,
+    "lever1": true,
+    "n2_1": 60,
+    "engHyd1": true,
+    "hydAPress": 1000
+   },
+   "expected": {
+    "hydALow": true,
+    "hydBLow": false,
+    "hydBPump1Low": false,
+    "hydBPump2Low": false,
+    "masterCaution": true
+   }
+  },
+  {
+   "name": "hydA_pressure_ok",
+   "ov": {
+    "battery": true,
+    "lever1": true,
+    "n2_1": 60,
+    "engHyd1": true,
+    "hydAPress": 3000
+   },
+   "expected": {
+    "hydALow": false,
+    "hydBLow": false,
+    "hydBPump1Low": false,
+    "hydBPump2Low": false,
+    "masterCaution": false
+   }
+  },
+  {
+   "name": "hydA_engine1_fire_pulled_bypassed",
+   "ov": {
+    "battery": true,
+    "lever1": true,
+    "n2_1": 60,
+    "engHyd1": true,
+    "hydAPress": 1000,
+    "engine1FirePulled": true
+   },
+   "expected": {
+    "hydALow": false,
+    "hydBLow": false,
+    "hydBPump1Low": false,
+    "hydBPump2Low": false,
+    "masterCaution": false
+   }
+  },
+  {
+   "name": "hydB_elec_pump1_low",
+   "ov": {
+    "battery": true,
+    "elecHyd1": true,
+    "hydBPress": 1000
+   },
+   "expected": {
+    "hydALow": false,
+    "hydBLow": true,
+    "hydBPump1Low": true,
+    "hydBPump2Low": false,
+    "masterCaution": true
+   }
+  },
+  {
+   "name": "hydB_elec_pump1_no_power_dark",
+   "ov": {
+    "elecHyd1": true,
+    "hydBPress": 1000
+   },
+   "expected": {
+    "hydALow": false,
+    "hydBLow": false,
+    "hydBPump1Low": false,
+    "hydBPump2Low": false,
+    "masterCaution": false
+   }
+  },
+  {
+   "name": "hydB_elec_pump2_ok_pressure",
+   "ov": {
+    "battery": true,
+    "elecHyd2": true,
+    "hydBPress": 3000
+   },
+   "expected": {
+    "hydALow": false,
+    "hydBLow": true,
+    "hydBPump1Low": false,
+    "hydBPump2Low": true,
+    "masterCaution": true
+   }
+  },
+  {
+   "name": "master_caution_pack_trip_left",
+   "ov": {
+    "battery": true,
+    "packTripL": true
+   },
+   "expected": {
+    "hydALow": false,
+    "hydBLow": false,
+    "hydBPump1Low": false,
+    "hydBPump2Low": false,
+    "masterCaution": true
+   }
+  },
+  {
+   "name": "master_caution_hydB_leak",
+   "ov": {
+    "battery": true,
+    "faults": {
+     "hydBLeak": true
+    }
+   },
+   "expected": {
+    "hydALow": false,
+    "hydBLow": false,
+    "hydBPump1Low": false,
+    "hydBPump2Low": false,
+    "masterCaution": true
+   }
+  },
+  {
+   "name": "master_caution_fuel_pump_timer",
+   "ov": {
+    "battery": true,
+    "fuelCenterPumpAutoShutoffInstalled": true,
+    "fuelCenterPump1LowPressureTimer": 12
+   },
+   "expected": {
+    "hydALow": false,
+    "hydBLow": false,
+    "hydBPump1Low": false,
+    "hydBPump2Low": false,
+    "masterCaution": true
+   }
+  },
+  {
+   "name": "master_caution_none_with_power",
+   "ov": {
+    "battery": true
+   },
+   "expected": {
+    "hydALow": false,
+    "hydBLow": false,
+    "hydBPump1Low": false,
+    "hydBPump2Low": false,
+    "masterCaution": false
+   }
+  }
+ ]
+}

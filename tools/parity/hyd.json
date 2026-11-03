@@ -1,0 +1,389 @@
+{
+ "fields": [
+  "hydAPump1On",
+  "hydAPump2On",
+  "hydA",
+  "hydBPump1On",
+  "hydBPump2On",
+  "hydB",
+  "groundAPress",
+  "flightControlAAvailable",
+  "flightControlBAvailable",
+  "thrustReverser1Active",
+  "thrustReverser2Active",
+  "hydS"
+ ],
+ "scenarios": [
+  {
+   "name": "no_hyd_power",
+   "ov": {
+    "battery": true
+   },
+   "expected": {
+    "hydAPump1On": false,
+    "hydAPump2On": false,
+    "hydA": 0,
+    "hydBPump1On": false,
+    "hydBPump2On": false,
+    "hydB": 0,
+    "groundAPress": 0,
+    "flightControlAAvailable": false,
+    "flightControlBAvailable": false,
+    "thrustReverser1Active": false,
+    "thrustReverser2Active": false,
+    "hydS": 0
+   }
+  },
+  {
+   "name": "sysA_pump1_eng1",
+   "ov": {
+    "battery": true,
+    "lever1": true,
+    "n2_1": 60,
+    "gen1": true,
+    "start1": "GRD",
+    "engHyd1": true
+   },
+   "expected": {
+    "hydAPump1On": true,
+    "hydAPump2On": false,
+    "hydA": 3000,
+    "hydBPump1On": false,
+    "hydBPump2On": false,
+    "hydB": 0,
+    "groundAPress": 0,
+    "flightControlAAvailable": true,
+    "flightControlBAvailable": false,
+    "thrustReverser1Active": false,
+    "thrustReverser2Active": false,
+    "hydS": 0
+   }
+  },
+  {
+   "name": "sysA_pump2_eng2",
+   "ov": {
+    "battery": true,
+    "lever2": true,
+    "n2_2": 60,
+    "gen2": true,
+    "start2": "GRD",
+    "engHyd2": true
+   },
+   "expected": {
+    "hydAPump1On": false,
+    "hydAPump2On": true,
+    "hydA": 3000,
+    "hydBPump1On": false,
+    "hydBPump2On": false,
+    "hydB": 0,
+    "groundAPress": 0,
+    "flightControlAAvailable": true,
+    "flightControlBAvailable": false,
+    "thrustReverser1Active": false,
+    "thrustReverser2Active": false,
+    "hydS": 0
+   }
+  },
+  {
+   "name": "sysA_leak_limited",
+   "ov": {
+    "battery": true,
+    "lever1": true,
+    "n2_1": 60,
+    "gen1": true,
+    "start1": "GRD",
+    "engHyd1": true,
+    "faults": {
+     "hydALeak": true
+    }
+   },
+   "expected": {
+    "hydAPump1On": true,
+    "hydAPump2On": false,
+    "hydA": 400,
+    "hydBPump1On": false,
+    "hydBPump2On": false,
+    "hydB": 0,
+    "groundAPress": 0,
+    "flightControlAAvailable": false,
+    "flightControlBAvailable": false,
+    "thrustReverser1Active": false,
+    "thrustReverser2Active": false,
+    "hydS": 0
+   }
+  },
+  {
+   "name": "sysB_pump1_gen1",
+   "ov": {
+    "battery": true,
+    "lever1": true,
+    "n2_1": 60,
+    "gen1": true,
+    "start1": "GRD",
+    "elecHyd1": true
+   },
+   "expected": {
+    "hydAPump1On": false,
+    "hydAPump2On": false,
+    "hydA": 0,
+    "hydBPump1On": true,
+    "hydBPump2On": false,
+    "hydB": 3000,
+    "groundAPress": 0,
+    "flightControlAAvailable": false,
+    "flightControlBAvailable": true,
+    "thrustReverser1Active": false,
+    "thrustReverser2Active": false,
+    "hydS": 0
+   }
+  },
+  {
+   "name": "sysB_pump1_gen1_open_phase",
+   "ov": {
+    "battery": true,
+    "lever1": true,
+    "n2_1": 60,
+    "gen1": true,
+    "start1": "GRD",
+    "elecHyd1": true,
+    "faults": {
+     "openPhase1": true
+    }
+   },
+   "expected": {
+    "hydAPump1On": false,
+    "hydAPump2On": false,
+    "hydA": 0,
+    "hydBPump1On": false,
+    "hydBPump2On": false,
+    "hydB": 0,
+    "groundAPress": 0,
+    "flightControlAAvailable": false,
+    "flightControlBAvailable": false,
+    "thrustReverser1Active": false,
+    "thrustReverser2Active": false,
+    "hydS": 0
+   }
+  },
+  {
+   "name": "sysB_ground_tie_pump",
+   "ov": {
+    "battery": true,
+    "externalPowerConnected": true,
+    "groundPowerOn": true,
+    "elecHyd1": true,
+    "lever1": true,
+    "n2_1": 60,
+    "start1": "GRD"
+   },
+   "expected": {
+    "hydAPump1On": false,
+    "hydAPump2On": false,
+    "hydA": 0,
+    "hydBPump1On": true,
+    "hydBPump2On": false,
+    "hydB": 3000,
+    "groundAPress": 0,
+    "flightControlAAvailable": false,
+    "flightControlBAvailable": true,
+    "thrustReverser1Active": false,
+    "thrustReverser2Active": false,
+    "hydS": 0
+   }
+  },
+  {
+   "name": "sysB_ground_service_source",
+   "ov": {
+    "battery": true,
+    "hydGroundPowerConnected": true,
+    "wow": true
+   },
+   "expected": {
+    "hydAPump1On": false,
+    "hydAPump2On": false,
+    "hydA": 0,
+    "hydBPump1On": false,
+    "hydBPump2On": false,
+    "hydB": 3000,
+    "groundAPress": 0,
+    "flightControlAAvailable": false,
+    "flightControlBAvailable": true,
+    "thrustReverser1Active": false,
+    "thrustReverser2Active": false,
+    "hydS": 0
+   }
+  },
+  {
+   "name": "ground_interconnect_parking_brake",
+   "ov": {
+    "battery": true,
+    "hydGroundPowerConnected": true,
+    "wow": true,
+    "parkingBrake": true,
+    "groundInterconnect": true
+   },
+   "expected": {
+    "hydAPump1On": false,
+    "hydAPump2On": false,
+    "hydA": 3000,
+    "hydBPump1On": false,
+    "hydBPump2On": false,
+    "hydB": 3000,
+    "groundAPress": 3000,
+    "flightControlAAvailable": true,
+    "flightControlBAvailable": true,
+    "thrustReverser1Active": false,
+    "thrustReverser2Active": false,
+    "hydS": 0
+   }
+  },
+  {
+   "name": "ground_interconnect_brake_released",
+   "ov": {
+    "battery": true,
+    "hydGroundPowerConnected": true,
+    "wow": true,
+    "parkingBrake": false,
+    "groundInterconnect": true
+   },
+   "expected": {
+    "hydAPump1On": false,
+    "hydAPump2On": false,
+    "hydA": 0,
+    "hydBPump1On": false,
+    "hydBPump2On": false,
+    "hydB": 3000,
+    "groundAPress": 0,
+    "flightControlAAvailable": false,
+    "flightControlBAvailable": true,
+    "thrustReverser1Active": false,
+    "thrustReverser2Active": false,
+    "hydS": 0
+   }
+  },
+  {
+   "name": "reservoir_air_ground_cart",
+   "ov": {
+    "battery": true,
+    "externalPowerConnected": true,
+    "groundPowerOn": true,
+    "hydReservoirAirConnected": true,
+    "hydReservoirAirPsi": 40,
+    "wow": true,
+    "elecHyd1": true
+   },
+   "expected": {
+    "hydAPump1On": false,
+    "hydAPump2On": false,
+    "hydA": 0,
+    "hydBPump1On": true,
+    "hydBPump2On": false,
+    "hydB": 3000,
+    "groundAPress": 0,
+    "flightControlAAvailable": false,
+    "flightControlBAvailable": true,
+    "thrustReverser1Active": false,
+    "thrustReverser2Active": false,
+    "hydS": 0
+   }
+  },
+  {
+   "name": "standby_auto_primary_loss",
+   "ov": {
+    "battery": true,
+    "standbyPower": "BAT",
+    "stbyHyd": "AUTO"
+   },
+   "expected": {
+    "hydAPump1On": false,
+    "hydAPump2On": false,
+    "hydA": 0,
+    "hydBPump1On": false,
+    "hydBPump2On": false,
+    "hydB": 0,
+    "groundAPress": 0,
+    "flightControlAAvailable": false,
+    "flightControlBAvailable": false,
+    "thrustReverser1Active": false,
+    "thrustReverser2Active": false,
+    "hydS": 2900
+   }
+  },
+  {
+   "name": "standby_alt_flaps_arm",
+   "ov": {
+    "battery": true,
+    "standbyPower": "BAT",
+    "altFlapsArm": true
+   },
+   "expected": {
+    "hydAPump1On": false,
+    "hydAPump2On": false,
+    "hydA": 0,
+    "hydBPump1On": false,
+    "hydBPump2On": false,
+    "hydB": 0,
+    "groundAPress": 0,
+    "flightControlAAvailable": false,
+    "flightControlBAvailable": false,
+    "thrustReverser1Active": false,
+    "thrustReverser2Active": false,
+    "hydS": 2900
+   }
+  },
+  {
+   "name": "thrust_reverser1_idle",
+   "ov": {
+    "battery": true,
+    "lever1": true,
+    "n2_1": 60,
+    "gen1": true,
+    "start1": "GRD",
+    "engHyd1": true,
+    "rev1": true,
+    "wow": true,
+    "throttle1": 0
+   },
+   "expected": {
+    "hydAPump1On": true,
+    "hydAPump2On": false,
+    "hydA": 3000,
+    "hydBPump1On": false,
+    "hydBPump2On": false,
+    "hydB": 0,
+    "groundAPress": 0,
+    "flightControlAAvailable": true,
+    "flightControlBAvailable": false,
+    "thrustReverser1Active": true,
+    "thrustReverser2Active": false,
+    "hydS": 0
+   }
+  },
+  {
+   "name": "flight_control_A_switch_on",
+   "ov": {
+    "battery": true,
+    "lever1": true,
+    "n2_1": 60,
+    "gen1": true,
+    "start1": "GRD",
+    "engHyd1": true,
+    "fltCtrlA": true
+   },
+   "expected": {
+    "hydAPump1On": true,
+    "hydAPump2On": false,
+    "hydA": 3000,
+    "hydBPump1On": false,
+    "hydBPump2On": false,
+    "hydB": 0,
+    "groundAPress": 0,
+    "flightControlAAvailable": true,
+    "flightControlBAvailable": false,
+    "thrustReverser1Active": false,
+    "thrustReverser2Active": false,
+    "hydS": 0
+   }
+  }
+ ]
+}

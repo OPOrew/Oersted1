@@ -1,0 +1,129 @@
+# PORT_MAP — web source → Android
+
+| Web (reference/web/src) | Lines | Android target | Status |
+|---|---|---|---|
+| data/systems.ts | 170 | data/Models.kt + assets/data/systems.json | exported, UI basic |
+| data/components.ts | 1699 | assets/data/parts.json | exported, UI basic |
+| data/amm.ts | 70 | assets/data/amm.json | exported, UI basic |
+| data/procedures.ts | 406 | sim/Procedures.kt | done |
+| lib/sim/types.ts | 992 | sim/SimTypes.kt (GENERATED) | done (generated) |
+| lib/sim/initial.ts | 487 | sim/SimTypes.kt → initialSimState() (GENERATED) | done (generated) |
+| lib/sim/derive.ts | 2917 | sim/*Derive.kt (one object per section, writes into Derived) | electrical (ElectricalDerive.kt) + services (ServicesDerive.kt) ported + parity-tested; ~lines 200–260 and later not started |
+| lib/sim/store.ts | 844 | sim/SimStore.kt, SimTick.kt, SimActions.kt | done (tick parity-dumped) |
+| lib/sim/lights.ts | 311 | sim/SimTypes.kt (types only, GENERATED); lightsInitial/deriveLights logic not ported | types done |
+| lib/sim/flightPhases.ts | 656 | sim/FlightPhases.kt, FlightPhaseControl.kt, FlightPhasePresets.kt, PhaseController.kt | done |
+| lib/sim/autoflight.ts | 229 | sim/Autoflight.kt | not started |
+| lib/sim/flightNavigation.ts | 314 | sim/FlightNavigation.kt | not started |
+| lib/sim/pitotStatic.ts | 686 | sim/PitotStatic.kt | not started |
+| lib/sim/audio.ts | 1406 | audio/ (SoundPool) | not started |
+| lib/sim/navData.ts, navaids-changi.ts, radionav*.ts, dmeModel.ts, adfBearing.ts, hfModel.ts, markerBeacons.ts, lrra.ts, mipLocal.ts, pedestal.ts, overheadLocal.ts, situation.ts, instrumentSources.ts, sources.ts, wxrWorld.ts, activeFlightPlan.ts, routeSequence.ts, planGuidance.ts, flightLevelCap.ts, autoPhases.ts, engineSpoolAudio.ts, markerLamps.ts, maintenanceInterlocks.ts, airportCoords.ts | ~3,000 | sim/ | not started |
+| lib/sim/liveWeather.ts | 57 | sim/LiveWeather.kt (pure: tileUrl, analyze) + platform/LiveWeatherSampler.kt (HttpURLConnection, BitmapFactory, org.json) | done (LiveWeatherTest.kt); Android part compiled only by CI |
+| routes/cockpit.tsx | 2706 | ui/cockpit/ | not started |
+| routes/index.tsx | 177 | ui/HangarScreen.kt | basic placeholder |
+| routes/flight-plan.tsx | 539 | ui/FlightPlanScreen.kt | not started |
+| routes/library.tsx, procedures.tsx, systems.$id.tsx | ~500 | ui/ | not started |
+| components/panel/*.tsx | ~30,000 | ui/panel/ | not started (see HANDOFF step 7 for order) |
+| components/aircraft/AircraftPlan.tsx | 298 | ui/AircraftPlan.kt (Canvas) | not started |
+| styles.css, tailwind | 632 | ui/theme | colors only (Theme in MainActivity) |
+
+| antiskid/autobrake (derive.ts ~813-871) | app/.../sim/AutobrakeDerive.kt | done |
+| start valves / 13th-stage bleed / annunciators (derive.ts ~870-905) | app/.../sim/StartBleedDerive.kt | done |
+| cargo fire detection / FIRE WARN (derive.ts ~906-911) | app/.../sim/CargoFireDerive.kt | done |
+| hydraulic LOW PRESS / MASTER CAUTION (derive.ts ~913-930) | app/.../sim/HydraulicCautionDerive.kt | done |
+| interlocks advisory list (derive.ts ~932-1123) | app/.../sim/InterlocksDerive.kt | done |
+| standby rudder / alt flaps / control-surface mixer / adverse yaw (derive.ts ~1125-1257) | app/.../sim/FlightControlDerive.kt | done |
+| hydraulic users list (derive.ts ~1148-1170) | app/.../sim/HydraulicUsersDerive.kt | done |
+| electrical users list (derive.ts ~1170-1200) | app/.../sim/ElectricalUsersDerive.kt | done |
+| components list + inventory (derive.ts ~1290-1410) | app/.../sim/ComponentsDerive.kt | done |
+| nose-wheel steering, brake source, wheel/decel, control authority, LE/speed-brake flags, EPR, oil, cabin temps, reservoirs (derive.ts ~1178-1262, ~1401-1403, return object ~1552-1706) | app/.../sim/ReturnFieldsDerive.kt (+ reservoir lines in HydraulicsDerive.kt) | done |
+| lighting model: DEFS table, deriveLights, lightComponents (lib/sim/lights.ts) | app/.../sim/LightsDerive.kt | done |
+| derive() return object, every key (all scalar and nested outputs) | app/.../sim/SimDerive.kt (computeAll) + sections above | done (AllReturnParityTest, 8 scenarios) |
+| step() fuel heat, drains, gen-drive oil, timers, equipment bay, oxygen, center pump, attitude (derive.ts ~1745-1905) | app/.../sim/StepPart1.kt | done |
+| step() fire pulls, wheel well, cargo, scavenge, APU, engines + oil, fuel draw, reservoirs/pressures, autobrake latches (derive.ts ~1905-2470) | app/.../sim/StepPart2.kt | done |
+| step() brakes/antiskid, rollout, wheel slip, decel, directional, gear, flaps/spoilers/LE, pack latches, cabin temps, icing, alpha vanes, service, pressurization, progressive profile (derive.ts ~2470-2895) | app/.../sim/StepPart3.kt | done |
+| step() orchestration, runway constants, controlLabel, pushLog (derive.ts ~1739-1745, ~2897-2917) | app/.../sim/StepSim.kt | done (StepParityTest 23 trajectories incl. overheat trips, RTO stop, manual gear, center-pump cutout, cabin temp on supply; StepSimTest) |
+| flightPhases.ts pure constants/helpers: PHASE_CONFIG, V_SPEEDS, FIELD_ELEV_FT, tasFromCas/casFromTas, climbPerformance, descentTargetFt (flightPhases.ts ~23-100, ~258-305) | app/.../sim/FlightPhases.kt | partial (FlightPhasesTest) |
+| flightPhases.ts controller, store, plan-to-controls patches, applyPhaseToGuidance (flightPhases.ts ~100-258, ~305-656) | not yet | blocked on store.ts, flightNavigation.ts, planGuidance.ts, navReceiver.ts |
+| planGuidance.ts (wrap, distance/bearing, lead distance, lateral command, TOD, computeGuidance) | app/.../sim/PlanGuidance.kt | done (PlanGuidanceTest) |
+| activeFlightPlan.ts types + readable validity; flightLevelCap applyFlightLevelCap | app/.../sim/ActiveFlightPlan.kt | types + pure logic done; localStorage bridge not ported |
+| flightNavigation.ts pure geometry + enrouteCompression, blendDeg, routeGuidance (flightNavigation.ts ~52-152) | app/.../sim/FlightNavigation.kt | done (FlightNavigationTest) |
+| navData.ts (AIRPORT_DATA, magVarAt, WSSS_ILS_02L, isWsssArrivalSceneId) | sim/NavData.kt | done (stale row fixed) |
+| navData.ts (AIRPORT_DATA, magVarAt, RPLL fixes/SIDs, WSSS ILS, destPoint, buildSidWaypoints, buildVectorArrival) | app/.../sim/NavData.kt | done (NavDataTest; fixes and SIDs cross-checked against TS) |
+| flightNavigation.ts route lookups (arrivalScene, departurePoint, departureRunwayHeadingMag, targetList, planRoutePoints, legStart, routeGuidance) | app/.../sim/FlightRoute.kt | done (FlightNavigatorTest) |
+| flightNavigation.ts state machine (buildState, reset, advance, live getters) | app/.../sim/FlightNavigator.kt | done (FlightNavigatorTest); persistence and events are platform hooks |
+| flightPhases.ts controller math (cruiseCasKt, slewThrottle, throttleFor, roll step, rollout, accelHold, schedule, vertical command, canStart, route length) and autoPhases.ts | app/.../sim/FlightPhaseControl.kt | done as pure functions (FlightPhaseControlTest); the stateful controller is not ported |
+| store.ts tick body (relay/protection timers, auto start, hydraulic servicing, test clock, nav advance, transition logs) | app/.../sim/SimTick.kt | done (SimStoreTest); not yet parity-dumped |
+| store.ts state holder (patch, tick, reset, clearLog, derived cache) | app/.../sim/SimStore.kt | core done; readyApu/readyForDeparture/startEngine/shutdownEngine/toggleFault/injectLandingGear*/runScenario not yet |
+| store.ts startEngine, shutdownEngine, injectLandingGearFault, clearLandingGearFault, toggleFault (+ 93 fault labels), readyApu | app/.../sim/SimActions.kt, FaultTable.kt (generated) | done (SimActionsTest) |
+| radionav.ts (angDiff, radioNav, vorDevOf, sceneGeom) | sim/RadioNav.kt | RadioNavTest.kt | Nested data class renamed RadioNavData (avoids clash with NavData object). Verified against TS. |
+| markerBeacons.ts | sim/MarkerBeacons.kt | RadioNavTest.kt | Verified line-by-line against TS. Test class should be split out (TODO). |
+| maintenanceInterlocks.ts | sim/MarkerBeacons.kt (MaintenanceInterlocks) | RadioNavTest.kt | Verified against TS. |
+| airportCoords.ts | sim/MarkerBeacons.kt (AirportCoords) | RadioNavTest.kt | Verified against TS. |
+| autoflight.ts (angDiff, AMM/TRAINER tunables, afInterlocks, afDisconnectReason, AP_DRILLS, radioLateral, stepLateral, inZoneOfConfusion, lateralLaw, stepGlide, gsGamma, glideGain, fpmToGamma, glideGamma, altAcquire, goAroundSelected, nextLight) | sim/AutoFlight.kt | AutoFlightTest.kt | Pure port; expectations hand-derived from TS, not yet parity-dumped. Light/LatSub/GsPhase are enums, AP_DRILLS a list. |
+| navaids-changi.ts catalogue (CHANGI_NAVAIDS, 54 entries) | sim/NavaidsChangi.kt (GENERATED by tools/gen-navaids.mts) | covered by AdfBearingTest lookups; table not hand-edited | Regenerate with tools/node_modules/.bin/tsx tools/gen-navaids.mts. WSSS_RUNWAYS is not yet ported (not needed by adfBearing). |
+| navaids-changi.ts helpers (findChangiNavaid, changiIlsList, changiVorList, distNm, bearingTrue) | sim/NavaidLookup.kt | AdfBearingTest | top-level functions |
+| adfBearing.ts computeAdfBearings | sim/AdfBearing.kt | AdfBearingTest | Stores replaced by parameters: nav position (readFlightNavigationState), pedestal freqs and modes (usePedestal). The caller supplies the TS `??` defaults. |
+| radionav-changi.ts computeChangiRadioNav, pedestalFreqToMHz | sim/RadioNavChangi.kt | RadioNavChangiTest.kt | Keeps this file's own angDiff formula. Re-exports and WSSS_RUNWAYS are not ported. The Changi ILS course/GS checks are hand-derived, not parity-dumped. |
+| dmeModel.ts (slantRangeNm, stepDmeChannel, IDLE_DME, DmeMode) | sim/DmeModel.kt | DmeModelTest.kt | DmeMode is an Int (0 STBY, 1 NORM, 2 ORIDE). JS Math.round is emulated with floor(x+0.5). Hand-derived tests, not parity-dumped. |
+| overheadLocal.ts (state shape, defaults, set) | sim/OverheadLocal.kt | OverheadLocalTest.kt | Zustand store becomes a holder with a transform-based set. The TS has no logic beyond defaults. Enums carry the TS labels. |
+| hfModel.ts (hfUsability, stepHfChannel, IDLE_HF, HfMode) | sim/HfModel.kt | HfModelTest.kt | HfMode is an Int (0 OFF, 1 USB, 2 AM). Hand-derived tests, not parity-dumped. |
+| lrra.ts (resolveLrra, LrraChannel) | sim/Lrra.kt | LrraTest.kt | Dual radio altimeter: antenna offset, dual-channel bias, rate blank, self-test. Hand-derived tests, not parity-dumped. |
+| wxrWorld.ts pure parts (WX_CELLS, WX_COAST, WX_CITIES, beamFactor, intensityFromRgb, turbulenceFromIntensity) | sim/WxrWorld.kt | WxrWorldTest.kt | beamFactor keeps the TS 6076 ft/nm constant. |
+| wxrWorld.ts stores (useWxrNav, useLiveWx, setLiveWeather) | sim/WxrWorld.kt (WxrNavHolder, LiveWxHolder) | WxrWorldTest.kt | Holders for the Android layer to wrap. Initial WxrNav comes from RadioNav.NAV_START_*. |
+| sources.ts (SrcFail, NO_SRC_FAIL, sourcesOf) | sim/Sources.kt | SourcesTest.kt | Selector ints: NAV/COMPASS 0/1/2, GYRO 0/1/2. |
+| instrumentSources.ts (stepErect, resolveInstrumentSources, gyro/compass/radio power) | sim/InstrumentSources.kt | InstrumentSourcesTest.kt | The TS erect timer sentinels are kept (negative = erected). The TS `ensure` helper for legacy partial memory objects is a no-op in typed Kotlin and is not ported. |
+| mipLocal.ts (MipStore state and defaults, afPanelOwned mirror subscriber) | sim/MipLocal.kt | MipLocalTest.kt | Zustand store becomes a data class with TS defaults plus a Holder. The subscriber becomes the pure afPanelOwnedMirror. navTuned is a String ("VOR" or "ILS"). |
+| situation.ts (Situation snapshot, trail rule, explain text, throttled publisher) | sim/Situation.kt | SituationTest.kt | Zustand store becomes SituationHolder; publishSituation takes nowMs. JS toFixed uses Java HALF_UP formatting on the exact value. |
+| routeSequence.ts (RPLL_WSSS_SEQUENCE, findNextSequenceItem, buildPlanSequence) | sim/RouteSequence.kt | RouteSequenceTest.kt | Uses NavaidLookup distNm. kind is a String ("VOR", "ILS", "NDB"). |
+| pitotStatic.ts (atmosphere, altitude/CAS/Mach helpers, pitotIced, vmoMmoLimitKt, flightStateActive, probes, alternate static, CADC, computeAirData incl. architecture/downstream/maintenance) | sim/PitotStatic.kt | PitotStaticTest.kt | Input is the typed SimState. Legacy alias keys (air.*, flight.*, captPitotStatic.*, standby.*, bare altFt/iasKt/vsiFpm and similar) are dropped because they never exist on SimState. The Mach warning threshold is the constant 0.84 (the TS override key never exists). |
+| engineSpoolAudio.ts (RotorTune, N1/N2 tunings, JET taus, AcousticSpool, newAcousticSpool, thrustFromN1, stepAcousticSpool) | sim/EngineSpoolAudio.kt | EngineSpoolAudioTest.kt | Pure maths, direct port. |
+| audio.ts `extras()` event logic and `rate()` (gear, flaps/LE, spoilers, APU door, hydraulics, touchdown/rollout/brakes, reversers, relays, start valves, fire handles, bottles, sign chimes, ambience, warning-loop wants) | sim/AudioEvents.kt | AudioEventsTest.kt | Pure: returns Frame(events, levels, loops). No WebAudio. Random pans for joint thumps are injected. Sample-vs-synth choice for the horn/wailer/shaker/GPWS/glideslope loops is left to the Android layer, which should act only on changes. Not yet ported: the tick() ignition clicks, light-off, fire bell timing, and the engine voice update (tickEngines). |
+| audio.ts `tick()` and `tickEngines()` scheduling (ignition clicks, light-off trigger, fire-bell strike schedule, sample-loop wants, engine snap on switch-on) | sim/AudioTicker.kt | AudioTickerTest.kt | Pure. Caller runs tick every 100 ms and tickEngines every 90 ms, passing audio-clock seconds and a `ready` flag (enabled, context running). Synthesis of click, lightOff, bell modes and the other voices is left to the Android layer. |
+| navaids-changi.ts WSSS_RUNWAYS (six Changi runway thresholds, displaced 20R) | sim/WsssRunways.kt | WsssRunwaysTest.kt | Uses NavData.dms. Re-export from radionav-changi.ts is covered by the same object. |
+| pedestal.ts (PedestalStore state, TS defaults, setCdu, reset) | sim/Pedestal.kt | PedestalTest.kt | zustand store becomes PedestalState data class plus Holder (set transform, setCdu(left), reset). Union strings become enums (FireTest, OvhtDet, CargoDet, XpdrMode, TcasMode, WxrMode, MicMask, ExtTest; ExtTest ONE/OFF/TWO maps to "1"/"OFF"/"2"). Record maps become Map. Select pairs use Pair. |
+| flightPhases.ts groundReadyPatch, parkAtDeparture sim patch, PLAN NAV arming MIP patch (inside loadPlanIntoControls / parkAtDeparture) | sim/FlightPhasePresets.kt | FlightPhasePresetsTest.kt | Returns maps for the stateful layer to apply to the sim and MIP holders. The stateful functions that call them (loadPlanIntoControls, parkAtDeparture, controllerTick, mirrorToControls, startPhase, timers) are not ported yet. |
+| flightPhases.ts stateful controller (usePhase store, loadPlanIntoControls, parkAtDeparture, controllerTick, touchdown, rollout, mirrorToControls, canStart, startPhase, resetFlightPhases) | sim/PhaseController.kt | PhaseControllerTest.kt | Talks to the sim, MIP and pedestal holders through PhaseWorld (key-based maps, same keys as the web patches; dotted reads like "att.hdg"). The platform calls tick(nowSec) every 200 ms while running. Ground-roll lift-off keeps gear DN, as the web does; gear goes up on the next airborne tick. |
+| navReceiver.ts (resolveNavReceiver, tuneNav1/tuneNav2, syncMipNavFromPedestal) and radionav.ts TRAINING_NAV_STATIONS | sim/NavReceiver.kt | NavReceiverTest.kt | Returns patches for the holders instead of writing stores. |
+| components/panel/FlightModeControl.tsx flightModePatch | sim/FlightModes.kt | FlightModesTest.kt | Map patch for the airborne preset. |
+| data/procedures.ts (10 procedures, 40 steps, done predicates) | sim/Procedures.kt | ProceduresTest.kt | Predicates take (SimState, Derived); caller computes Derived once with SimDerive.computeAll. Text copied verbatim. |
+| store.ts tick() (parity-dumped against the real web store) | sim/SimTick.kt | TickParityTest.kt (generated from tools/parity/tick.json) | Tick parity: 23 trajectory scenarios, 555 fields, all match the web store. Generated by tools/parity/dump-tick.mts and gen-tick-test.mts. |
+
+| parity: radionav, lrra, dmeModel, autoflight, markerBeacons, routeSequence, situation.explain, pitotStatic (computeAirData, helpers), flightNavigation.advance, flightPhases (load, canStart, controllerTick replay), Situation publisher | tools/parity/fn/* → app/src/test/.../*WebParityTest.kt | done | generated; do not hand-edit. SimPhaseWorld adapter (sim/SimPhaseWorld.kt), unit-tested and end-to-end checked against the web takeoff run (PhaseE2EWebParityTest). |
+
+| `flightPhases.ts` tick (long run) | `PhaseController.kt` `tick` | Fixed: `applyPhaseToGuidance` uses the live phase after the auto-descent switch. Covered by `PhaseLongE2EWebParityTest` (5000 ticks, takeoff → approach). |
+
+| audio.ts sample loops (SAMPLE_PATHS, mkSampleLoop, ensureSampleLoops) | platform/SamplePlayer.kt (MediaPlayer, asset files) | none (Android-only) | Acts on changes only. Looping MediaPlayer, not the web's crossfade: a seam may click on some devices. Not compiled in the sandbox. |
+| flightPhases.ts controller timer (startController / stopController, 200 ms) | platform/PhaseTimer.kt | none (Android-only) | Coroutine loop calls PhaseController.tick. Not compiled in the sandbox. |
+| markerLamps.ts useMarkerKeyed | sim/MarkerLamps.kt (pure rule) + platform/MarkerLampTimer.kt (40 ms refresh) | MarkerLampsTest.kt | Rule tested; timer not compiled in the sandbox. |
+
+| routes/cockpit.tsx (phase, hint, readouts, phase buttons only) | sim/CockpitReadout.kt (pure) + ui/cockpit/CockpitModel.kt (sim ticker, controller) + ui/cockpit/CockpitScreen.kt | CockpitReadoutTest.kt | First cockpit slice. Not yet: the 2,700-line cockpit route, the panels, flight-plan activation UI, live weather wiring, sound. |
+
+| routes/flight-plan.tsx (core fields, save, activate) | sim/FlightPlanDraft.kt (pure, defaults and activeFrom) + platform/PlanStore.kt (SharedPreferences) + ui/flightplan/FlightPlanScreen.kt + CockpitModel.activate (publishAndArm) | FlightPlanDraftTest.kt | Partial. Not yet: waypoints, the map picker (NavaidStationPicker), SID / STAR / approach selection, vectored ILS arrival, ILS choice, reserve fuel, top-of-climb / descent points. |
+
+| flight-plan.tsx vectorArrivalFor / arrival setter (vectored ILS 02L) | sim/FlightPlanDraft.kt (withVectoredArrival) + NavData.buildVectorArrival + ui/flightplan/FlightPlanScreen.kt | FlightPlanDraftTest.kt | Done for the arrival, and verified through LAND and ROLLOUT by PhaseLongE2EWebParityTest (8000 ticks). Waypoints from the departure airport when the plan has no fixes. Not yet: the ILS station choice (setIls, icwIls), the Manila–Singapore preset. |
+
+| components/panel/SixPack.tsx (data part: attitude source, clamps, yaw rate, unpowered blanking) | sim/SixPackData.kt + ui/cockpit/SixPackView.kt (attitude ball, readouts) | SixPackDataTest.kt | Data verified by tests. The dials are a first pass: roll sign and the 5 px/deg pitch scale still need checking against the web SVG. Not yet: the tape and dial graphics. |
+
+| useAttitude kinematic core (MainInstrumentPanel.tsx: step, pitch and roll approach, heading from bank) | sim/AttitudeKinematics.kt | AttitudeKinematicsTest.kt | Hand-computed tests only, not a web parity harness. Targets come in as inputs; the orchestration (autopilot modes, radio-nav and flight-director logic, the attitude-target choice) is not yet ported. |
+
+| useAttitude attitude targets and dyn flight-path branch (MainInstrumentPanel.tsx) | sim/AttitudeTargets.kt | AttitudeTargetsTest.kt | Pure: the caller passes in the lateral law, altitude-capture and glide-capture results (already ported in AutoFlight.kt) plus the heading errors. Hand-computed tests, not a web parity harness. |
+
+| useAttitude flight-director V-pointer commands (MainInstrumentPanel.tsx) | sim/FlightDirector.kt (uses AutoFlight.radioLateral, gsGamma, FD_LIMIT_BANK / FD_LIMIT_PITCH) | FlightDirectorTest.kt | Pure. Quantisation uses JS Math.round semantics (half up). Hand-computed tests, not a web parity harness. The caller computes the change-detection writes to the MIP. |
+| useAttitude autopilot mode gating (MainInstrumentPanel.tsx ~986–1033: ga, ailOn/elevOn, turb, CWS detents, navHeld, HDG SEL / NAV / ALT HOLD drop-outs, disconnect, FD glide capture) | sim/AutopilotModes.kt (uses AutoFlight.goAroundSelected) | AutopilotModesTest.kt | Pure. The interlocks result, the glide-slope step and the navigation solution come in as inputs. Hand-computed tests, not a web parity harness. The caller writes the MIP updates and the A/P disconnect text. |
+| useAttitude PLAN NAV gating (MainInstrumentPanel.tsx ~1034–1060: planLat, planVert, altSel, altAp override, planNavStatus) | sim/PlanNav.kt | PlanNavTest.kt | Pure. Lateral and vertical helpers (lateralLaw, altAcquire, glideGamma) are already in AutoFlight.kt. The ILS handoff is ported as IlsHandoff.kt. |
+| useAttitude ILS handoff (MainInstrumentPanel.tsx ~1047–1059: NAV 1/2 tune, course, FD AUTO APP, AP APP/LOC) | sim/IlsHandoff.kt (uses NavReceiver.tuneNav1 / tuneNav2) | IlsHandoffTest.kt | Pure. Returns the writes; the caller applies them to MIP and pedestal. |
+| useAttitude output step (MainInstrumentPanel.tsx ~1118–1145: dyn altitude / vsNow publish, attitude write gate) | sim/AttitudeOutputs.kt | AttitudeOutputsTest.kt | Pure. The caller applies psFlight* to SimStore, calls advanceFlightNavigation, and writes MIP att only when shouldWriteAttitude is true. |
+| useAttitude per-tick composition (MainInstrumentPanel.tsx ~1064–1145: targets → integrate → altitude → FD → write gate) | sim/AttitudeHook.kt | AttitudeHookTest.kt | Pure. Composes AttitudeTargets, AttitudeKinematics, AttitudeOutputs and FlightDirector in web order. Upstream inputs (autopilot, plan, radio) are supplied by the caller. Hand-computed tests, no web parity yet. |
+| flight-plan.tsx Plan fields and activeFrom procedures (sid, enrouteRoute, star, approach, procedureStatus; draft-only reserveFuelLb, cruiseTopOfClimbNm, descentStartNm, approachAltitudeFt, routeText) | sim/FlightPlanDraft.kt | FlightPlanDraftTest.kt | Procedures are carried into the active plan as the web activeFrom does. Not yet ported: destinationKind/lat/lon and the timeCompression editor. The ILS choice is in FlightPlanIls.kt. |
+| flight-plan.tsx loadManilaSingaporePreset (RWY 24 VERDE2B, VCT vectors to WSSS 02L) | sim/FlightPlanPresets.kt | FlightPlanPresetsTest.kt | Pure: returns the draft; the caller decides whether to publish. Sets the ICW 02L approach ILS as the web does. |
+| flight-plan.tsx ILS choice (ilsFromNavaid, isIlsNavaid, icwIls, setIls, clearIls) | sim/FlightPlanIls.kt (uses NavaidsChangi catalog) | FlightPlanIlsTest.kt | Pure. Vector fixes are dropped by their VCT- id, because the web keys them by source "vector", which the Kotlin waypoint does not carry. |
+| ApproachProgress.tsx (VOR/LOC and GLIDE SLOPE lamps, press to test) | sim/ApproachProgressLamps.kt (state logic), ui/cockpit/ApproachProgressView.kt (Compose) | ApproachProgressLampsTest.kt | Lamp state is pure and tested. The Compose view is not compiled locally and its colours match the web; verify on CI. |
+| Fold.tsx (collapsible Training Console group) | ui/common/Fold.kt (Compose) | none (UI only) | Compose only. Not compiled locally; verify on CI. |
+| ApTrainerView.tsx (layout math: area scroll centring, opening area, zoom levels) | sim/ApTrainerLayout.kt | ApTrainerLayoutTest.kt | Pure math only. The view itself wraps the full instrument Panel, which is not ported yet. |
+| audio.ts synthesis primitives (biquad filters with Web Audio coefficients, oscillators, deterministic noise, linear-ramp gain envelopes) | sim/AudioDsp.kt | AudioDspTest.kt | Software-mixer design (default decision, not yet confirmed by the user). The per-sound builders (build/buildFx: clicks, bells, whooshes, engine and APU voices) are not ported yet. |
+| audio.ts click (switch click, bandpass 3200 Hz, exponential envelope) and the mixer pieces (exponential ramps, equal-power pan, stereo mixer) | sim/AudioSounds.kt, sim/AudioDsp.kt (ExpEnvelope, equalPowerPan, StereoMixer) | AudioSoundsTest.kt | The first sound builder. The other builders (bells, whooshes, thumps, engine and APU voices) are still to port. The playSwitchClick throttle (35 ms) and per-click pitch randomness are not ported yet. |
+| audio.ts toneBurst, noiseBurst, env, thump, clunk | sim/AudioSounds.kt (toneBurst, noiseBurst, sum, thump, clunk) | AudioBurstsTest.kt | Mono renders; the pan and gain are applied by the mixer. Not yet ported: lockThunk, tyreChirp, wheelSpinDown, whoosh, bell, chime, the loop builders and the engine and APU voices. |
+| audio.ts whoosh, wheelSpinDown, tyreChirp, lockThunk (swept filter via Biquad.retune) | sim/AudioSounds.kt, sim/AudioDsp.kt (Biquad.retune) | AudioSweepsTest.kt | Mono renders. Not yet ported: bell, chime, the loop builders (shaker, clack), and the engine and APU voices. |
+| audio.ts bell (one fire-bell strike: six partials, clapper click, knock), bell pan, chime | sim/AudioSounds.kt (bell, bellPan, chime) | AudioBellTest.kt | Mono renders. The strike's random detune and level are caller parameters here (the web draws them with Math.random). Not yet ported: the loop builders (shaker, clack) and the engine and APU voices. |
+| audio.ts loopBuffer, shakerLoop, clackLoop | sim/AudioSounds.kt | AudioLoopsTest.kt | One-second loops, peak-normalised. Random draws use a seeded noise source (the web uses Math.random), so the exact texture differs from the web but the structure matches. Not yet ported: the engine and APU voices and the sample loops. |
+

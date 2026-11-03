@@ -1,0 +1,132 @@
+{
+ "fields": [
+  "cargoFwdFireWarn",
+  "cargoAftFireWarn",
+  "fireWarn"
+ ],
+ "scenarios": [
+  {
+   "name": "cargo_not_installed_fire_ignored",
+   "ov": {
+    "battery": true,
+    "cargoFwdFire": true
+   },
+   "expected": {
+    "cargoFwdFireWarn": true,
+    "cargoAftFireWarn": false,
+    "fireWarn": true
+   }
+  },
+  {
+   "name": "installed_loop_a_only_no_fire",
+   "ov": {
+    "battery": true,
+    "cargoFireInstalled": true,
+    "cargoLoopA": true
+   },
+   "expected": {
+    "cargoFwdFireWarn": false,
+    "cargoAftFireWarn": false,
+    "fireWarn": false
+   }
+  },
+  {
+   "name": "both_loops_fwd_level_above_035",
+   "ov": {
+    "battery": true,
+    "cargoFireInstalled": true,
+    "cargoLoopA": true,
+    "cargoLoopB": true,
+    "cargoFwdLevel": 0.4
+   },
+   "expected": {
+    "cargoFwdFireWarn": true,
+    "cargoAftFireWarn": false,
+    "fireWarn": true
+   }
+  },
+  {
+   "name": "single_loop_fwd_level_040_no_warn",
+   "ov": {
+    "battery": true,
+    "cargoFireInstalled": true,
+    "cargoLoopA": true,
+    "cargoFwdLevel": 0.4
+   },
+   "expected": {
+    "cargoFwdFireWarn": true,
+    "cargoAftFireWarn": false,
+    "fireWarn": true
+   }
+  },
+  {
+   "name": "single_loop_fwd_level_070_warn",
+   "ov": {
+    "battery": true,
+    "cargoFireInstalled": true,
+    "cargoLoopB": true,
+    "cargoFwdLevel": 0.7
+   },
+   "expected": {
+    "cargoFwdFireWarn": true,
+    "cargoAftFireWarn": false,
+    "fireWarn": true
+   }
+  },
+  {
+   "name": "aft_fire_both_loops",
+   "ov": {
+    "battery": true,
+    "cargoFireInstalled": true,
+    "cargoLoopA": true,
+    "cargoLoopB": true,
+    "cargoAftFire": true
+   },
+   "expected": {
+    "cargoFwdFireWarn": false,
+    "cargoAftFireWarn": true,
+    "fireWarn": true
+   }
+  },
+  {
+   "name": "installed_no_loops_fire_ignored",
+   "ov": {
+    "battery": true,
+    "cargoFireInstalled": true,
+    "cargoFwdFire": true
+   },
+   "expected": {
+    "cargoFwdFireWarn": true,
+    "cargoAftFireWarn": false,
+    "fireWarn": true
+   }
+  },
+  {
+   "name": "cargo_fire_no_dc_power_dark",
+   "ov": {
+    "cargoFireInstalled": true,
+    "cargoLoopA": true,
+    "cargoFwdFire": true
+   },
+   "expected": {
+    "cargoFwdFireWarn": false,
+    "cargoAftFireWarn": false,
+    "fireWarn": false
+   }
+  },
+  {
+   "name": "engine1_fire_drives_fire_warn",
+   "ov": {
+    "battery": true,
+    "faults": {
+     "engineFire1": true
+    }
+   },
+   "expected": {
+    "cargoFwdFireWarn": false,
+    "cargoAftFireWarn": false,
+    "fireWarn": true
+   }
+  }
+ ]
+}

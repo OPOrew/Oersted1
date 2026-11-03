@@ -1,0 +1,111 @@
+{
+ "fields": [
+  "hydraulicUsers"
+ ],
+ "scenarios": [
+  {
+   "name": "all_quiet_no_hydraulics",
+   "ov": {
+    "battery": true
+   },
+   "expected": {
+    "hydraulicUsers": "ailerons|Ailerons|false|false|false|false|MECH REVERSION\nelevators|Elevators|false|false|false|false|MECH REVERSION\nrudder|Rudder|false|false|false|false|NONE\nle-devices|LE devices|false|false|false|false|NONE\nte-flaps|TE flaps|false|false|false|false|NONE\nthrust-reversers|Thrust reversers|false|false|false|false|NONE\ninboard-flight-spoilers|Flight spoilers 3 / 6 (System A)|false|false|false|false|NONE\noutboard-flight-spoilers|Flight spoilers 2 / 7 (System B)|false|false|false|false|NONE\nground-spoilers|Ground spoilers|false|false|false|false|NONE\nlanding-gear|Landing gear|false|false|false|false|NONE\nnose-wheel-steering|Nose-wheel steering|false|false|false|false|NONE\ninboard-brakes|Inboard brakes|false|false|false|false|NONE\noutboard-brakes|Outboard brakes|false|false|false|false|NONE"
+   }
+  },
+  {
+   "name": "system_a_only",
+   "ov": {
+    "battery": true,
+    "hydAPress": 3000,
+    "spoilerA": true,
+    "spoilerB": true
+   },
+   "expected": {
+    "hydraulicUsers": "ailerons|Ailerons|false|false|false|false|MECH REVERSION\nelevators|Elevators|false|false|false|false|MECH REVERSION\nrudder|Rudder|false|false|false|false|NONE\nle-devices|LE devices|false|false|false|false|NONE\nte-flaps|TE flaps|false|false|false|false|NONE\nthrust-reversers|Thrust reversers|false|false|false|false|NONE\ninboard-flight-spoilers|Flight spoilers 3 / 6 (System A)|false|false|false|false|NONE\noutboard-flight-spoilers|Flight spoilers 2 / 7 (System B)|false|false|false|false|NONE\nground-spoilers|Ground spoilers|false|false|false|false|NONE\nlanding-gear|Landing gear|false|false|false|false|NONE\nnose-wheel-steering|Nose-wheel steering|false|false|false|false|NONE\ninboard-brakes|Inboard brakes|false|false|false|false|NONE\noutboard-brakes|Outboard brakes|false|false|false|false|NONE"
+   }
+  },
+  {
+   "name": "system_b_only",
+   "ov": {
+    "battery": true,
+    "hydBPress": 3000,
+    "spoilerA": true,
+    "spoilerB": true
+   },
+   "expected": {
+    "hydraulicUsers": "ailerons|Ailerons|false|false|false|false|MECH REVERSION\nelevators|Elevators|false|false|false|false|MECH REVERSION\nrudder|Rudder|false|false|false|false|NONE\nle-devices|LE devices|false|false|false|false|NONE\nte-flaps|TE flaps|false|false|false|false|NONE\nthrust-reversers|Thrust reversers|false|false|false|false|NONE\ninboard-flight-spoilers|Flight spoilers 3 / 6 (System A)|false|false|false|false|NONE\noutboard-flight-spoilers|Flight spoilers 2 / 7 (System B)|false|false|false|false|NONE\nground-spoilers|Ground spoilers|false|false|false|false|NONE\nlanding-gear|Landing gear|false|false|false|false|NONE\nnose-wheel-steering|Nose-wheel steering|false|false|false|false|NONE\ninboard-brakes|Inboard brakes|false|false|false|false|NONE\noutboard-brakes|Outboard brakes|false|false|false|false|NONE"
+   }
+  },
+  {
+   "name": "both_systems_pressurised",
+   "ov": {
+    "battery": true,
+    "hydAPress": 3000,
+    "hydBPress": 3000,
+    "spoilerA": true,
+    "spoilerB": true
+   },
+   "expected": {
+    "hydraulicUsers": "ailerons|Ailerons|false|false|false|false|MECH REVERSION\nelevators|Elevators|false|false|false|false|MECH REVERSION\nrudder|Rudder|false|false|false|false|NONE\nle-devices|LE devices|false|false|false|false|NONE\nte-flaps|TE flaps|false|false|false|false|NONE\nthrust-reversers|Thrust reversers|false|false|false|false|NONE\ninboard-flight-spoilers|Flight spoilers 3 / 6 (System A)|false|false|false|false|NONE\noutboard-flight-spoilers|Flight spoilers 2 / 7 (System B)|false|false|false|false|NONE\nground-spoilers|Ground spoilers|false|false|false|false|NONE\nlanding-gear|Landing gear|false|false|false|false|NONE\nnose-wheel-steering|Nose-wheel steering|false|false|false|false|NONE\ninboard-brakes|Inboard brakes|false|false|false|false|NONE\noutboard-brakes|Outboard brakes|false|false|false|false|NONE"
+   }
+  },
+  {
+   "name": "both_low_stby_auto",
+   "ov": {
+    "battery": true,
+    "stbyHyd": "AUTO",
+    "hydAPress": 1000,
+    "hydBPress": 1000,
+    "hydSQty": 10
+   },
+   "expected": {
+    "hydraulicUsers": "ailerons|Ailerons|false|false|false|false|MECH REVERSION\nelevators|Elevators|false|false|false|false|MECH REVERSION\nrudder|Rudder|false|false|true|false|STBY ACTUATOR\nle-devices|LE devices|false|false|false|false|NONE\nte-flaps|TE flaps|false|false|false|false|NONE\nthrust-reversers|Thrust reversers|false|false|false|false|NONE\ninboard-flight-spoilers|Flight spoilers 3 / 6 (System A)|false|false|false|false|NONE\noutboard-flight-spoilers|Flight spoilers 2 / 7 (System B)|false|false|false|false|NONE\nground-spoilers|Ground spoilers|false|false|false|false|NONE\nlanding-gear|Landing gear|false|false|false|false|NONE\nnose-wheel-steering|Nose-wheel steering|false|false|false|false|NONE\ninboard-brakes|Inboard brakes|false|false|false|false|NONE\noutboard-brakes|Outboard brakes|false|false|false|false|NONE"
+   }
+  },
+  {
+   "name": "ground_spoilers_wow_speedbrake_up",
+   "ov": {
+    "battery": true,
+    "hydAPress": 3000,
+    "spoilerA": true,
+    "spoilerB": true,
+    "wow": true,
+    "speedBrake": "UP"
+   },
+   "expected": {
+    "hydraulicUsers": "ailerons|Ailerons|false|false|false|false|MECH REVERSION\nelevators|Elevators|false|false|false|false|MECH REVERSION\nrudder|Rudder|false|false|false|false|NONE\nle-devices|LE devices|false|false|false|false|NONE\nte-flaps|TE flaps|false|false|false|false|NONE\nthrust-reversers|Thrust reversers|false|false|false|false|NONE\ninboard-flight-spoilers|Flight spoilers 3 / 6 (System A)|false|false|false|false|NONE\noutboard-flight-spoilers|Flight spoilers 2 / 7 (System B)|false|false|false|false|NONE\nground-spoilers|Ground spoilers|false|false|false|false|NONE\nlanding-gear|Landing gear|false|false|false|false|NONE\nnose-wheel-steering|Nose-wheel steering|false|false|false|false|NONE\ninboard-brakes|Inboard brakes|false|false|false|false|NONE\noutboard-brakes|Outboard brakes|false|false|false|false|NONE"
+   }
+  },
+  {
+   "name": "alt_flaps_takeover_dn",
+   "ov": {
+    "battery": true,
+    "hydAPress": 3000,
+    "lever1": true,
+    "n2_1": 60,
+    "gen1": true,
+    "altFlapsArm": true,
+    "altFlapsControl": "DN",
+    "flapPos": 10,
+    "hydSQty": 10
+   },
+   "expected": {
+    "hydraulicUsers": "ailerons|Ailerons|false|false|false|false|MECH REVERSION\nelevators|Elevators|false|false|false|false|MECH REVERSION\nrudder|Rudder|false|false|false|false|NONE\nle-devices|LE devices|false|false|true|false|STBY\nte-flaps|TE flaps|false|false|false|true|FPU ELEC\nthrust-reversers|Thrust reversers|false|false|false|false|NONE\ninboard-flight-spoilers|Flight spoilers 3 / 6 (System A)|false|false|false|false|NONE\noutboard-flight-spoilers|Flight spoilers 2 / 7 (System B)|false|false|false|false|NONE\nground-spoilers|Ground spoilers|false|false|false|false|NONE\nlanding-gear|Landing gear|false|false|false|false|NONE\nnose-wheel-steering|Nose-wheel steering|false|false|false|false|NONE\ninboard-brakes|Inboard brakes|false|false|false|false|NONE\noutboard-brakes|Outboard brakes|false|false|false|false|NONE"
+   }
+  },
+  {
+   "name": "gear_up_hyd_a_only",
+   "ov": {
+    "battery": true,
+    "hydAPress": 3000,
+    "gear": "UP"
+   },
+   "expected": {
+    "hydraulicUsers": "ailerons|Ailerons|false|false|false|false|MECH REVERSION\nelevators|Elevators|false|false|false|false|MECH REVERSION\nrudder|Rudder|false|false|false|false|NONE\nle-devices|LE devices|false|false|false|false|NONE\nte-flaps|TE flaps|false|false|false|false|NONE\nthrust-reversers|Thrust reversers|false|false|false|false|NONE\ninboard-flight-spoilers|Flight spoilers 3 / 6 (System A)|false|false|false|false|NONE\noutboard-flight-spoilers|Flight spoilers 2 / 7 (System B)|false|false|false|false|NONE\nground-spoilers|Ground spoilers|false|false|false|false|NONE\nlanding-gear|Landing gear|false|false|false|false|NONE\nnose-wheel-steering|Nose-wheel steering|false|false|false|false|NONE\ninboard-brakes|Inboard brakes|false|false|false|false|NONE\noutboard-brakes|Outboard brakes|false|false|false|false|NONE"
+   }
+  }
+ ],
+ "expr": {
+  "hydraulicUsers": "d.hydraulicUsers.joinToString(\"\\n\") { listOf(it.id, it.label, it.systemA, it.systemB, it.standby, it.electricAlternate, it.activeSource).joinToString(\"|\") }"
+ }
+}

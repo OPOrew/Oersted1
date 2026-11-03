@@ -1,0 +1,267 @@
+{
+ "fields": [
+  "interlocks",
+  "apuLowOil",
+  "generator1ProtectionTripped",
+  "generator2ProtectionTripped"
+ ],
+ "scenarios": [
+  {
+   "name": "quiet_default",
+   "ov": {
+    "battery": true
+   },
+   "expected": {
+    "interlocks": "",
+    "apuLowOil": false,
+    "generator1ProtectionTripped": false,
+    "generator2ProtectionTripped": false
+   }
+  },
+  {
+   "name": "apu_low_oil_light_running",
+   "ov": {
+    "battery": true,
+    "apuMaster": "ON",
+    "apuLowOilLightOn": true
+   },
+   "expected": {
+    "interlocks": "apu-low-oil|APU LOW OIL PRESSURE — normal during start until oil pressure reaches 55 psi; abnormal if it remains low at service speed.|caution\napu-fuel|Inlet door waits on the fuel shutoff valve. Valve must reach full open first.|info",
+    "apuLowOil": true,
+    "generator1ProtectionTripped": false,
+    "generator2ProtectionTripped": false
+   }
+  },
+  {
+   "name": "apu_door_start_lockout",
+   "ov": {
+    "battery": true,
+    "apuMaster": "START",
+    "apuDoor": 0.5
+   },
+   "expected": {
+    "interlocks": "apu-low-oil|APU LOW OIL PRESSURE — normal during start until oil pressure reaches 55 psi; abnormal if it remains low at service speed.|caution\napu-door|Starter lockout relay held — APU inlet door is not fully open.|caution",
+    "apuLowOil": true,
+    "generator1ProtectionTripped": false,
+    "generator2ProtectionTripped": false
+   }
+  },
+  {
+   "name": "apu_fuel_valve_wait",
+   "ov": {
+    "battery": true,
+    "apuMaster": "ON",
+    "apuFuelValve": 0.5,
+    "apuDoor": 0
+   },
+   "expected": {
+    "interlocks": "apu-low-oil|APU LOW OIL PRESSURE — normal during start until oil pressure reaches 55 psi; abnormal if it remains low at service speed.|caution\napu-fuel|Inlet door waits on the fuel shutoff valve. Valve must reach full open first.|info",
+    "apuLowOil": true,
+    "generator1ProtectionTripped": false,
+    "generator2ProtectionTripped": false
+   }
+  },
+  {
+   "name": "start_air_low_duct_grd",
+   "ov": {
+    "battery": true,
+    "start1": "GRD"
+   },
+   "expected": {
+    "interlocks": "start-air|Pneumatic starter needs ≥ 30 psi at the starter. Use APU bleed, the ground pneumatic source, an engine bleed, or cross-bleed as applicable.|caution",
+    "apuLowOil": false,
+    "generator1ProtectionTripped": false,
+    "generator2ProtectionTripped": false
+   }
+  },
+  {
+   "name": "idle_prompt_eng1_n2_window",
+   "ov": {
+    "battery": true,
+    "start1": "GRD",
+    "lever1": false,
+    "n2_1": 25
+   },
+   "expected": {
+    "interlocks": "start-air|Pneumatic starter needs ≥ 30 psi at the starter. Use APU bleed, the ground pneumatic source, an engine bleed, or cross-bleed as applicable.|caution\nidle-1|Engine 1 N2 is on starter. Move start lever to IDLE to introduce fuel and ignition.|info",
+    "apuLowOil": false,
+    "generator1ProtectionTripped": false,
+    "generator2ProtectionTripped": false
+   }
+  },
+  {
+   "name": "dual_bleed_apu_and_eng1",
+   "ov": {
+    "battery": true,
+    "apuRpm": 100,
+    "apuMaster": "ON",
+    "apuBleed": true,
+    "apuBleedValve": 1,
+    "bleed1": true,
+    "lever1": true,
+    "n2_1": 60
+   },
+   "expected": {
+    "interlocks": "apu-low-oil|APU LOW OIL PRESSURE — normal during start until oil pressure reaches 55 psi; abnormal if it remains low at service speed.|caution\napu-fuel|Inlet door waits on the fuel shutoff valve. Valve must reach full open first.|info\ndual-bleed|DUAL BLEED — APU bleed valve is open, an engine bleed valve is open, and the isolation valve is open (ATA 36 source conflict).|warn",
+    "apuLowOil": true,
+    "generator1ProtectionTripped": false,
+    "generator2ProtectionTripped": false
+   }
+  },
+  {
+   "name": "gen1_protection_latched",
+   "ov": {
+    "battery": true,
+    "gen1": true,
+    "generator1ProtectionLatched": true
+   },
+   "expected": {
+    "interlocks": "gen1-off-bus-protection|GEN 1 OFF BUS — protection trip has removed GEN 1 from its generator bus. Transfer relay can pick up Transfer Bus 1 from GEN 2 if BUS TRANSFER is AUTO.|warn\ngen1-protection|GEN 1 protection trip — abnormal generator condition persisted for 0.40 s; generator breaker/source is tripped.|warn",
+    "apuLowOil": false,
+    "generator1ProtectionTripped": true,
+    "generator2ProtectionTripped": false
+   }
+  },
+  {
+   "name": "gen2_protection_timer_over_threshold",
+   "ov": {
+    "battery": true,
+    "gen2": true,
+    "faults": {
+     "generator2OverVoltage": true
+    },
+    "generator2ProtectionTimer": 0.5
+   },
+   "expected": {
+    "interlocks": "gen2-off-bus-protection|GEN 2 OFF BUS — protection trip has removed GEN 2 from its generator bus. Transfer relay can pick up Transfer Bus 2 from GEN 1 if BUS TRANSFER is AUTO.|warn\ngen2-protection|GEN 2 protection trip — abnormal generator condition persisted for 0.40 s; generator breaker/source is tripped.|warn",
+    "apuLowOil": false,
+    "generator1ProtectionTripped": false,
+    "generator2ProtectionTripped": true
+   }
+  },
+  {
+   "name": "gear_up_hydA_low",
+   "ov": {
+    "battery": true,
+    "gear": "UP",
+    "hydAPress": 1000
+   },
+   "expected": {
+    "interlocks": "gear-hyd|Landing gear is powered by Hydraulic System A only. Pressure is too low to retract.|caution\nantiskid-gear-retract|ANTISKID DISABLED — two microswitches on the gear lever inhibit antiskid while the lever is selected UP (gear retraction).|caution",
+    "apuLowOil": false,
+    "generator1ProtectionTripped": false,
+    "generator2ProtectionTripped": false
+   }
+  },
+  {
+   "name": "rev1_inhibited_no_wow",
+   "ov": {
+    "battery": true,
+    "rev1": true
+   },
+   "expected": {
+    "interlocks": "rev1-isolation|ENGINE 1 thrust reverser inhibited — requires WOW, engine running, idle thrust lever, System A hydraulic pressure, and no fire-handle shutdown.|warn",
+    "apuLowOil": false,
+    "generator1ProtectionTripped": false,
+    "generator2ProtectionTripped": false
+   }
+  },
+  {
+   "name": "fault_bundle_hydA_pack_tr1_antiskid",
+   "ov": {
+    "battery": true,
+    "faults": {
+     "hydALeak": true,
+     "packOverheatR": true,
+     "tr1Failure": true,
+     "antiskidInop": true
+    }
+   },
+   "expected": {
+    "interlocks": "hyd-leak|Fault injected: System A leak. Standby pump can cover rudder / LE flaps.|warn\npack-oh-r|Fault injected: R pack overheat. PACK TRIP OFF — mix valve drives full cold.|warn\ntr1-fail|TR 1 failure injected — DC Bus 1 relies on TR 3 backup from Generator Bus 2 when that AC input is available.|warn\nantiskid-fail|ANTISKID fault injected — automatic braking is inhibited while the fault is present.|warn",
+    "apuLowOil": false,
+    "generator1ProtectionTripped": false,
+    "generator2ProtectionTripped": false
+   }
+  },
+  {
+   "name": "gear_position_fault_nose",
+   "ov": {
+    "battery": true,
+    "gear": "DN",
+    "landingGearFault": "NOSE"
+   },
+   "expected": {
+    "interlocks": "gear-position-fault|Fault injected: NOSE GEAR position fault — selector DN but the affected gear is not down-and-locked.|warn",
+    "apuLowOil": false,
+    "generator1ProtectionTripped": false,
+    "generator2ProtectionTripped": false
+   }
+  },
+  {
+   "name": "autobrake_antiskid_disarm",
+   "ov": {
+    "battery": true,
+    "autobrake": 2,
+    "faults": {
+     "antiskidInop": true
+    }
+   },
+   "expected": {
+    "interlocks": "antiskid-fail|ANTISKID fault injected — automatic braking is inhibited while the fault is present.|warn\nautobrake-antiskid|AUTOBRAKE DISARM — both antiskid channels must be operative.|warn",
+    "apuLowOil": false,
+    "generator1ProtectionTripped": false,
+    "generator2ProtectionTripped": false
+   }
+  },
+  {
+   "name": "gear_lever_up_antiskid_disabled",
+   "ov": {
+    "battery": true,
+    "gear": "UP",
+    "antiskidInbd": true,
+    "antiskidOutbd": true
+   },
+   "expected": {
+    "interlocks": "gear-hyd|Landing gear is powered by Hydraulic System A only. Pressure is too low to retract.|caution\nantiskid-gear-retract|ANTISKID DISABLED — two microswitches on the gear lever inhibit antiskid while the lever is selected UP (gear retraction).|caution",
+    "apuLowOil": false,
+    "generator1ProtectionTripped": false,
+    "generator2ProtectionTripped": false
+   }
+  },
+  {
+   "name": "engine1_fire_not_pulled",
+   "ov": {
+    "battery": true,
+    "faults": {
+     "engineFire1": true
+    }
+   },
+   "expected": {
+    "interlocks": "eng1-fire|ENGINE 1 FIRE — pull the ENG 1 fire handle to shut down the engine and arm extinguishing.|warn",
+    "apuLowOil": false,
+    "generator1ProtectionTripped": false,
+    "generator2ProtectionTripped": false
+   }
+  },
+  {
+   "name": "te_flap_motor_fail_no_alt_arm",
+   "ov": {
+    "battery": true,
+    "faults": {
+     "teFlapHydMotorFail": true
+    },
+    "altFlapsArm": false
+   },
+   "expected": {
+    "interlocks": "te-flap-hyd-fail|TE flap hydraulic motor failure — normal System A drive is unavailable. Arm ALTERNATE FLAPS and use the alternate position switch for electric drive.|warn",
+    "apuLowOil": false,
+    "generator1ProtectionTripped": false,
+    "generator2ProtectionTripped": false
+   }
+  }
+ ],
+ "expr": {
+  "interlocks": "d.interlocks.joinToString(\"\\n\") { it.id + \"|\" + it.text + \"|\" + it.tone }"
+ }
+}

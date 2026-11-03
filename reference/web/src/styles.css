@@ -1,0 +1,632 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0a0c0e;
+  --color-surface: #12151a;
+  --color-panel: #181c24;
+  --color-raised: #222833;
+  --color-inset: #0e1116;
+  --color-fg: #e7e2d6;
+  --color-muted: #8d929c;
+  --color-subtle: #5c616c;
+  --color-border: #2c323d;
+  --color-line: #3a4150;
+  --color-accent: #8ba4b8;
+  --color-accent-fg: #0a0c0e;
+  --color-ok: #3dd68c;
+  --color-caution: #e0a84a;
+  --color-warn: #e24b4b;
+  --color-pneumatic: #d4a574;
+  --color-hyd-a: #5b8fd4;
+  --color-hyd-b: #3dd68c;
+  --color-hyd-s: #d4a34a;
+  --color-elec: #7ec8e3;
+  --color-fuel: #7dba6a;
+  --color-metal: #9aa3b0;
+
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Barlow Condensed", "IBM Plex Sans", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+
+  --shadow-panel: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html,
+  body,
+  #app {
+    min-height: 100%;
+    background: var(--color-bg);
+    color: var(--color-fg);
+  }
+
+  body {
+    font-family: var(--font-sans);
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+@keyframes hydraulic-fluid-horizontal {
+  from { background-position: 0 0; }
+  to { background-position: 24px 0; }
+}
+
+@keyframes hydraulic-fluid-dot {
+  0% { transform: translateX(-8px); opacity: 0; }
+  12% { opacity: 1; }
+  88% { opacity: 1; }
+  100% { transform: translateX(calc(100% + 8px)); opacity: 0; }
+}
+
+@keyframes hydraulic-fluid-return {
+  0%, 100% { transform: translateY(-2px); opacity: .65; }
+  50% { transform: translateY(3px); opacity: 1; }
+}
+
+
+.hyd-flow-arrow {
+  font-size: 13px;
+  line-height: 1;
+  text-shadow: 0 0 5px currentColor;
+}
+
+.hyd-flow-line:not(.hyd-fluid-active) .hyd-flow-arrow {
+  opacity: .65;
+}
+
+.hyd-fluid-active .hyd-flow-track {
+  background: repeating-linear-gradient(90deg, currentColor 0 7px, transparent 7px 13px);
+  animation: hydraulic-fluid-horizontal .55s linear infinite;
+  opacity: .95;
+}
+
+.hyd-user-wire.hyd-fluid-active::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, currentColor 45%, transparent 90%);
+  opacity: .08;
+  transform: translateX(-100%);
+  animation: hydraulic-fluid-horizontal 1s linear infinite;
+}
+
+.hyd-fluid-dot {
+  position: absolute;
+  left: 18%;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  margin-top: -2.5px;
+  border-radius: 999px;
+  background: currentColor;
+  box-shadow: 0 0 7px currentColor;
+  animation: hydraulic-fluid-dot 1.05s linear infinite;
+  pointer-events: none;
+}
+
+.hyd-return-arrow.hyd-fluid-active span:first-child {
+  animation: hydraulic-fluid-return .55s ease-in-out infinite;
+}
+
+@keyframes flow-dash {
+  to {
+    stroke-dashoffset: -28;
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes spool {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.flow-active {
+  stroke-dasharray: 6 10;
+  animation: flow-dash 0.75s linear infinite;
+}
+
+.glow-ok {
+  animation: pulse-glow 1.8s ease-in-out infinite;
+}
+
+.spool {
+  transform-origin: center;
+  animation: spool 0.8s linear infinite;
+}
+
+.spool-slow {
+  transform-origin: center;
+  animation: spool 2.4s linear infinite;
+}
+
+@keyframes wheel-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Light-mode palette: keeps the simulator controls and hydraulic color coding intact
+   while changing the application chrome to a bright technical/training surface. */
+html.light-mode {
+  color-scheme: light;
+
+  --color-bg: #f3f5f7;
+  --color-surface: #ffffff;
+  --color-panel: #e8edf1;
+  --color-raised: #dce3e8;
+  --color-inset: #eef1f4;
+  --color-fg: #18212a;
+  --color-muted: #56616c;
+  --color-subtle: #707b86;
+  --color-border: #b9c3cc;
+  --color-line: #98a6b2;
+  --color-accent: #496b86;
+  --color-accent-fg: #ffffff;
+  --color-ok: #168653;
+  --color-caution: #9a6508;
+  --color-warn: #b32626;
+  --color-pneumatic: #95662f;
+  --color-hyd-a: #3269a8;
+  --color-hyd-b: #168653;
+  --color-hyd-s: #9a6d12;
+  --color-elec: #287e9d;
+  --color-fuel: #4e813e;
+  --color-metal: #697681;
+  --shadow-panel: 0 8px 28px rgba(40, 55, 70, 0.14);
+}
+
+html.light-mode body {
+  background: var(--color-bg);
+}
+
+html.light-mode .bg-surface\/95 {
+  background-color: rgb(255 255 255 / 0.95);
+}
+
+html.light-mode .bg-inset\/80 {
+  background-color: rgb(238 241 244 / 0.88);
+}
+
+html.light-mode .backdrop-blur-sm {
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+/* Cross-device layout baseline: desktop, laptop, tablet, and mobile browsers. */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    width: 100%;
+    min-width: 0;
+    overflow-x: clip;
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 5rem;
+  }
+
+  body,
+  #app {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: clip;
+  }
+
+  img,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    font: inherit;
+  }
+
+  button,
+  [role="button"],
+  input[type="range"],
+  input[type="checkbox"],
+  input[type="radio"] {
+    touch-action: manipulation;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+}
+
+/* Fluid containers and robust grid children prevent long labels from forcing page width. */
+#app main,
+#app section,
+#app article,
+#app header,
+#app nav,
+#app aside,
+#app [class*="grid"],
+#app [class*="flex"] {
+  min-width: 0;
+}
+
+#app .overflow-x-auto {
+  max-width: 100%;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+#app table {
+  max-width: 100%;
+}
+
+/* The instrument view scales with available viewport height rather than a fixed desktop size. */
+.cockpit-3d-viewport,
+[data-cockpit-3d],
+#app canvas {
+  max-width: 100%;
+}
+
+@media (max-width: 639px) {
+  html { scroll-padding-top: 3.5rem; }
+
+  #app main {
+    padding-left: max(0.5rem, env(safe-area-inset-left));
+    padding-right: max(0.5rem, env(safe-area-inset-right));
+  }
+
+  #app header .mx-auto {
+    gap: 0.5rem;
+  }
+
+  #app header a .font-display.text-lg {
+    font-size: clamp(0.8rem, 3.6vw, 1rem);
+    letter-spacing: 0.025em;
+  }
+
+  #app header a .font-display.text-\[11px\] {
+    font-size: 9px;
+    letter-spacing: 0.08em;
+  }
+
+  #app .text-3xl {
+    font-size: clamp(1.45rem, 6vw, 1.9rem);
+    line-height: 1.15;
+  }
+
+  #app button,
+  #app [role="button"] {
+    max-width: 100%;
+  }
+
+  /* Compact the top status row without hiding essential status indications. */
+  #app header .border-t .mx-auto {
+    column-gap: 0.55rem;
+    row-gap: 0.4rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  #app nav.fixed {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Keep panel geometry legible: scroll an individual wide panel instead of the whole page. */
+  #app .panel-scroll,
+  #app [data-panel-scroll] {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #app .h-\[620px\] {
+    height: clamp(280px, 58svh, 480px);
+    min-height: 280px;
+  }
+
+  /* Touch-friendly targets, while preserving the compact trainer-panel look. */
+  #app input[type="range"] {
+    min-height: 28px;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
+  #app main {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  #app .h-\[620px\] {
+    height: clamp(400px, 62svh, 560px);
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1439px) {
+  #app main {
+    padding-left: clamp(0.75rem, 1.5vw, 1.5rem);
+    padding-right: clamp(0.75rem, 1.5vw, 1.5rem);
+  }
+}
+
+@media (min-width: 1440px) {
+  #app main {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* Landscape phones have limited vertical room; allow the trainer to use it. */
+@media (max-width: 900px) and (orientation: landscape) {
+  #app nav.fixed {
+    max-height: 4rem;
+  }
+
+  #app nav.fixed .min-h-14 {
+    min-height: 3rem;
+  }
+
+  #app .h-\[620px\] {
+    height: 72svh;
+    min-height: 220px;
+  }
+}
+
+/* Avoid hover-only interaction assumptions on Android and other touch browsers. */
+@media (hover: none) and (pointer: coarse) {
+  #app button,
+  #app a,
+  #app [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   UNIVERSAL RESPONSIVE HARDENING
+   Applies to every panel, trainer, diagram, and layout surface so fixed-width
+   aircraft panels never force the page wider than the device.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Any section that is intentionally wider than the viewport scrolls itself. */
+#app .panel-scroll,
+#app [data-panel-scroll],
+#app [data-scaled-panel],
+#app section.relative.rounded-xl {
+  max-width: 100%;
+  min-width: 0;
+}
+
+#app .panel-scroll,
+#app [data-panel-scroll] {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+/* Scaled instrument stages (MIP / P5 / pedestal / control stand) */
+#app [data-scaled-panel] > div {
+  max-width: 100%;
+}
+
+/* Prevent absolute-positioned children from expanding ancestors */
+#app .relative {
+  min-width: 0;
+}
+
+/* Tables and wide mono rows */
+#app table,
+#app pre {
+  max-width: 100%;
+}
+
+/* Leaflet / map containers */
+#app .leaflet-container {
+  width: 100% !important;
+  max-width: 100%;
+  min-height: 220px;
+}
+
+/* Canvas viewports always fit */
+#app canvas,
+#app .cockpit-3d-viewport,
+#app [data-cockpit-3d] {
+  max-width: 100% !important;
+}
+
+/* Fluid media */
+#app img,
+#app picture,
+#app video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ---- Phone (≤639px) ---------------------------------------------------- */
+@media (max-width: 639px) {
+  /* Stack multi-column trainer grids unless marked data-keep-cols */
+  #app .resp-grid-2,
+  #app .resp-grid-3,
+  #app .resp-grid-4 {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Explicitly responsive grids opt in via .resp-grid-* classes.
+     Dense instrument panels keep their columns and scroll horizontally if needed. */
+
+  /* Tighter padding on panel chrome */
+  #app section.relative.rounded-xl {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  /* Header status strip wraps cleanly */
+  #app header .border-t .mx-auto {
+    flex-wrap: wrap;
+  }
+
+  /* Side vertical tabs — hide on very small screens */
+  #app button.\[writing-mode\:vertical-rl\] {
+    display: none;
+  }
+
+  /* Volume / narrow controls expand */
+  #app input[type="range"].w-32 {
+    width: 100%;
+    max-width: 12rem;
+  }
+
+  /* Dialog / drawer full-bleed on phones */
+  #app .fixed.inset-y-0.right-0 {
+    width: min(100vw, 25rem) !important;
+  }
+
+  /* Map / diagram height */
+  #app .h-\[620px\],
+  #app [data-map-viewport] {
+    height: clamp(240px, 52svh, 420px) !important;
+    min-height: 220px;
+  }
+}
+
+/* ---- Tablet (640–1023px) ------------------------------------------------ */
+@media (min-width: 640px) and (max-width: 1023px) {
+  #app .resp-grid-3,
+  #app .resp-grid-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  #app .h-\[620px\],
+  #app [data-map-viewport] {
+    height: clamp(360px, 58svh, 520px);
+  }
+}
+
+/* ---- Landscape phones --------------------------------------------------- */
+@media (max-width: 900px) and (orientation: landscape) {
+  #app .h-\[620px\],
+  #app [data-map-viewport] {
+    height: min(68svh, 420px) !important;
+    min-height: 180px;
+  }
+
+  #app section.relative.rounded-xl {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+}
+
+/* ---- Touch devices ------------------------------------------------------ */
+@media (hover: none) and (pointer: coarse) {
+  #app button:not([data-dense]),
+  #app [role="button"]:not([data-dense]) {
+    min-height: 2rem;
+  }
+
+  #app input[type="range"] {
+    min-height: 32px;
+    touch-action: manipulation;
+  }
+
+  #app [data-scaled-panel],
+  #app .panel-scroll {
+    touch-action: pan-x pan-y;
+  }
+}
+
+/* Safe-area for notched phones */
+@supports (padding: env(safe-area-inset-bottom)) {
+  #app main {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+  @media (max-width: 639px) {
+    #app main {
+      padding-left: max(0.5rem, env(safe-area-inset-left));
+      padding-right: max(0.5rem, env(safe-area-inset-right));
+    }
+  }
+}
+
+/* Offline navigation chart (no tile server) */
+#app .leaflet-container {
+  background: #0d1620 !important;
+}
+#app .leaflet-tile-pane {
+  /* Hide any residual tile pane if a plugin injects one */
+  display: none;
+}
+#app .leaflet-pane.leaflet-offlineChart-pane,
+#app .leaflet-pane[name="offlineChart"] {
+  z-index: 200;
+}
+#app .oersted-aircraft-marker {
+  background: transparent !important;
+  border: none !important;
+}
+#app .leaflet-pane[name="offlineChart"] {
+  z-index: 200;
+}
+#app .oersted-aircraft-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Prevent browser long-press context menu / callout on interactive cockpit panels (mobile & desktop). */
+.panel-interactive,
+.panel-interactive * {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}

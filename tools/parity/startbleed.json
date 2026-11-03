@@ -1,0 +1,282 @@
+{
+ "fields": [
+  "startValveOpen1",
+  "startValveOpen2",
+  "bleed13Available1",
+  "bleed13Available2",
+  "apuGenOffBus",
+  "gen1OffBus",
+  "gen2OffBus",
+  "engine1FireWarn",
+  "engine2FireWarn",
+  "apuFireWarn",
+  "wheelWellFireWarn"
+ ],
+ "scenarios": [
+  {
+   "name": "start_valve1_closed_default",
+   "ov": {
+    "battery": true
+   },
+   "expected": {
+    "startValveOpen1": false,
+    "startValveOpen2": false,
+    "bleed13Available1": false,
+    "bleed13Available2": false,
+    "apuGenOffBus": false,
+    "gen1OffBus": false,
+    "gen2OffBus": false,
+    "engine1FireWarn": false,
+    "engine2FireWarn": false,
+    "apuFireWarn": false,
+    "wheelWellFireWarn": false
+   }
+  },
+  {
+   "name": "start_valve1_open_with_apu_duct",
+   "ov": {
+    "battery": true,
+    "apuRpm": 100,
+    "apuMaster": "ON",
+    "apuBleed": true,
+    "apuBleedValve": 1,
+    "startValve1": true
+   },
+   "expected": {
+    "startValveOpen1": true,
+    "startValveOpen2": false,
+    "bleed13Available1": false,
+    "bleed13Available2": false,
+    "apuGenOffBus": false,
+    "gen1OffBus": false,
+    "gen2OffBus": false,
+    "engine1FireWarn": false,
+    "engine2FireWarn": false,
+    "apuFireWarn": false,
+    "wheelWellFireWarn": false
+   }
+  },
+  {
+   "name": "start_valve1_no_dc_power",
+   "ov": {
+    "apuRpm": 100,
+    "apuMaster": "ON",
+    "apuBleed": true,
+    "apuBleedValve": 1,
+    "startValve1": true
+   },
+   "expected": {
+    "startValveOpen1": false,
+    "startValveOpen2": false,
+    "bleed13Available1": false,
+    "bleed13Available2": false,
+    "apuGenOffBus": false,
+    "gen1OffBus": false,
+    "gen2OffBus": false,
+    "engine1FireWarn": false,
+    "engine2FireWarn": false,
+    "apuFireWarn": false,
+    "wheelWellFireWarn": false
+   }
+  },
+  {
+   "name": "bleed13_eng1_running",
+   "ov": {
+    "battery": true,
+    "lever1": true,
+    "bleed1": true
+   },
+   "expected": {
+    "startValveOpen1": false,
+    "startValveOpen2": false,
+    "bleed13Available1": false,
+    "bleed13Available2": false,
+    "apuGenOffBus": false,
+    "gen1OffBus": false,
+    "gen2OffBus": false,
+    "engine1FireWarn": false,
+    "engine2FireWarn": false,
+    "apuFireWarn": false,
+    "wheelWellFireWarn": false
+   }
+  },
+  {
+   "name": "bleed13_inhibited_by_starter",
+   "ov": {
+    "battery": true,
+    "lever1": true,
+    "bleed1": true,
+    "apuRpm": 100,
+    "apuMaster": "ON",
+    "apuBleed": true,
+    "apuBleedValve": 1,
+    "startValve1": true
+   },
+   "expected": {
+    "startValveOpen1": true,
+    "startValveOpen2": false,
+    "bleed13Available1": false,
+    "bleed13Available2": false,
+    "apuGenOffBus": false,
+    "gen1OffBus": false,
+    "gen2OffBus": false,
+    "engine1FireWarn": false,
+    "engine2FireWarn": false,
+    "apuFireWarn": false,
+    "wheelWellFireWarn": false
+   }
+  },
+  {
+   "name": "apu_gen_off_bus_ground_power",
+   "ov": {
+    "battery": true,
+    "apuRpm": 100,
+    "apuMaster": "ON",
+    "apuBleed": true,
+    "apuBleedValve": 1,
+    "apuGen": true,
+    "groundPowerOn": true
+   },
+   "expected": {
+    "startValveOpen1": false,
+    "startValveOpen2": false,
+    "bleed13Available1": false,
+    "bleed13Available2": false,
+    "apuGenOffBus": true,
+    "gen1OffBus": false,
+    "gen2OffBus": false,
+    "engine1FireWarn": false,
+    "engine2FireWarn": false,
+    "apuFireWarn": false,
+    "wheelWellFireWarn": false
+   }
+  },
+  {
+   "name": "gen1_off_bus_fault",
+   "ov": {
+    "battery": true,
+    "lever1": true,
+    "bleed1": true,
+    "gen1": true
+   },
+   "expected": {
+    "startValveOpen1": false,
+    "startValveOpen2": false,
+    "bleed13Available1": false,
+    "bleed13Available2": false,
+    "apuGenOffBus": false,
+    "gen1OffBus": false,
+    "gen2OffBus": false,
+    "engine1FireWarn": false,
+    "engine2FireWarn": false,
+    "apuFireWarn": false,
+    "wheelWellFireWarn": false
+   }
+  },
+  {
+   "name": "engine1_fire_detected",
+   "ov": {
+    "battery": true,
+    "faults": {
+     "engineFire1": true
+    }
+   },
+   "expected": {
+    "startValveOpen1": false,
+    "startValveOpen2": false,
+    "bleed13Available1": false,
+    "bleed13Available2": false,
+    "apuGenOffBus": false,
+    "gen1OffBus": false,
+    "gen2OffBus": false,
+    "engine1FireWarn": true,
+    "engine2FireWarn": false,
+    "apuFireWarn": false,
+    "wheelWellFireWarn": false
+   }
+  },
+  {
+   "name": "engine2_fire_detected",
+   "ov": {
+    "battery": true,
+    "faults": {
+     "engineFire2": true
+    }
+   },
+   "expected": {
+    "startValveOpen1": false,
+    "startValveOpen2": false,
+    "bleed13Available1": false,
+    "bleed13Available2": false,
+    "apuGenOffBus": false,
+    "gen1OffBus": false,
+    "gen2OffBus": false,
+    "engine1FireWarn": false,
+    "engine2FireWarn": true,
+    "apuFireWarn": false,
+    "wheelWellFireWarn": false
+   }
+  },
+  {
+   "name": "apu_fire_no_power_dark",
+   "ov": {
+    "faults": {
+     "apuFireDetected": true
+    }
+   },
+   "expected": {
+    "startValveOpen1": false,
+    "startValveOpen2": false,
+    "bleed13Available1": false,
+    "bleed13Available2": false,
+    "apuGenOffBus": false,
+    "gen1OffBus": false,
+    "gen2OffBus": false,
+    "engine1FireWarn": false,
+    "engine2FireWarn": false,
+    "apuFireWarn": false,
+    "wheelWellFireWarn": false
+   }
+  },
+  {
+   "name": "wheel_well_fire",
+   "ov": {
+    "battery": true,
+    "wheelWellFire": true
+   },
+   "expected": {
+    "startValveOpen1": false,
+    "startValveOpen2": false,
+    "bleed13Available1": false,
+    "bleed13Available2": false,
+    "apuGenOffBus": false,
+    "gen1OffBus": false,
+    "gen2OffBus": false,
+    "engine1FireWarn": false,
+    "engine2FireWarn": false,
+    "apuFireWarn": false,
+    "wheelWellFireWarn": true
+   }
+  },
+  {
+   "name": "wheel_well_level_warn",
+   "ov": {
+    "battery": true,
+    "wheelWellLevel": 0.6
+   },
+   "expected": {
+    "startValveOpen1": false,
+    "startValveOpen2": false,
+    "bleed13Available1": false,
+    "bleed13Available2": false,
+    "apuGenOffBus": false,
+    "gen1OffBus": false,
+    "gen2OffBus": false,
+    "engine1FireWarn": false,
+    "engine2FireWarn": false,
+    "apuFireWarn": false,
+    "wheelWellFireWarn": true
+   }
+  }
+ ]
+}

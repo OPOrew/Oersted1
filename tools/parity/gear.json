@@ -1,0 +1,258 @@
+{
+ "fields": [
+  "gearPositions.nose",
+  "gearPositions.leftMain",
+  "gearPositions.rightMain",
+  "gearDown",
+  "gearUp",
+  "gearWarningHorn",
+  "gearLights.nose.green",
+  "gearLights.nose.red",
+  "gearLights.leftMain.green",
+  "gearLights.leftMain.red",
+  "gearLights.rightMain.green",
+  "gearLights.rightMain.red",
+  "gearPositionDisagree",
+  "gearTransit"
+ ],
+ "scenarios": [
+  {
+   "name": "gear_down_locked",
+   "ov": {
+    "battery": true,
+    "noseGearPos": 1,
+    "leftMainGearPos": 1,
+    "rightMainGearPos": 1,
+    "gear": "DN"
+   },
+   "expected": {
+    "gearPositions.nose": 1,
+    "gearPositions.leftMain": 1,
+    "gearPositions.rightMain": 1,
+    "gearDown": true,
+    "gearUp": false,
+    "gearWarningHorn": false,
+    "gearLights.nose.green": true,
+    "gearLights.nose.red": false,
+    "gearLights.leftMain.green": true,
+    "gearLights.leftMain.red": false,
+    "gearLights.rightMain.green": true,
+    "gearLights.rightMain.red": false,
+    "gearPositionDisagree": false,
+    "gearTransit": false
+   }
+  },
+  {
+   "name": "gear_up_locked",
+   "ov": {
+    "battery": true,
+    "noseGearPos": 0,
+    "leftMainGearPos": 0,
+    "rightMainGearPos": 0,
+    "gear": "UP"
+   },
+   "expected": {
+    "gearPositions.nose": 0,
+    "gearPositions.leftMain": 0,
+    "gearPositions.rightMain": 0,
+    "gearDown": false,
+    "gearUp": true,
+    "gearWarningHorn": true,
+    "gearLights.nose.green": false,
+    "gearLights.nose.red": true,
+    "gearLights.leftMain.green": false,
+    "gearLights.leftMain.red": true,
+    "gearLights.rightMain.green": false,
+    "gearLights.rightMain.red": true,
+    "gearPositionDisagree": false,
+    "gearTransit": false
+   }
+  },
+  {
+   "name": "gear_transit_down",
+   "ov": {
+    "battery": true,
+    "noseGearPos": 0.5,
+    "leftMainGearPos": 0.5,
+    "rightMainGearPos": 0.5,
+    "gear": "DN"
+   },
+   "expected": {
+    "gearPositions.nose": 0.5,
+    "gearPositions.leftMain": 0.5,
+    "gearPositions.rightMain": 0.5,
+    "gearDown": false,
+    "gearUp": false,
+    "gearWarningHorn": true,
+    "gearLights.nose.green": false,
+    "gearLights.nose.red": true,
+    "gearLights.leftMain.green": false,
+    "gearLights.leftMain.red": true,
+    "gearLights.rightMain.green": false,
+    "gearLights.rightMain.red": true,
+    "gearPositionDisagree": true,
+    "gearTransit": true
+   }
+  },
+  {
+   "name": "gear_selector_up_gear_down",
+   "ov": {
+    "battery": true,
+    "noseGearPos": 1,
+    "leftMainGearPos": 1,
+    "rightMainGearPos": 1,
+    "gear": "UP"
+   },
+   "expected": {
+    "gearPositions.nose": 1,
+    "gearPositions.leftMain": 1,
+    "gearPositions.rightMain": 1,
+    "gearDown": true,
+    "gearUp": false,
+    "gearWarningHorn": false,
+    "gearLights.nose.green": true,
+    "gearLights.nose.red": true,
+    "gearLights.leftMain.green": true,
+    "gearLights.leftMain.red": true,
+    "gearLights.rightMain.green": true,
+    "gearLights.rightMain.red": true,
+    "gearPositionDisagree": true,
+    "gearTransit": true
+   }
+  },
+  {
+   "name": "gear_nose_fault_injected",
+   "ov": {
+    "battery": true,
+    "noseGearPos": 0.7,
+    "leftMainGearPos": 1,
+    "rightMainGearPos": 1,
+    "gear": "DN",
+    "landingGearFault": "NOSE"
+   },
+   "expected": {
+    "gearPositions.nose": 0.7,
+    "gearPositions.leftMain": 1,
+    "gearPositions.rightMain": 1,
+    "gearDown": false,
+    "gearUp": false,
+    "gearWarningHorn": true,
+    "gearLights.nose.green": false,
+    "gearLights.nose.red": true,
+    "gearLights.leftMain.green": true,
+    "gearLights.leftMain.red": false,
+    "gearLights.rightMain.green": true,
+    "gearLights.rightMain.red": false,
+    "gearPositionDisagree": true,
+    "gearTransit": true
+   }
+  },
+  {
+   "name": "gear_left_main_fault_injected",
+   "ov": {
+    "battery": true,
+    "noseGearPos": 1,
+    "leftMainGearPos": 0.9,
+    "rightMainGearPos": 1,
+    "gear": "DN",
+    "landingGearFault": "LEFT_MAIN"
+   },
+   "expected": {
+    "gearPositions.nose": 1,
+    "gearPositions.leftMain": 0.9,
+    "gearPositions.rightMain": 1,
+    "gearDown": false,
+    "gearUp": false,
+    "gearWarningHorn": true,
+    "gearLights.nose.green": true,
+    "gearLights.nose.red": false,
+    "gearLights.leftMain.green": false,
+    "gearLights.leftMain.red": true,
+    "gearLights.rightMain.green": true,
+    "gearLights.rightMain.red": false,
+    "gearPositionDisagree": true,
+    "gearTransit": true
+   }
+  },
+  {
+   "name": "gear_horn_throttle_retarded",
+   "ov": {
+    "battery": true,
+    "noseGearPos": 0,
+    "leftMainGearPos": 0,
+    "rightMainGearPos": 0,
+    "gear": "UP",
+    "throttle1": 0.05,
+    "throttle2": 0.05
+   },
+   "expected": {
+    "gearPositions.nose": 0,
+    "gearPositions.leftMain": 0,
+    "gearPositions.rightMain": 0,
+    "gearDown": false,
+    "gearUp": true,
+    "gearWarningHorn": true,
+    "gearLights.nose.green": false,
+    "gearLights.nose.red": true,
+    "gearLights.leftMain.green": false,
+    "gearLights.leftMain.red": true,
+    "gearLights.rightMain.green": false,
+    "gearLights.rightMain.red": true,
+    "gearPositionDisagree": false,
+    "gearTransit": false
+   }
+  },
+  {
+   "name": "gear_horn_flaps_over_15",
+   "ov": {
+    "battery": true,
+    "noseGearPos": 0,
+    "leftMainGearPos": 0,
+    "rightMainGearPos": 0,
+    "gear": "UP",
+    "flaps": 30
+   },
+   "expected": {
+    "gearPositions.nose": 0,
+    "gearPositions.leftMain": 0,
+    "gearPositions.rightMain": 0,
+    "gearDown": false,
+    "gearUp": true,
+    "gearWarningHorn": true,
+    "gearLights.nose.green": false,
+    "gearLights.nose.red": true,
+    "gearLights.leftMain.green": false,
+    "gearLights.leftMain.red": true,
+    "gearLights.rightMain.green": false,
+    "gearLights.rightMain.red": true,
+    "gearPositionDisagree": false,
+    "gearTransit": false
+   }
+  },
+  {
+   "name": "gear_no_dc_power_lights_dark",
+   "ov": {
+    "noseGearPos": 0.5,
+    "leftMainGearPos": 0.5,
+    "rightMainGearPos": 0.5,
+    "gear": "DN"
+   },
+   "expected": {
+    "gearPositions.nose": 0.5,
+    "gearPositions.leftMain": 0.5,
+    "gearPositions.rightMain": 0.5,
+    "gearDown": false,
+    "gearUp": false,
+    "gearWarningHorn": false,
+    "gearLights.nose.green": false,
+    "gearLights.nose.red": false,
+    "gearLights.leftMain.green": false,
+    "gearLights.leftMain.red": false,
+    "gearLights.rightMain.green": false,
+    "gearLights.rightMain.red": false,
+    "gearPositionDisagree": true,
+    "gearTransit": true
+   }
+  }
+ ]
+}

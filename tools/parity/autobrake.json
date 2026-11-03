@@ -1,0 +1,301 @@
+{
+ "fields": [
+  "antiskidOperational",
+  "antiskidInbdOperational",
+  "antiskidOutbdOperational",
+  "autobrakeTestPassed",
+  "autobrakeArmed",
+  "autobrakeActive",
+  "autobrakeDisarm",
+  "autobrakePressure",
+  "antiskidModulating"
+ ],
+ "scenarios": [
+  {
+   "name": "autobrake_off_default",
+   "ov": {
+    "battery": true
+   },
+   "expected": {
+    "antiskidOperational": true,
+    "antiskidInbdOperational": true,
+    "antiskidOutbdOperational": true,
+    "autobrakeTestPassed": false,
+    "autobrakeArmed": false,
+    "autobrakeActive": false,
+    "autobrakeDisarm": false,
+    "autobrakePressure": 0,
+    "antiskidModulating": false
+   }
+  },
+  {
+   "name": "antiskid_both_channels",
+   "ov": {
+    "battery": true,
+    "gear": "DN",
+    "antiskidInbd": true,
+    "antiskidOutbd": true
+   },
+   "expected": {
+    "antiskidOperational": true,
+    "antiskidInbdOperational": true,
+    "antiskidOutbdOperational": true,
+    "autobrakeTestPassed": false,
+    "autobrakeArmed": false,
+    "autobrakeActive": false,
+    "autobrakeDisarm": false,
+    "autobrakePressure": 0,
+    "antiskidModulating": false
+   }
+  },
+  {
+   "name": "gear_up_disables_antiskid",
+   "ov": {
+    "battery": true,
+    "antiskidInbd": true,
+    "antiskidOutbd": true,
+    "gear": "UP"
+   },
+   "expected": {
+    "antiskidOperational": false,
+    "antiskidInbdOperational": false,
+    "antiskidOutbdOperational": false,
+    "autobrakeTestPassed": false,
+    "autobrakeArmed": false,
+    "autobrakeActive": false,
+    "autobrakeDisarm": false,
+    "autobrakePressure": 0,
+    "antiskidModulating": false
+   }
+  },
+  {
+   "name": "inbd_antiskid_cb_open",
+   "ov": {
+    "battery": true,
+    "gear": "DN",
+    "antiskidInbd": true,
+    "antiskidOutbd": true,
+    "circuitBreakers": {
+     "antiskid-inbd": false
+    }
+   },
+   "expected": {
+    "antiskidOperational": false,
+    "antiskidInbdOperational": false,
+    "antiskidOutbdOperational": true,
+    "autobrakeTestPassed": false,
+    "autobrakeArmed": false,
+    "autobrakeActive": false,
+    "autobrakeDisarm": false,
+    "autobrakePressure": 0,
+    "antiskidModulating": false
+   }
+  },
+  {
+   "name": "landing_autobrake_active",
+   "ov": {
+    "battery": true,
+    "hydAPress": 3000,
+    "hydBPress": 3000,
+    "autobrake": 2,
+    "autobrakeTestTimer": 3,
+    "speedBrake": "ARMED",
+    "throttle1": 0,
+    "throttle2": 0,
+    "wow": true,
+    "groundSpeedKt": 70,
+    "gear": "DN",
+    "antiskidInbd": true,
+    "antiskidOutbd": true
+   },
+   "expected": {
+    "antiskidOperational": true,
+    "antiskidInbdOperational": true,
+    "antiskidOutbdOperational": true,
+    "autobrakeTestPassed": true,
+    "autobrakeArmed": true,
+    "autobrakeActive": true,
+    "autobrakeDisarm": false,
+    "autobrakePressure": 2000,
+    "antiskidModulating": true
+   }
+  },
+  {
+   "name": "landing_thrust_advanced_disarm",
+   "ov": {
+    "battery": true,
+    "hydAPress": 3000,
+    "hydBPress": 3000,
+    "autobrake": 2,
+    "autobrakeTestTimer": 3,
+    "speedBrake": "ARMED",
+    "throttle1": 0.5,
+    "throttle2": 0,
+    "wow": true,
+    "groundSpeedKt": 70,
+    "gear": "DN",
+    "antiskidInbd": true,
+    "antiskidOutbd": true
+   },
+   "expected": {
+    "antiskidOperational": true,
+    "antiskidInbdOperational": true,
+    "antiskidOutbdOperational": true,
+    "autobrakeTestPassed": true,
+    "autobrakeArmed": true,
+    "autobrakeActive": false,
+    "autobrakeDisarm": true,
+    "autobrakePressure": 0,
+    "antiskidModulating": false
+   }
+  },
+  {
+   "name": "landing_hyd_low_disarm",
+   "ov": {
+    "battery": true,
+    "hydAPress": 1000,
+    "hydBPress": 3000,
+    "autobrake": 2,
+    "autobrakeTestTimer": 3,
+    "speedBrake": "ARMED",
+    "throttle1": 0,
+    "throttle2": 0,
+    "wow": true,
+    "groundSpeedKt": 70,
+    "gear": "DN",
+    "antiskidInbd": true,
+    "antiskidOutbd": true
+   },
+   "expected": {
+    "antiskidOperational": true,
+    "antiskidInbdOperational": true,
+    "antiskidOutbdOperational": true,
+    "autobrakeTestPassed": false,
+    "autobrakeArmed": false,
+    "autobrakeActive": false,
+    "autobrakeDisarm": true,
+    "autobrakePressure": 0,
+    "antiskidModulating": false
+   }
+  },
+  {
+   "name": "landing_pedal_override",
+   "ov": {
+    "battery": true,
+    "hydAPress": 3000,
+    "hydBPress": 3000,
+    "autobrake": 2,
+    "autobrakeTestTimer": 3,
+    "speedBrake": "ARMED",
+    "throttle1": 0,
+    "throttle2": 0,
+    "wow": true,
+    "groundSpeedKt": 70,
+    "gear": "DN",
+    "antiskidInbd": true,
+    "antiskidOutbd": true,
+    "leftBrakePedal": 0.5
+   },
+   "expected": {
+    "antiskidOperational": true,
+    "antiskidInbdOperational": true,
+    "antiskidOutbdOperational": true,
+    "autobrakeTestPassed": true,
+    "autobrakeArmed": true,
+    "autobrakeActive": false,
+    "autobrakeDisarm": true,
+    "autobrakePressure": 0,
+    "antiskidModulating": false
+   }
+  },
+  {
+   "name": "landing_disarmed_latched",
+   "ov": {
+    "battery": true,
+    "hydAPress": 3000,
+    "hydBPress": 3000,
+    "autobrake": 2,
+    "autobrakeTestTimer": 3,
+    "speedBrake": "ARMED",
+    "throttle1": 0,
+    "throttle2": 0,
+    "wow": true,
+    "groundSpeedKt": 70,
+    "gear": "DN",
+    "antiskidInbd": true,
+    "antiskidOutbd": true,
+    "autobrakeLandingDisarmed": true
+   },
+   "expected": {
+    "antiskidOperational": true,
+    "antiskidInbdOperational": true,
+    "antiskidOutbdOperational": true,
+    "autobrakeTestPassed": true,
+    "autobrakeArmed": false,
+    "autobrakeActive": false,
+    "autobrakeDisarm": true,
+    "autobrakePressure": 0,
+    "antiskidModulating": false
+   }
+  },
+  {
+   "name": "rto_armed_stopped_fast",
+   "ov": {
+    "battery": true,
+    "hydAPress": 3000,
+    "hydBPress": 3000,
+    "autobrake": 4,
+    "autobrakeTestTimer": 3,
+    "speedBrake": "ARMED",
+    "throttle1": 0,
+    "throttle2": 0,
+    "wow": true,
+    "groundSpeedKt": 95,
+    "gear": "DN",
+    "antiskidInbd": true,
+    "antiskidOutbd": true,
+    "autobrakeRtoArmed": true
+   },
+   "expected": {
+    "antiskidOperational": true,
+    "antiskidInbdOperational": true,
+    "antiskidOutbdOperational": true,
+    "autobrakeTestPassed": true,
+    "autobrakeArmed": true,
+    "autobrakeActive": true,
+    "autobrakeDisarm": false,
+    "autobrakePressure": 3000,
+    "antiskidModulating": true
+   }
+  },
+  {
+   "name": "landing_autobrake_max_pressure",
+   "ov": {
+    "battery": true,
+    "hydAPress": 3000,
+    "hydBPress": 3000,
+    "autobrake": 3,
+    "autobrakeTestTimer": 3,
+    "speedBrake": "ARMED",
+    "throttle1": 0,
+    "throttle2": 0,
+    "wow": true,
+    "groundSpeedKt": 70,
+    "gear": "DN",
+    "antiskidInbd": true,
+    "antiskidOutbd": true
+   },
+   "expected": {
+    "antiskidOperational": true,
+    "antiskidInbdOperational": true,
+    "antiskidOutbdOperational": true,
+    "autobrakeTestPassed": true,
+    "autobrakeArmed": true,
+    "autobrakeActive": true,
+    "autobrakeDisarm": false,
+    "autobrakePressure": 3000,
+    "antiskidModulating": true
+   }
+  }
+ ]
+}

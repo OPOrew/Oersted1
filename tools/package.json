@@ -1,0 +1,11 @@
+{
+  "name": "oersted-tools",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dump-init": "tsx dump-init.mts ../reference/web/src ../build/initialSim.json",
+    "gen-sim": "tsx gen-sim.mts ../reference/web/src ../app/src/main/java/com/oersted/trainer/sim/SimTypes.kt ../build/initialSim.json",
+    "export-data": "tsx export-data.mts ../reference/web/src ../app/src/main/assets/data"
+  },
+  "devDependencies": { "tsx": "^4.19.0", "typescript": "^5.7.0" }
+}

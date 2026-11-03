@@ -1,0 +1,492 @@
+{
+ "fields": [
+  "drainHeater1Powered",
+  "drainHeater2Powered",
+  "drainMastAirPowered",
+  "drainMastGroundPowered",
+  "drainMastForwardPowered",
+  "drainMastAftPowered",
+  "drainHeater1Hot",
+  "drainHeater2Hot",
+  "alphaVaneHeatedL",
+  "alphaVaneHeatedR",
+  "doorPressureLeak",
+  "staticInverterPowered",
+  "standbyAcPowered",
+  "standbyDcPowered",
+  "standbyAcSource",
+  "standbyDcSource",
+  "groundServiceBusPowered",
+  "batteryChargerPowered",
+  "ac28vPowered",
+  "electricalSource1",
+  "electricalSource2"
+ ],
+ "scenarios": [
+  {
+   "name": "drain_heater1_cold",
+   "ov": {
+    "battery": true,
+    "lever2": true,
+    "n2_2": 60,
+    "gen2": true,
+    "start2": "GRD",
+    "drainHeater1TempC": 10
+   },
+   "expected": {
+    "drainHeater1Powered": true,
+    "drainHeater2Powered": true,
+    "drainMastAirPowered": false,
+    "drainMastGroundPowered": true,
+    "drainMastForwardPowered": true,
+    "drainMastAftPowered": true,
+    "drainHeater1Hot": false,
+    "drainHeater2Hot": false,
+    "alphaVaneHeatedL": false,
+    "alphaVaneHeatedR": false,
+    "doorPressureLeak": false,
+    "staticInverterPowered": true,
+    "standbyAcPowered": true,
+    "standbyDcPowered": true,
+    "standbyAcSource": "STATIC INVERTER",
+    "standbyDcSource": "BATTERY BUS",
+    "groundServiceBusPowered": false,
+    "batteryChargerPowered": true,
+    "ac28vPowered": true,
+    "electricalSource1": "NONE",
+    "electricalSource2": "GEN 2"
+   }
+  },
+  {
+   "name": "drain_heater1_hot",
+   "ov": {
+    "battery": true,
+    "lever2": true,
+    "n2_2": 60,
+    "gen2": true,
+    "start2": "GRD",
+    "drainHeater1TempC": 25
+   },
+   "expected": {
+    "drainHeater1Powered": true,
+    "drainHeater2Powered": true,
+    "drainMastAirPowered": false,
+    "drainMastGroundPowered": true,
+    "drainMastForwardPowered": true,
+    "drainMastAftPowered": true,
+    "drainHeater1Hot": true,
+    "drainHeater2Hot": false,
+    "alphaVaneHeatedL": false,
+    "alphaVaneHeatedR": false,
+    "doorPressureLeak": false,
+    "staticInverterPowered": true,
+    "standbyAcPowered": true,
+    "standbyDcPowered": true,
+    "standbyAcSource": "STATIC INVERTER",
+    "standbyDcSource": "BATTERY BUS",
+    "groundServiceBusPowered": false,
+    "batteryChargerPowered": true,
+    "ac28vPowered": true,
+    "electricalSource1": "NONE",
+    "electricalSource2": "GEN 2"
+   }
+  },
+  {
+   "name": "drain_mast_air_in_flight_on_gen1",
+   "ov": {
+    "battery": true,
+    "lever1": true,
+    "n2_1": 60,
+    "gen1": true,
+    "start1": "GRD",
+    "wow": false
+   },
+   "expected": {
+    "drainHeater1Powered": false,
+    "drainHeater2Powered": false,
+    "drainMastAirPowered": true,
+    "drainMastGroundPowered": false,
+    "drainMastForwardPowered": true,
+    "drainMastAftPowered": true,
+    "drainHeater1Hot": false,
+    "drainHeater2Hot": false,
+    "alphaVaneHeatedL": false,
+    "alphaVaneHeatedR": false,
+    "doorPressureLeak": false,
+    "staticInverterPowered": false,
+    "standbyAcPowered": true,
+    "standbyDcPowered": true,
+    "standbyAcSource": "TRANSFER BUS 1",
+    "standbyDcSource": "DC BUS 1",
+    "groundServiceBusPowered": false,
+    "batteryChargerPowered": false,
+    "ac28vPowered": true,
+    "electricalSource1": "GEN 1",
+    "electricalSource2": "NONE"
+   }
+  },
+  {
+   "name": "drain_mast_ground_wow_ac28",
+   "ov": {
+    "battery": true,
+    "lever2": true,
+    "n2_2": 60,
+    "gen2": true,
+    "start2": "GRD",
+    "wow": true
+   },
+   "expected": {
+    "drainHeater1Powered": true,
+    "drainHeater2Powered": true,
+    "drainMastAirPowered": false,
+    "drainMastGroundPowered": true,
+    "drainMastForwardPowered": true,
+    "drainMastAftPowered": true,
+    "drainHeater1Hot": false,
+    "drainHeater2Hot": false,
+    "alphaVaneHeatedL": false,
+    "alphaVaneHeatedR": false,
+    "doorPressureLeak": false,
+    "staticInverterPowered": true,
+    "standbyAcPowered": true,
+    "standbyDcPowered": true,
+    "standbyAcSource": "STATIC INVERTER",
+    "standbyDcSource": "BATTERY BUS",
+    "groundServiceBusPowered": false,
+    "batteryChargerPowered": true,
+    "ac28vPowered": true,
+    "electricalSource1": "NONE",
+    "electricalSource2": "GEN 2"
+   }
+  },
+  {
+   "name": "alpha_vane_left_heated",
+   "ov": {
+    "battery": true,
+    "lever1": true,
+    "n2_1": 60,
+    "gen1": true,
+    "start1": "GRD",
+    "probeHeatAlphaL": true
+   },
+   "expected": {
+    "drainHeater1Powered": false,
+    "drainHeater2Powered": false,
+    "drainMastAirPowered": false,
+    "drainMastGroundPowered": false,
+    "drainMastForwardPowered": false,
+    "drainMastAftPowered": false,
+    "drainHeater1Hot": false,
+    "drainHeater2Hot": false,
+    "alphaVaneHeatedL": true,
+    "alphaVaneHeatedR": false,
+    "doorPressureLeak": false,
+    "staticInverterPowered": false,
+    "standbyAcPowered": true,
+    "standbyDcPowered": true,
+    "standbyAcSource": "TRANSFER BUS 1",
+    "standbyDcSource": "DC BUS 1",
+    "groundServiceBusPowered": false,
+    "batteryChargerPowered": false,
+    "ac28vPowered": true,
+    "electricalSource1": "GEN 1",
+    "electricalSource2": "NONE"
+   }
+  },
+  {
+   "name": "alpha_vane_left_failed",
+   "ov": {
+    "battery": true,
+    "lever1": true,
+    "n2_1": 60,
+    "gen1": true,
+    "start1": "GRD",
+    "probeHeatAlphaL": true,
+    "faults": {
+     "alphaVaneHeatFailureL": true
+    }
+   },
+   "expected": {
+    "drainHeater1Powered": false,
+    "drainHeater2Powered": false,
+    "drainMastAirPowered": false,
+    "drainMastGroundPowered": false,
+    "drainMastForwardPowered": false,
+    "drainMastAftPowered": false,
+    "drainHeater1Hot": false,
+    "drainHeater2Hot": false,
+    "alphaVaneHeatedL": false,
+    "alphaVaneHeatedR": false,
+    "doorPressureLeak": false,
+    "staticInverterPowered": false,
+    "standbyAcPowered": true,
+    "standbyDcPowered": true,
+    "standbyAcSource": "TRANSFER BUS 1",
+    "standbyDcSource": "DC BUS 1",
+    "groundServiceBusPowered": false,
+    "batteryChargerPowered": false,
+    "ac28vPowered": true,
+    "electricalSource1": "GEN 1",
+    "electricalSource2": "NONE"
+   }
+  },
+  {
+   "name": "standby_auto_normal_transfer_bus1",
+   "ov": {
+    "battery": true,
+    "lever1": true,
+    "n2_1": 60,
+    "gen1": true,
+    "start1": "GRD",
+    "standbyPower": "AUTO"
+   },
+   "expected": {
+    "drainHeater1Powered": false,
+    "drainHeater2Powered": false,
+    "drainMastAirPowered": false,
+    "drainMastGroundPowered": false,
+    "drainMastForwardPowered": false,
+    "drainMastAftPowered": false,
+    "drainHeater1Hot": false,
+    "drainHeater2Hot": false,
+    "alphaVaneHeatedL": false,
+    "alphaVaneHeatedR": false,
+    "doorPressureLeak": false,
+    "staticInverterPowered": false,
+    "standbyAcPowered": true,
+    "standbyDcPowered": true,
+    "standbyAcSource": "TRANSFER BUS 1",
+    "standbyDcSource": "DC BUS 1",
+    "groundServiceBusPowered": false,
+    "batteryChargerPowered": false,
+    "ac28vPowered": true,
+    "electricalSource1": "GEN 1",
+    "electricalSource2": "NONE"
+   }
+  },
+  {
+   "name": "standby_auto_no_gen_inverter",
+   "ov": {
+    "battery": true,
+    "standbyPower": "AUTO"
+   },
+   "expected": {
+    "drainHeater1Powered": false,
+    "drainHeater2Powered": false,
+    "drainMastAirPowered": false,
+    "drainMastGroundPowered": false,
+    "drainMastForwardPowered": false,
+    "drainMastAftPowered": false,
+    "drainHeater1Hot": false,
+    "drainHeater2Hot": false,
+    "alphaVaneHeatedL": false,
+    "alphaVaneHeatedR": false,
+    "doorPressureLeak": false,
+    "staticInverterPowered": true,
+    "standbyAcPowered": true,
+    "standbyDcPowered": true,
+    "standbyAcSource": "STATIC INVERTER",
+    "standbyDcSource": "BATTERY BUS",
+    "groundServiceBusPowered": false,
+    "batteryChargerPowered": false,
+    "ac28vPowered": false,
+    "electricalSource1": "NONE",
+    "electricalSource2": "NONE"
+   }
+  },
+  {
+   "name": "standby_bat_inverter",
+   "ov": {
+    "battery": true,
+    "standbyPower": "BAT"
+   },
+   "expected": {
+    "drainHeater1Powered": false,
+    "drainHeater2Powered": false,
+    "drainMastAirPowered": false,
+    "drainMastGroundPowered": false,
+    "drainMastForwardPowered": false,
+    "drainMastAftPowered": false,
+    "drainHeater1Hot": false,
+    "drainHeater2Hot": false,
+    "alphaVaneHeatedL": false,
+    "alphaVaneHeatedR": false,
+    "doorPressureLeak": false,
+    "staticInverterPowered": true,
+    "standbyAcPowered": true,
+    "standbyDcPowered": true,
+    "standbyAcSource": "STATIC INVERTER",
+    "standbyDcSource": "BATTERY BUS",
+    "groundServiceBusPowered": false,
+    "batteryChargerPowered": false,
+    "ac28vPowered": false,
+    "electricalSource1": "NONE",
+    "electricalSource2": "NONE"
+   }
+  },
+  {
+   "name": "standby_inverter_failed",
+   "ov": {
+    "battery": true,
+    "standbyPower": "BAT",
+    "faults": {
+     "staticInverterFailure": true
+    }
+   },
+   "expected": {
+    "drainHeater1Powered": false,
+    "drainHeater2Powered": false,
+    "drainMastAirPowered": false,
+    "drainMastGroundPowered": false,
+    "drainMastForwardPowered": false,
+    "drainMastAftPowered": false,
+    "drainHeater1Hot": false,
+    "drainHeater2Hot": false,
+    "alphaVaneHeatedL": false,
+    "alphaVaneHeatedR": false,
+    "doorPressureLeak": false,
+    "staticInverterPowered": false,
+    "standbyAcPowered": false,
+    "standbyDcPowered": false,
+    "standbyAcSource": "NONE",
+    "standbyDcSource": "NONE",
+    "groundServiceBusPowered": false,
+    "batteryChargerPowered": false,
+    "ac28vPowered": false,
+    "electricalSource1": "NONE",
+    "electricalSource2": "NONE"
+   }
+  },
+  {
+   "name": "ground_service_on_ext_power",
+   "ov": {
+    "battery": true,
+    "externalPowerConnected": true,
+    "groundPowerOn": true,
+    "groundServiceOn": true
+   },
+   "expected": {
+    "drainHeater1Powered": true,
+    "drainHeater2Powered": true,
+    "drainMastAirPowered": false,
+    "drainMastGroundPowered": true,
+    "drainMastForwardPowered": true,
+    "drainMastAftPowered": true,
+    "drainHeater1Hot": false,
+    "drainHeater2Hot": false,
+    "alphaVaneHeatedL": false,
+    "alphaVaneHeatedR": false,
+    "doorPressureLeak": false,
+    "staticInverterPowered": false,
+    "standbyAcPowered": true,
+    "standbyDcPowered": true,
+    "standbyAcSource": "TRANSFER BUS 1",
+    "standbyDcSource": "DC BUS 1",
+    "groundServiceBusPowered": true,
+    "batteryChargerPowered": true,
+    "ac28vPowered": true,
+    "electricalSource1": "GPU",
+    "electricalSource2": "GPU"
+   }
+  },
+  {
+   "name": "ground_service_on_gen1",
+   "ov": {
+    "battery": true,
+    "lever1": true,
+    "n2_1": 60,
+    "gen1": true,
+    "start1": "GRD",
+    "groundServiceOn": true
+   },
+   "expected": {
+    "drainHeater1Powered": false,
+    "drainHeater2Powered": false,
+    "drainMastAirPowered": false,
+    "drainMastGroundPowered": false,
+    "drainMastForwardPowered": false,
+    "drainMastAftPowered": false,
+    "drainHeater1Hot": false,
+    "drainHeater2Hot": false,
+    "alphaVaneHeatedL": false,
+    "alphaVaneHeatedR": false,
+    "doorPressureLeak": false,
+    "staticInverterPowered": false,
+    "standbyAcPowered": true,
+    "standbyDcPowered": true,
+    "standbyAcSource": "TRANSFER BUS 1",
+    "standbyDcSource": "DC BUS 1",
+    "groundServiceBusPowered": true,
+    "batteryChargerPowered": true,
+    "ac28vPowered": true,
+    "electricalSource1": "GEN 1",
+    "electricalSource2": "NONE"
+   }
+  },
+  {
+   "name": "charger_fed_from_bus2_transfer",
+   "ov": {
+    "battery": true,
+    "lever2": true,
+    "n2_2": 60,
+    "gen2": true,
+    "start2": "GRD"
+   },
+   "expected": {
+    "drainHeater1Powered": true,
+    "drainHeater2Powered": true,
+    "drainMastAirPowered": false,
+    "drainMastGroundPowered": true,
+    "drainMastForwardPowered": true,
+    "drainMastAftPowered": true,
+    "drainHeater1Hot": false,
+    "drainHeater2Hot": false,
+    "alphaVaneHeatedL": false,
+    "alphaVaneHeatedR": false,
+    "doorPressureLeak": false,
+    "staticInverterPowered": true,
+    "standbyAcPowered": true,
+    "standbyDcPowered": true,
+    "standbyAcSource": "STATIC INVERTER",
+    "standbyDcSource": "BATTERY BUS",
+    "groundServiceBusPowered": false,
+    "batteryChargerPowered": true,
+    "ac28vPowered": true,
+    "electricalSource1": "NONE",
+    "electricalSource2": "GEN 2"
+   }
+  },
+  {
+   "name": "door_aft_open_leak_flag",
+   "ov": {
+    "battery": true,
+    "doorPositions": {
+     "aftEntry": true
+    }
+   },
+   "expected": {
+    "drainHeater1Powered": false,
+    "drainHeater2Powered": false,
+    "drainMastAirPowered": false,
+    "drainMastGroundPowered": false,
+    "drainMastForwardPowered": false,
+    "drainMastAftPowered": false,
+    "drainHeater1Hot": false,
+    "drainHeater2Hot": false,
+    "alphaVaneHeatedL": false,
+    "alphaVaneHeatedR": false,
+    "doorPressureLeak": true,
+    "staticInverterPowered": true,
+    "standbyAcPowered": true,
+    "standbyDcPowered": true,
+    "standbyAcSource": "STATIC INVERTER",
+    "standbyDcSource": "BATTERY BUS",
+    "groundServiceBusPowered": false,
+    "batteryChargerPowered": false,
+    "ac28vPowered": false,
+    "electricalSource1": "NONE",
+    "electricalSource2": "NONE"
+   }
+  }
+ ]
+}

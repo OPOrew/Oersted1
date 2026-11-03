@@ -1,0 +1,437 @@
+{
+ "fields": [
+  "dcPower",
+  "acPower",
+  "acMainBus1Powered",
+  "acMainBus2Powered",
+  "ac28vMainBus2Powered",
+  "transferBus1Powered",
+  "transferBus2Powered",
+  "dcBus1Powered",
+  "dcBus2Powered",
+  "tr1Powered",
+  "tr2Powered",
+  "tr3Powered",
+  "batteryBusPowered",
+  "ignition1On",
+  "ignition2On",
+  "externalPowerContactorClosed",
+  "externalPowerNotInUse",
+  "eng1Running",
+  "eng2Running",
+  "apuAvailable"
+ ],
+ "scenarios": [
+  {
+   "name": "cold_and_dark",
+   "ov": {},
+   "expected": {
+    "dcPower": false,
+    "acPower": false,
+    "acMainBus1Powered": false,
+    "acMainBus2Powered": false,
+    "ac28vMainBus2Powered": false,
+    "transferBus1Powered": false,
+    "transferBus2Powered": false,
+    "dcBus1Powered": false,
+    "dcBus2Powered": false,
+    "tr1Powered": false,
+    "tr2Powered": false,
+    "tr3Powered": false,
+    "batteryBusPowered": false,
+    "ignition1On": false,
+    "ignition2On": false,
+    "externalPowerContactorClosed": false,
+    "externalPowerNotInUse": false,
+    "eng1Running": false,
+    "eng2Running": false,
+    "apuAvailable": false
+   }
+  },
+  {
+   "name": "battery_only",
+   "ov": {
+    "battery": true
+   },
+   "expected": {
+    "dcPower": true,
+    "acPower": false,
+    "acMainBus1Powered": false,
+    "acMainBus2Powered": false,
+    "ac28vMainBus2Powered": false,
+    "transferBus1Powered": false,
+    "transferBus2Powered": false,
+    "dcBus1Powered": false,
+    "dcBus2Powered": false,
+    "tr1Powered": false,
+    "tr2Powered": false,
+    "tr3Powered": false,
+    "batteryBusPowered": true,
+    "ignition1On": false,
+    "ignition2On": false,
+    "externalPowerContactorClosed": false,
+    "externalPowerNotInUse": false,
+    "eng1Running": false,
+    "eng2Running": false,
+    "apuAvailable": false
+   }
+  },
+  {
+   "name": "eng1_running_gen1",
+   "ov": {
+    "battery": true,
+    "lever1": true,
+    "n2_1": 60,
+    "start1": "GRD",
+    "gen1": true
+   },
+   "expected": {
+    "dcPower": true,
+    "acPower": true,
+    "acMainBus1Powered": true,
+    "acMainBus2Powered": false,
+    "ac28vMainBus2Powered": false,
+    "transferBus1Powered": true,
+    "transferBus2Powered": false,
+    "dcBus1Powered": true,
+    "dcBus2Powered": false,
+    "tr1Powered": true,
+    "tr2Powered": false,
+    "tr3Powered": false,
+    "batteryBusPowered": true,
+    "ignition1On": true,
+    "ignition2On": false,
+    "externalPowerContactorClosed": false,
+    "externalPowerNotInUse": false,
+    "eng1Running": true,
+    "eng2Running": false,
+    "apuAvailable": false
+   }
+  },
+  {
+   "name": "both_engines_gen_bus_tie",
+   "ov": {
+    "battery": true,
+    "lever1": true,
+    "lever2": true,
+    "n2_1": 60,
+    "n2_2": 60,
+    "gen1": true,
+    "gen2": true,
+    "busTie": true
+   },
+   "expected": {
+    "dcPower": true,
+    "acPower": true,
+    "acMainBus1Powered": true,
+    "acMainBus2Powered": true,
+    "ac28vMainBus2Powered": true,
+    "transferBus1Powered": true,
+    "transferBus2Powered": true,
+    "dcBus1Powered": true,
+    "dcBus2Powered": true,
+    "tr1Powered": true,
+    "tr2Powered": true,
+    "tr3Powered": true,
+    "batteryBusPowered": true,
+    "ignition1On": false,
+    "ignition2On": false,
+    "externalPowerContactorClosed": false,
+    "externalPowerNotInUse": false,
+    "eng1Running": true,
+    "eng2Running": true,
+    "apuAvailable": false
+   }
+  },
+  {
+   "name": "external_power_only",
+   "ov": {
+    "battery": true,
+    "externalPowerConnected": true,
+    "groundPowerOn": true
+   },
+   "expected": {
+    "dcPower": true,
+    "acPower": true,
+    "acMainBus1Powered": true,
+    "acMainBus2Powered": true,
+    "ac28vMainBus2Powered": true,
+    "transferBus1Powered": true,
+    "transferBus2Powered": true,
+    "dcBus1Powered": true,
+    "dcBus2Powered": true,
+    "tr1Powered": true,
+    "tr2Powered": true,
+    "tr3Powered": true,
+    "batteryBusPowered": true,
+    "ignition1On": false,
+    "ignition2On": false,
+    "externalPowerContactorClosed": true,
+    "externalPowerNotInUse": false,
+    "eng1Running": false,
+    "eng2Running": false,
+    "apuAvailable": false
+   }
+  },
+  {
+   "name": "apu_gen_left_control",
+   "ov": {
+    "battery": true,
+    "apuMaster": "ON",
+    "apuRpm": 100,
+    "apuGen": true,
+    "apuLeftControl": true
+   },
+   "expected": {
+    "dcPower": true,
+    "acPower": true,
+    "acMainBus1Powered": true,
+    "acMainBus2Powered": false,
+    "ac28vMainBus2Powered": false,
+    "transferBus1Powered": true,
+    "transferBus2Powered": false,
+    "dcBus1Powered": true,
+    "dcBus2Powered": false,
+    "tr1Powered": true,
+    "tr2Powered": false,
+    "tr3Powered": false,
+    "batteryBusPowered": true,
+    "ignition1On": false,
+    "ignition2On": false,
+    "externalPowerContactorClosed": false,
+    "externalPowerNotInUse": false,
+    "eng1Running": false,
+    "eng2Running": false,
+    "apuAvailable": true
+   }
+  },
+  {
+   "name": "tr1_failed_gen1",
+   "ov": {
+    "battery": true,
+    "lever1": true,
+    "n2_1": 60,
+    "gen1": true,
+    "faults": {
+     "tr1Failure": true
+    }
+   },
+   "expected": {
+    "dcPower": true,
+    "acPower": true,
+    "acMainBus1Powered": true,
+    "acMainBus2Powered": false,
+    "ac28vMainBus2Powered": false,
+    "transferBus1Powered": true,
+    "transferBus2Powered": false,
+    "dcBus1Powered": false,
+    "dcBus2Powered": false,
+    "tr1Powered": false,
+    "tr2Powered": false,
+    "tr3Powered": false,
+    "batteryBusPowered": true,
+    "ignition1On": false,
+    "ignition2On": false,
+    "externalPowerContactorClosed": false,
+    "externalPowerNotInUse": false,
+    "eng1Running": true,
+    "eng2Running": false,
+    "apuAvailable": false
+   }
+  },
+  {
+   "name": "gen1_open_phase",
+   "ov": {
+    "battery": true,
+    "lever1": true,
+    "n2_1": 60,
+    "gen1": true,
+    "faults": {
+     "openPhase1": true
+    }
+   },
+   "expected": {
+    "dcPower": true,
+    "acPower": true,
+    "acMainBus1Powered": true,
+    "acMainBus2Powered": false,
+    "ac28vMainBus2Powered": false,
+    "transferBus1Powered": true,
+    "transferBus2Powered": false,
+    "dcBus1Powered": false,
+    "dcBus2Powered": false,
+    "tr1Powered": false,
+    "tr2Powered": false,
+    "tr3Powered": false,
+    "batteryBusPowered": true,
+    "ignition1On": false,
+    "ignition2On": false,
+    "externalPowerContactorClosed": false,
+    "externalPowerNotInUse": false,
+    "eng1Running": true,
+    "eng2Running": false,
+    "apuAvailable": false
+   }
+  },
+  {
+   "name": "ignition_grd_both_cb_on",
+   "ov": {
+    "battery": true,
+    "lever1": true,
+    "start1": "GRD"
+   },
+   "expected": {
+    "dcPower": true,
+    "acPower": false,
+    "acMainBus1Powered": false,
+    "acMainBus2Powered": false,
+    "ac28vMainBus2Powered": false,
+    "transferBus1Powered": false,
+    "transferBus2Powered": false,
+    "dcBus1Powered": false,
+    "dcBus2Powered": false,
+    "tr1Powered": false,
+    "tr2Powered": false,
+    "tr3Powered": false,
+    "batteryBusPowered": true,
+    "ignition1On": true,
+    "ignition2On": false,
+    "externalPowerContactorClosed": false,
+    "externalPowerNotInUse": false,
+    "eng1Running": false,
+    "eng2Running": false,
+    "apuAvailable": false
+   }
+  },
+  {
+   "name": "ignition_left_cb_open",
+   "ov": {
+    "battery": true,
+    "lever1": true,
+    "start1": "IGN_L",
+    "circuitBreakers": {
+     "eng1-ign-left": false
+    }
+   },
+   "expected": {
+    "dcPower": true,
+    "acPower": false,
+    "acMainBus1Powered": false,
+    "acMainBus2Powered": false,
+    "ac28vMainBus2Powered": false,
+    "transferBus1Powered": false,
+    "transferBus2Powered": false,
+    "dcBus1Powered": false,
+    "dcBus2Powered": false,
+    "tr1Powered": false,
+    "tr2Powered": false,
+    "tr3Powered": false,
+    "batteryBusPowered": true,
+    "ignition1On": false,
+    "ignition2On": false,
+    "externalPowerContactorClosed": false,
+    "externalPowerNotInUse": false,
+    "eng1Running": false,
+    "eng2Running": false,
+    "apuAvailable": false
+   }
+  },
+  {
+   "name": "gen1_protection_latched",
+   "ov": {
+    "battery": true,
+    "lever1": true,
+    "n2_1": 60,
+    "gen1": true,
+    "generator1ProtectionLatched": true
+   },
+   "expected": {
+    "dcPower": true,
+    "acPower": false,
+    "acMainBus1Powered": false,
+    "acMainBus2Powered": false,
+    "ac28vMainBus2Powered": false,
+    "transferBus1Powered": false,
+    "transferBus2Powered": false,
+    "dcBus1Powered": false,
+    "dcBus2Powered": false,
+    "tr1Powered": false,
+    "tr2Powered": false,
+    "tr3Powered": false,
+    "batteryBusPowered": true,
+    "ignition1On": false,
+    "ignition2On": false,
+    "externalPowerContactorClosed": false,
+    "externalPowerNotInUse": false,
+    "eng1Running": true,
+    "eng2Running": false,
+    "apuAvailable": false
+   }
+  },
+  {
+   "name": "gen2_only_bus_tie_relay_alt",
+   "ov": {
+    "battery": true,
+    "lever2": true,
+    "n2_2": 60,
+    "gen2": true,
+    "busTie": true,
+    "transferRelay1Timer": 0.2
+   },
+   "expected": {
+    "dcPower": true,
+    "acPower": true,
+    "acMainBus1Powered": false,
+    "acMainBus2Powered": true,
+    "ac28vMainBus2Powered": true,
+    "transferBus1Powered": true,
+    "transferBus2Powered": true,
+    "dcBus1Powered": true,
+    "dcBus2Powered": true,
+    "tr1Powered": true,
+    "tr2Powered": true,
+    "tr3Powered": true,
+    "batteryBusPowered": true,
+    "ignition1On": false,
+    "ignition2On": false,
+    "externalPowerContactorClosed": false,
+    "externalPowerNotInUse": false,
+    "eng1Running": false,
+    "eng2Running": true,
+    "apuAvailable": false
+   }
+  },
+  {
+   "name": "gen1_fire_pulled",
+   "ov": {
+    "battery": true,
+    "lever1": true,
+    "n2_1": 60,
+    "gen1": true,
+    "engine1FirePulled": true
+   },
+   "expected": {
+    "dcPower": true,
+    "acPower": false,
+    "acMainBus1Powered": false,
+    "acMainBus2Powered": false,
+    "ac28vMainBus2Powered": false,
+    "transferBus1Powered": false,
+    "transferBus2Powered": false,
+    "dcBus1Powered": false,
+    "dcBus2Powered": false,
+    "tr1Powered": false,
+    "tr2Powered": false,
+    "tr3Powered": false,
+    "batteryBusPowered": true,
+    "ignition1On": false,
+    "ignition2On": false,
+    "externalPowerContactorClosed": false,
+    "externalPowerNotInUse": false,
+    "eng1Running": true,
+    "eng2Running": false,
+    "apuAvailable": false
+   }
+  }
+ ]
+}

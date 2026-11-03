@@ -1,0 +1,11 @@
+import { writeFileSync, mkdirSync } from "fs";
+const SRC = process.argv[2];
+const OUT = process.argv[3];
+mkdirSync(OUT, { recursive: true });
+const { SYSTEMS } = await import(SRC + "/data/systems.ts");
+const { PARTS } = await import(SRC + "/data/components.ts");
+const { AMM_META, AMM_CHAPTERS, AIRCRAFT_DIMS } = await import(SRC + "/data/amm.ts");
+writeFileSync(OUT + "/systems.json", JSON.stringify(SYSTEMS, null, 1));
+writeFileSync(OUT + "/parts.json", JSON.stringify(PARTS, null, 1));
+writeFileSync(OUT + "/amm.json", JSON.stringify({ meta: AMM_META, chapters: AMM_CHAPTERS, dims: AIRCRAFT_DIMS ?? null }, null, 1));
+console.log("systems", SYSTEMS.length, "parts", PARTS.length, "chapters", AMM_CHAPTERS.length);
