@@ -7,6 +7,8 @@ import com.oersted.trainer.sim.FlightNavigator
 import com.oersted.trainer.sim.MipLocal.AttHdgRequest
 import com.oersted.trainer.sim.FlightPlanDraft
 import com.oersted.trainer.sim.FlightRoute
+import com.oersted.trainer.sim.LogEntry
+import com.oersted.trainer.sim.SimState
 import com.oersted.trainer.sim.FlightPhases.Phase
 import com.oersted.trainer.sim.MipLocal
 import com.oersted.trainer.sim.PitotStatic
@@ -55,6 +57,20 @@ class CockpitModel(
     private val _activePlanLabel = MutableStateFlow<String?>(null)
     /** e.g. "RPLL → WSSS" when a plan is active, null otherwise. */
     val activePlanLabel: StateFlow<String?> = _activePlanLabel.asStateFlow()
+
+    private val _log = MutableStateFlow<List<LogEntry>>(emptyList())
+    /** The sim's event log, newest entries as the sim keeps them; drives the LOG drawer. */
+    val log: StateFlow<List<LogEntry>> = _log.asStateFlow()
+
+    private val _simState = MutableStateFlow(sim.current())
+    /** Latest sim state, for the TRAINING console's switch labels. */
+    val simState: StateFlow<SimState> = _simState.asStateFlow()
+
+    /** Applies a pure state change (TrainingConsoleRules and similar) and publishes it. */
+    fun applySim(transform: (SimState) -> SimState) {
+        sim.apply(transform)
+        publish()
+    }
 
     private val _readout = MutableStateFlow(snapshot())
     val readout: StateFlow<CockpitReadout> = _readout.asStateFlow()
@@ -123,9 +139,17 @@ class CockpitModel(
         return SixPackData.build(st, m.attLive, m.att, air)
     }
 
+    /** LOG drawer: clears the sim's event log, as the web's clearLog. */
+    fun clearLog() {
+        sim.clearLog()
+        publish()
+    }
+
     private fun publish() {
         _readout.value = snapshot()
         _sixPack.value = sixPackSnapshot()
+        _log.value = sim.current().log.toList()
+        _simState.value = sim.current()
     }
 
     private companion object {

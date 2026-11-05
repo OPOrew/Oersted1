@@ -1,5 +1,9 @@
 package com.oersted.trainer.ui.cockpit
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +19,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.oersted.trainer.sim.CockpitReadout
@@ -24,6 +31,11 @@ import com.oersted.trainer.sim.CockpitReadout
 fun CockpitScreen(model: CockpitModel) {
     val r by model.readout.collectAsState()
     val sixPack by model.sixPack.collectAsState()
+    val log by model.log.collectAsState()
+    val simState by model.simState.collectAsState()
+    var trainingOpen by remember { mutableStateOf(false) }
+    var logOpen by remember { mutableStateOf(false) }
+    Box(Modifier.fillMaxSize()) {
     Column(Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState())) {
         Text("COCKPIT", style = MaterialTheme.typography.labelSmall)
         Text(r.phaseLabel, style = MaterialTheme.typography.headlineMedium)
@@ -46,5 +58,22 @@ fun CockpitScreen(model: CockpitModel) {
             if (gate != null && !gate.ok) Text(gate.reason, style = MaterialTheme.typography.labelSmall)
             Spacer(Modifier.height(8.dp))
         }
+    }
+    LogDrawerView(
+        entries = log,
+        open = logOpen,
+        onToggle = { logOpen = !logOpen },
+        onClose = { logOpen = false },
+        onClear = { model.clearLog() },
+    )
+    if (trainingOpen) {
+        TrainingConsoleView(s = simState, change = model::applySim, onClose = { trainingOpen = false })
+    } else {
+        OutlinedButton(
+            onClick = { trainingOpen = true },
+            shape = RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp),
+            modifier = Modifier.align(Alignment.TopEnd).padding(top = 8.dp),
+        ) { Text("TRAINING") }
+    }
     }
 }
