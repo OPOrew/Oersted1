@@ -38,6 +38,11 @@ object FlightPlanPresets {
             approachAltitudeFt = 3500.0,
             waypoints = sidFixes,
         )
-        return base.copy(ils = FlightPlanIls.icw()).withVectoredArrival(verde.latitude, verde.longitude)
+        return base.copy(
+            destinationKind = "airport",
+            destinationLat = NavData.WSSS_ILS_02L.thrLat,
+            destinationLon = NavData.WSSS_ILS_02L.thrLon,
+            ils = FlightPlanIls.icw(),
+        ).withVectoredArrival(verde.latitude, verde.longitude)
     }
 }

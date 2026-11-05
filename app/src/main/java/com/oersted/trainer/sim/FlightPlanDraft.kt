@@ -31,6 +31,10 @@ data class FlightPlanDraft(
     val approachAltitudeFt: Double = 3000.0,
     /** Approach guidance ILS (not a route endpoint); null when none is chosen. */
     val ils: ActiveIls? = null,
+    /** Destination kind and the point the destination is plotted at (flight-plan.tsx destinationKind / destinationLat / destinationLon). Draft-only. */
+    val destinationKind: String = "airport",
+    val destinationLat: Double? = null,
+    val destinationLon: Double? = null,
 ) {
     /**
      * TS vectorArrivalFor + the arrival setter: a vectored arrival to WSSS RWY 02L built from the point (fromLat, fromLon).

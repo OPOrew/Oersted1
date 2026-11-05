@@ -349,4 +349,46 @@ and the packages zustand@4.5.5, react@18.3.1, clsx, tailwind-merge installed wit
 - Audio mixer decision (default, the user has not confirmed it): software mixer in pure Kotlin. Primitives ported: `sim/AudioDsp.kt` (biquads with Web Audio coefficients, oscillators, deterministic noise, linear-ramp envelopes), 5 tests. First sound builder ported: the switch click in `sim/AudioSounds.kt`, with exponential envelopes, equal-power pan and a stereo mixer in `sim/AudioDsp.kt` (4 tests). Still to port: the other builders in audio.ts (build/buildFx, about 900 lines), the playSwitchClick throttle, and a PCM output path in platform/.
 - Burst builders ported in `sim/AudioSounds.kt`: toneBurst, noiseBurst, thump, clunk (4 tests). Also ported: whoosh, wheelSpinDown, tyreChirp, lockThunk (4 tests; `Biquad.retune` for the swept filter). Also ported: bell strike, bell pan and chime (3 tests), and the shaker and clack loops (3 tests). Still to port: the engine and APU voices, and the sample-loop builders.
 - CI run 1 (android.yml, testDebugUnitTest) failed at compileDebugKotlin with 3 errors, all fixed in this round: LiveWeatherSampler.sample was an expression body with returns (now a block body); SixPackView and ApproachProgressView imported the internal layout `weight` extension (import removed; Modifier.weight is the scope member). Re-run CI to confirm.
-- Suite: pass=836 fail=0.
+- AudioParam model ported: `TargetParam` in `sim/AudioDsp.kt` (setValueAtTime and setTargetAtTime, 5 tests). It caps its history at 64 events. Still to port: the engine and APU voices built on it.
+- APU voice ported: `sim/ApuVoice.kt` (streaming, 4 tests). Its bandpass retunes every 32 samples. Still to port: the engine voices and the engine space reverb.
+- Recorded-engine layer mapping ported: `sim/EngineSampleLayer.kt` (5 tests). Still to port: the engine's synth voices (fan, compressor, roar, body), the engine space reverb, and the sample attach wiring.
+- Dial angle maps ported: `sim/DialGeometry.kt` (radio altimeter and flap), 5 tests. The Compose dials are in `ui/instruments/Dials.kt` (not compiled locally; the height dial's red sector is not drawn yet).
+- Instrument readout rules ported: `sim/InstrumentReadouts.kt` (yaw needle, fuel LED text, IAS strip text, JS-style rounding), 5 tests.
+- Chronometer rules ported: `sim/ChronometerLogic.kt` (hands, elapsed text, flag, tick, toggle, reset), 6 tests.
+- Selector and EPR rules ported: `sim/SelectorLogic.kt`, 3 tests.
+- Compose controls written in `ui/instruments/Controls.kt` (chronometer face, three-position selector, EPR counter). Not compiled locally; simplified visuals noted in PORT_MAP.
+- Suite: pass=868 fail=0.
+- Engine synth targets ported: `sim/EngineSynthTargets.kt` (6 tests). Still open for the engine voice: the node graph and ramps in platform/, engFx (space reverb and echo), and attachSamples wiring.
+- Suite: pass=874 fail=0.
+- buildFx method targets ported: `sim/FxTargets.kt` (11 tests). Still open: the buildFx node graph and loops in platform/, the wailer siren LFO, and the engine reverb and echo (engFx).
+- Suite: pass=885 fail=0.
+- Plan waypoint editing rules ported: `sim/FlightPlanEdits.kt` (5 tests). Gap: the per-waypoint source tag is not stored (the Kotlin waypoint type has no field). Still open: destination lat/lon and kind on the draft, applySid and applyVectorArrival, and the editor UI.
+- Suite: pass=891 fail=0.
+- SID and vector-arrival apply rules ported: `sim/FlightPlanProcedures.kt` (4 tests). Destination kind and lat/lon added to the draft (draft-only, as on the web). Still open: the plan editor UI, the time compression field, and the publish-and-arm actions that write the MIP store.
+- Suite: pass=895 fail=0.
+- Panel strips written in `ui/instruments/PanelStrips.kt` (IAS strip, QTY LED, yaw indicator, annunciator lamp). Compose only, not compiled locally; CI must verify before more UI is built on them.
+- Light test rules ported: `sim/LightTestLogic.kt` (4 tests). LightTestKey written as Compose in `ui/instruments/LightTestControls.kt` (not compiled locally). Still open: GearColumn, GearPairMini and Comparator views.
+- Suite: pass=899 fail=0.
+- Gear lamp group and comparator plate written in `ui/instruments/GearAndComparator.kt` (Compose only, not compiled locally). Still open: the gear lever and its WOW lock-out tag, and the glareshield band.
+- Gear lever rules ported: `sim/GearLeverLogic.kt` (5 tests). Gear lever view in `ui/instruments/GearLever.kt` (Compose only, not compiled locally). Still open: the glareshield band and the remaining panel parts.
+- Suite: pass=904 fail=0.
+- Glareshield drag rules ported: `sim/GlareshieldDrag.kt` (6 tests). Still open: the glareshield views (knobs, HDG and ALT HOLD buttons, FD controllers, engage paddles, photo background from GlareshieldPanel.tsx, 378 lines).
+- Suite: pass=910 fail=0.
+- Course knob and HDG SEL button written in `ui/glareshield/GlareshieldKnobs.kt` (Compose only, not compiled locally). Still open: ALT HOLD, FD controllers, engage paddles, the photo band.
+- ALT HOLD, engage paddle and pitch knob rules ported: `sim/GlareshieldLogic.kt` (5 tests). Switch and paddle views in `ui/glareshield/GlareshieldSwitches.kt` (Compose only). Still open: the FD controller knobs, the photo band and the FD mode legends.
+- Suite: pass=915 fail=0.
+- Detent knob rules and view ported (`sim/KnobPick.kt`, 6 tests; `ui/glareshield/DetentKnob.kt`, Compose only). Still open: the FdController layout, the SP-77 centre controller and the photo band.
+- Suite: pass=921 fail=0.
+- FD controller layout written in `ui/glareshield/FdController.kt` (Compose only, not compiled locally). Still open: the SP-77 centre controller, the engage paddles' layout, and the photo band.
+- SP-77 centre controller rules ported (engage rule on the requested state, HDG switch, heading wrap, INOP lamps, knob marks) in `sim/GlareshieldLogic.kt`; view in `ui/glareshield/ApCentreController.kt` (Compose only). Still open: the photo band, and the glareshield state holder that wires these views to the MIP store.
+- Suite: pass=926 fail=0.
+- Glareshield annunciator rules ported: `sim/GlareshieldAnnunciators.kt` (7 tests). Correction: the glareshield has no photo; the 'photo band' in earlier notes is the CSS housing. Still open: the Lens views, the housing drawing, and the glareshield state holder wiring.
+- Suite: pass=933 fail=0.
+- Lens view written in `ui/glareshield/Lens.kt` (Compose only, not compiled locally). Still open: the housing drawing and the glareshield state holder that wires the views to the stores.
+- Glareshield state changes ported as reducers (`sim/GlareshieldReducer.kt`, 6 tests) and a StateFlow holder `platform/MipStore.kt` (not compiled locally). Still open: wiring the glareshield views to MipStore and the pedestal store (fire test, bell cut-out), and the housing drawing.
+- Suite: pass=939 fail=0.
+- Warning reducers ported (`sim/WarningReducer.kt`, 3 tests): master caution ack, caution-ack sync, bell cut-out. The pedestal Holder already exists in sim/Pedestal.kt. Still open: wiring the glareshield views to MipStore and the pedestal Holder, and the housing drawing.
+- Suite: pass=942 fail=0.
+- Engine gauge rules ported: `sim/EngineGaugeRules.kt` (5 tests). Still open: the engine gauge views and the cream and dark strip layout in EnginePanels (MainInstrumentPanel.tsx ~388-533), the glareshield views wiring, and the housing drawing.
+- Suite: pass=947 fail=0.
+- Engine gauge views written in `ui/instruments/EngineGauges.kt` (band bar and readout box, Compose only, not compiled locally). Simplified: linear bars instead of the web's round dials. Still open: the EnginePanels layout placement and the glareshield views.

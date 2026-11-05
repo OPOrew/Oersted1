@@ -137,6 +137,44 @@ object AudioDsp {
         }
     }
 
+    /**
+     * Web Audio AudioParam with setValueAtTime and setTargetAtTime (first-order approach with time constant tau).
+     * Events must be given in ascending time order. audio.ts uses setTargetAtTime for most of its live parameters.
+     */
+    class TargetParam(initial: Double) {
+        /**
+         * One scheduled event: a held value (isTarget false) or an approach to [target] with time constant [tau] (isTarget true).
+         * [startV] is the value the approach starts from, captured when the event is added, so evaluation never recurses.
+         */
+        private class Event(val t: Double, val isTarget: Boolean, val v: Double, val target: Double, val tau: Double, val startV: Double)
+
+        private val events = mutableListOf(Event(Double.NEGATIVE_INFINITY, false, initial, initial, 0.0, initial))
+
+        /** History kept for queries; older events are dropped so a live parameter does not grow without limit. */
+        private val maxHistory = 64
+
+        /** Holds [v] from time [t] on. */
+        fun setValueAtTime(v: Double, t: Double) = add(Event(t, false, v, v, 0.0, v))
+
+        /** Approaches [target] from the value it has at [t], with time constant [tau] seconds. */
+        fun setTargetAtTime(target: Double, t: Double, tau: Double) = add(Event(t, true, 0.0, target, tau, valueAt(t)))
+
+        private fun add(e: Event) {
+            events.add(e)
+            if (events.size > maxHistory) events.removeAt(0)
+        }
+
+        /** Value at [t], from the latest event at or before it. */
+        fun valueAt(t: Double): Double {
+            var i = events.size - 1
+            while (i > 0 && events[i].t > t) i--
+            val e = events[i]
+            if (!e.isTarget) return e.v
+            if (e.tau <= 0.0) return e.target
+            return e.target + (e.startV - e.target) * Math.exp(-(t - e.t) / e.tau)
+        }
+    }
+
     /** Equal-power stereo pan (Web Audio StereoPannerNode): returns (left gain, right gain) for pan in [-1, 1]. */
     fun equalPowerPan(pan: Double): Pair<Double, Double> {
         val x = (pan.coerceIn(-1.0, 1.0) + 1) / 2
