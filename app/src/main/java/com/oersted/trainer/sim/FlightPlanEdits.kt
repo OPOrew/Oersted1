@@ -81,4 +81,14 @@ object FlightPlanEdits {
         val m = ((rounded % 360) + 360) % 360
         return m.toInt()
     }
+
+    /** The en-route time compression choices on the PLAN screen (flight-plan.tsx select). */
+    val TIME_COMPRESSION_OPTIONS: List<Double> = listOf(1.0, 5.0, 10.0, 15.0, 20.0)
+
+    /** Picks a compression from the select; any other value leaves the draft unchanged. */
+    fun withTimeCompression(draft: FlightPlanDraft, value: Double): FlightPlanDraft =
+        if (value in TIME_COMPRESSION_OPTIONS) draft.copy(timeCompression = value) else draft
+
+    /** The distance boxes (top of climb, descent start): 0 to 1500 NM, blank is 0. */
+    fun nmFromText(text: String): Double = clamp(jsNumberOrZero(text), 0.0, 1500.0)
 }

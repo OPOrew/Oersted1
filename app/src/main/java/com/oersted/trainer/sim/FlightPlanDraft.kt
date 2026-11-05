@@ -31,6 +31,8 @@ data class FlightPlanDraft(
     val approachAltitudeFt: Double = 3000.0,
     /** Approach guidance ILS (not a route endpoint); null when none is chosen. */
     val ils: ActiveIls? = null,
+    /** En-route time compression chosen on the PLAN screen (1, 5, 10, 15 or 20). Default 15, as DEFAULT_PLAN. */
+    val timeCompression: Double = 15.0,
     /** Destination kind and the point the destination is plotted at (flight-plan.tsx destinationKind / destinationLat / destinationLon). Draft-only. */
     val destinationKind: String = "airport",
     val destinationLat: Double? = null,
@@ -88,6 +90,6 @@ data class FlightPlanDraft(
         waypoints = waypoints,
         ils = ils,
         arrival = arrival,
-        timeCompression = 15.0,
+        timeCompression = timeCompression,
     )
 }

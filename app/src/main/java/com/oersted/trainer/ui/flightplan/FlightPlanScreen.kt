@@ -24,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.oersted.trainer.platform.PlanStore
 import com.oersted.trainer.sim.FlightPlanDraft
-import com.oersted.trainer.sim.FlightRoute
 
 /**
  * PLAN tab: edit the core flight-plan fields, save them on this device, and activate them into the cockpit.
@@ -66,6 +65,8 @@ fun FlightPlanScreen(store: PlanStore, activePlanLabel: String?, onActivate: (Fl
             modifier = Modifier.fillMaxWidth(),
         )
         Spacer(Modifier.height(12.dp))
+        ProcedureSection(draft) { d, n -> draft = d; if (n.isNotEmpty()) notice = n }
+        Spacer(Modifier.height(12.dp))
 
         if (problem != null) Text(problem, style = MaterialTheme.typography.bodySmall)
         Row(Modifier.fillMaxWidth()) {
@@ -82,15 +83,9 @@ fun FlightPlanScreen(store: PlanStore, activePlanLabel: String?, onActivate: (Fl
         OutlinedButton(
             onClick = {
                 // Built from the last fix, or the departure airport when the plan has no fixes (TS vectorArrivalFor).
-                val from = draft.waypoints.lastOrNull()
-                val dep = FlightRoute.AIRPORTS[draft.departure]
-                val lat = from?.latitude ?: dep?.lat
-                val lon = from?.longitude ?: dep?.lon
-                if (lat == null || lon == null) {
-                    notice = "Unknown departure airport, so the vector pattern cannot be placed."
-                } else {
-                    draft = draft.withVectoredArrival(lat, lon)
-                    notice = "Vectored ILS arrival to WSSS RWY 02L added (VCT-A downwind, VCT-B base, VCT-C intercept). These fixes are synthetic, not charted."
+                when (val r = com.oersted.trainer.sim.FlightPlanProcedures.applyVectorArrival(draft)) {
+                    is com.oersted.trainer.sim.FlightPlanProcedures.Result.Applied -> { draft = r.draft; notice = r.notice }
+                    is com.oersted.trainer.sim.FlightPlanProcedures.Result.Refused -> notice = r.reason
                 }
             },
             modifier = Modifier.fillMaxWidth(),

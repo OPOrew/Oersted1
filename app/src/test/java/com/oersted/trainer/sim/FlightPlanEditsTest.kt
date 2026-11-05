@@ -65,4 +65,17 @@ class FlightPlanEditsTest {
         assertEquals(0, FlightPlanEdits.headingBugTarget(359.6, 0.0))   // round(359.6) = 360 -> 0
         assertEquals(0, FlightPlanEdits.headingBugTarget(0.0, 0.0))
     }
+
+    @Test fun timeCompressionTakesOnlyTheSelectOptions() {
+        assertEquals(15.0, FlightPlanDraft().timeCompression, 0.0)
+        assertEquals(5.0, FlightPlanEdits.withTimeCompression(base, 5.0).timeCompression, 0.0)
+        assertEquals(15.0, FlightPlanEdits.withTimeCompression(base, 7.0).timeCompression, 0.0)
+        assertEquals(15.0, FlightPlanEdits.withTimeCompression(base, 5.0).copy(timeCompression = 15.0).toActive("t").timeCompression!!, 0.0)
+    }
+
+    @Test fun distanceBoxesClampToFifteenHundredNm() {
+        assertEquals(0.0, FlightPlanEdits.nmFromText(""), 0.0)
+        assertEquals(1500.0, FlightPlanEdits.nmFromText("2000"), 0.0)
+        assertEquals(180.0, FlightPlanEdits.nmFromText("180"), 0.0)
+    }
 }

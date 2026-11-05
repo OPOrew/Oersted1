@@ -108,7 +108,7 @@ fun QtyLed(
             .background(Color(0xFF2A2F37), RoundedCornerShape(14.dp))
             .border(2.dp, Color(0xFF1C1F24), RoundedCornerShape(14.dp)),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Alignment.CenterVertically,
+        verticalArrangement = Arrangement.Center,
     ) {
         Box(
             modifier = Modifier

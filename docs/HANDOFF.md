@@ -392,3 +392,6 @@ and the packages zustand@4.5.5, react@18.3.1, clsx, tailwind-merge installed wit
 - Engine gauge rules ported: `sim/EngineGaugeRules.kt` (5 tests). Still open: the engine gauge views and the cream and dark strip layout in EnginePanels (MainInstrumentPanel.tsx ~388-533), the glareshield views wiring, and the housing drawing.
 - Suite: pass=947 fail=0.
 - Engine gauge views written in `ui/instruments/EngineGauges.kt` (band bar and readout box, Compose only, not compiled locally). Simplified: linear bars instead of the web's round dials. Still open: the EnginePanels layout placement and the glareshield views.
+- Time compression field and distance clamps ported (`FlightPlanDraft.timeCompression`, `FlightPlanEdits`), 2 more tests. Still open: the plan editor screen, the attitude hook caller, the panel and glareshield layouts, and the trainer screens.
+- Suite: pass=949 fail=0.
+- Plan procedures section written (`ui/flightplan/ProcedureSection.kt`) and wired into the existing PLAN screen; the vector button now uses the ported rule. Compose only, not compiled locally. Still open: the waypoint add form and the navaid picker on the PLAN screen, the attitude hook caller, and the panel layouts.
