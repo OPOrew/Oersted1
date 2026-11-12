@@ -45,8 +45,10 @@ class CockpitModel(
     private val clockMs: () -> Long = { System.currentTimeMillis() }
     private val nav = FlightNavigator()
     private val sim = SimStore(initialSimState(), nav, { plan }, { clockMs().toDouble() })
-    private val mip = MipLocal.Holder()
-    private val pedestal = Pedestal.Holder()
+    private val _mip = MutableStateFlow(MipLocal.MipState())
+    private val _pedestal = MutableStateFlow(Pedestal.PedestalState())
+    private val mip = MipLocal.Holder(onChange = { _mip.value = it })
+    private val pedestal = Pedestal.Holder(onChange = { _pedestal.value = it })
     private val world = SimPhaseWorld(sim, mip, pedestal, nav, { clockMs() }, monoSec, { plan })
     private val controller = PhaseController(world)
     private val phaseTimer = PhaseTimer(scope, controller, monoSec)
@@ -97,6 +99,24 @@ class CockpitModel(
 
     /** Web "Cold & dark" (reset to the initial state). */
     fun coldAndDark() = applySim { initialSimState() }
+
+    /** MIP state (FD, autopilot, warning lamps) for the glareshield panel. */
+    val mipState: StateFlow<MipLocal.MipState> = _mip.asStateFlow()
+
+    /** Pedestal state (fire test, bell cut-out) for the glareshield panel. */
+    val pedestalState: StateFlow<Pedestal.PedestalState> = _pedestal.asStateFlow()
+
+    /** Applies a MIP reducer (GlareshieldReducer, WarningReducer) and republishes the sim. */
+    fun updateMip(transform: (MipLocal.MipState) -> MipLocal.MipState) {
+        mip.set(transform)
+        publish()
+    }
+
+    /** Applies a pedestal reducer (WarningReducer.silenceBell and similar) and republishes the sim. */
+    fun updatePedestal(transform: (Pedestal.PedestalState) -> Pedestal.PedestalState) {
+        pedestal.set(transform)
+        publish()
+    }
 
     private val _readout = MutableStateFlow(snapshot())
     val readout: StateFlow<CockpitReadout> = _readout.asStateFlow()
