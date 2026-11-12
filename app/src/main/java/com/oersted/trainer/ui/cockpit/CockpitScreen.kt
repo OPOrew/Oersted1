@@ -26,6 +26,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.oersted.trainer.sim.CockpitReadout
 import com.oersted.trainer.ui.glareshield.GlareshieldPanel
+import com.oersted.trainer.ui.instruments.AlertLenses
+import com.oersted.trainer.ui.instruments.AnnPanel
+import com.oersted.trainer.ui.instruments.TopStrip
 import com.oersted.trainer.ui.panel.Overhead
 import androidx.compose.foundation.layout.BoxWithConstraints
 
@@ -67,6 +70,17 @@ fun CockpitScreen(model: CockpitModel) {
         Spacer(Modifier.height(8.dp))
         BoxWithConstraints(Modifier.fillMaxWidth()) {
             GlareshieldPanel(cockpit = model, width = maxWidth)
+        }
+        Spacer(Modifier.height(12.dp))
+        Text("CAPTAIN CAPTION STRIP", style = MaterialTheme.typography.labelSmall)
+        TopStrip(cockpit = model, left = true)
+        Spacer(Modifier.height(8.dp))
+        Text("FIRST OFFICER CAPTION STRIP", style = MaterialTheme.typography.labelSmall)
+        TopStrip(cockpit = model, left = false)
+        Spacer(Modifier.height(8.dp))
+        Row(Modifier.fillMaxWidth().height(120.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Box(Modifier.weight(1f).fillMaxSize()) { AlertLenses(cockpit = model, left = true) }
+            Box(Modifier.weight(2f).fillMaxSize()) { AnnPanel(cockpit = model, left = true) }
         }
         Spacer(Modifier.height(16.dp))
         Text("OVERHEAD PANEL", style = MaterialTheme.typography.labelSmall)
