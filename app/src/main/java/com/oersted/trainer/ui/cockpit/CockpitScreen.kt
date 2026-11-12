@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.oersted.trainer.sim.CockpitReadout
+import com.oersted.trainer.ui.panel.Overhead
 
 /** Cockpit tab: phase, hint, the key readouts and the phase buttons (each gated as the web's canStart). Not compiled in the sandbox. */
 @Composable
@@ -33,6 +34,7 @@ fun CockpitScreen(model: CockpitModel) {
     val sixPack by model.sixPack.collectAsState()
     val log by model.log.collectAsState()
     val simState by model.simState.collectAsState()
+    val derived by model.derived.collectAsState()
     var trainingOpen by remember { mutableStateOf(false) }
     var logOpen by remember { mutableStateOf(false) }
     Box(Modifier.fillMaxSize()) {
@@ -58,6 +60,10 @@ fun CockpitScreen(model: CockpitModel) {
             if (gate != null && !gate.ok) Text(gate.reason, style = MaterialTheme.typography.labelSmall)
             Spacer(Modifier.height(8.dp))
         }
+        Spacer(Modifier.height(16.dp))
+        Text("OVERHEAD PANEL", style = MaterialTheme.typography.labelSmall)
+        Spacer(Modifier.height(8.dp))
+        Overhead(cockpit = model)
     }
     LogDrawerView(
         entries = log,
@@ -67,7 +73,7 @@ fun CockpitScreen(model: CockpitModel) {
         onClear = { model.clearLog() },
     )
     if (trainingOpen) {
-        TrainingConsoleView(s = simState, change = model::applySim, onClose = { trainingOpen = false })
+        TrainingConsoleView(s = simState, d = derived, change = model::applySim, onClose = { trainingOpen = false })
     } else {
         OutlinedButton(
             onClick = { trainingOpen = true },

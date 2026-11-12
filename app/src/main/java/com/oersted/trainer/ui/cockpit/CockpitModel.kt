@@ -3,6 +3,8 @@ package com.oersted.trainer.ui.cockpit
 import com.oersted.trainer.platform.PhaseTimer
 import com.oersted.trainer.sim.ActiveFlightPlan
 import com.oersted.trainer.sim.CockpitReadout
+import com.oersted.trainer.sim.Derived
+import com.oersted.trainer.sim.SimActions
 import com.oersted.trainer.sim.FlightNavigator
 import com.oersted.trainer.sim.MipLocal.AttHdgRequest
 import com.oersted.trainer.sim.FlightPlanDraft
@@ -62,6 +64,10 @@ class CockpitModel(
     /** The sim's event log, newest entries as the sim keeps them; drives the LOG drawer. */
     val log: StateFlow<List<LogEntry>> = _log.asStateFlow()
 
+    private val _derived = MutableStateFlow(sim.derived(sim.current()))
+    /** Derived values for the current sim state (transfer-bus power, engine running, ...). */
+    val derived: StateFlow<Derived> = _derived.asStateFlow()
+
     private val _simState = MutableStateFlow(sim.current())
     /** Latest sim state, for the TRAINING console's switch labels. */
     val simState: StateFlow<SimState> = _simState.asStateFlow()
@@ -71,6 +77,26 @@ class CockpitModel(
         sim.apply(transform)
         publish()
     }
+
+    /** Kotlin form of the web `s.patch({...})`: copy the state, apply the edit, publish. */
+    fun patchSim(edit: SimState.() -> Unit) {
+        applySim { s -> s.copy().apply(edit) }
+    }
+
+    /** Web StatusStrip time button: 1x -> 4x -> 10x -> 1x. */
+    fun cycleTimeScale() {
+        applySim { s ->
+            val c = s.copy()
+            c.timeScale = if (s.timeScale == 1.0) 4.0 else if (s.timeScale == 4.0) 10.0 else 1.0
+            c
+        }
+    }
+
+    /** Web "Set APU running" (SimActions.readyApu preset). */
+    fun readyApu() = applySim { SimActions.readyApu(System.currentTimeMillis().toDouble()) }
+
+    /** Web "Cold & dark" (reset to the initial state). */
+    fun coldAndDark() = applySim { initialSimState() }
 
     private val _readout = MutableStateFlow(snapshot())
     val readout: StateFlow<CockpitReadout> = _readout.asStateFlow()
@@ -150,6 +176,7 @@ class CockpitModel(
         _sixPack.value = sixPackSnapshot()
         _log.value = sim.current().log.toList()
         _simState.value = sim.current()
+        _derived.value = sim.derived(sim.current())
     }
 
     private companion object {

@@ -425,3 +425,42 @@ and the packages zustand@4.5.5, react@18.3.1, clsx, tailwind-merge installed wit
 - Suite: pass=1044 fail=0.
 - Hydraulics panel switch rules ported: `sim/HydraulicTrainerRules.kt` (engine and electric pumps, standby selector, ground interconnect, ground servicing and hydraulic power switches, ground air cart, enable rules for the electric pumps and the weight-on-wheels gate; 6 tests). Still open: the Hydraulics panel view and its flow drawing (HydraulicsTrainerPanel and the wire builders in routes/cockpit.tsx).
 - Suite: pass=1050 fail=0.
+- Hydraulics section view written in `ui/cockpit/TrainingConsoleView.kt` (Compose only, not compiled locally): ENG 1/2 and ELEC 1/2 pumps (ELEC enabled by the AC transfer bus), STBY HYD selector, GND INTERCONNECT, GND SERVICING, GND HYD POWER and GND AIR CART (ground only). `CockpitModel` now exposes `derived`, and `CockpitScreen` passes it to the console. Still open: the hydraulic flow drawing, and the other section views.
+- Fuel and Engine Start section views written in `ui/cockpit/TrainingConsoleView.kt` (Compose only, not compiled locally): tank readouts, six boost pumps, crossfeed, low fuel and reset quantity; engine status line, START and SHUTDOWN (through SimActions). Still open: the other section views, the hydraulic flow drawing and the LOG/TRAINING polish.
+
+## Shell layout matches the web AppShell
+- Header "Classic 737 Line Lab" with "model · book Rev revision" (from AMM meta), as in `components/layout/AppShell.tsx`.
+- Bottom nav in web NAV order: Hangar (systems list), Flight deck (cockpit), Flight plan, Procedures (placeholder, not ported), Library (parts).
+- The Android-only AMM tab was removed from the bottom bar; `AmmScreen` is still in `AppRoot.kt` but unused, pending a decision on where the AMM chapter index goes (web: Library page).
+- Not yet done: light/dark theme toggle (web `classic737-theme`), StatusStrip and SimTicker in the shell. Not compiled locally; verify in GitHub Actions.
+
+## Shell chrome ported (StatusStrip, sim-time bar, theme)
+- `ui/common/ShellChrome.kt`: `Classic737Palette` (web @theme tokens), `classic737Scheme(light)` (dark and html.light-mode values), `StatusStrip` (MASTER CAUTION, FIRE, GND/AIR, APU, N2-1/2, DUCT, HYD A/B tapes; 1x/4x/10x time, Set APU running, Cold & dark).
+- `MainActivity` stores the theme under `classic737-theme` (SharedPreferences), like the web's localStorage key.
+- `CockpitModel.cycleTimeScale()`, `readyApu()`, `coldAndDark()`. Cold & dark uses `initialSimState()`, so it also clears the log (the web keeps the log).
+- Not compiled locally; verify in GitHub Actions.
+
+## Library and Hangar match the web (not compiled locally)
+- Library: search box and system chips (All plus each system's short name) filter parts the same way as `routes/library.tsx`.
+- Hangar: system cards show "OPEN LAYOUT →". The link is not wired, because the system layout screen is not ported.
+
+## Procedures page ported (not compiled locally)
+- `ui/procedures/ProceduresScreen.kt` mirrors `routes/procedures.tsx`: Normal and Emergency switch, procedure chips, live step list (done / next highlighted), Complete / In progress badge, Reset airplane and APU running preset buttons.
+- Uses `sim/Procedures.kt` (already ported and tested). Not yet ported from the web page: the Overhead and GroundModule panels under the steps.
+
+## System layout screens (Hangar → system) ported (not compiled locally)
+- `ui/aircraft/AircraftPlan.kt`: `components/aircraft/AircraftPlan.tsx` as a Compose Canvas in the web's 1200 x 520 space (wings, flaps, spoilers, fuselage, windows, APU cone and inlet door, JT8D nacelles, gear, pack bays, part hotspots). Tap selects the nearest part. Not ported: the flow and spool CSS animations and the hover card.
+- `ui/systems/SystemScreen.kt`: `routes/systems.$id.tsx` (header, system chips, fault buttons, plan, selected part detail, part list). Not ported: the Overhead and GroundModule panels under the plan.
+- AppRoot: the Hangar opens a system through `openSystemId` (back button returns to the list). The Hangar cards are now clickable.
+
+## Overhead panel port (in progress, not compiled locally)
+- Done: `ui/panel/Widgets.kt` (widgets.tsx), `ui/panel/OverheadModules.kt` (Flight controls, Hydraulics, Electrical, APU). Remaining from Overhead.tsx: Bleed/packs, Fuel, Environment, Anti-ice + window heat, Start, Exterior lights, Flight deck lights, Signs/emergency, Annunciator bar, and the `Overhead` composable with `focus`.
+- Sim edits use `SimEdit` = `(SimState.() -> Unit) -> Unit` (the Kotlin form of `s.patch`). Web patch log notes are not written yet.
+- Overhead port is now complete for the Overhead module grid and lighting modules (`ui/panel/Overhead.kt`, `OverheadModules.kt`, `OverheadModules2.kt`). The Flight deck shows the overhead below the phase buttons (`CockpitScreen.kt`).
+- `CockpitModel.patchSim(edit)` is the Kotlin form of the web `s.patch`. Log notes from the web patch calls are not written yet.
+- Not ported from `Overhead.tsx`: Landing gear, Brake, Fire, Fault, Scenario, Electrical distribution and Ground modules (they belong to their own section views).
+- Not compiled locally; verify in GitHub Actions.
+- Brakes and fire ported (`ui/panel/BrakeFireModules.kt`): `BrakeModule`, `BrakeWheelReadout` (text rows, the wheel graphic is not ported), `FireModule`. The web uses these in their own sections (brakes, fire), so they are not on the Overhead grid yet. Fire actions use `FireProtectionRules`; the stubborn-bottle rule is passed as `stubborn = false` for now.
+- Scenarios and fault injection ported (`ui/panel/ScenarioFaultModules.kt`): the five scenario buttons (SimActions.runScenario), the full fault button table (SimActions.toggleFault), the center pump auto-shutoff toggle (FaultInjectionRules), and the landing-gear fault box (injectLandingGearFault / clearLandingGearFault). Not yet placed on a screen; the web uses them in the training views.
+- Electrical distribution and ground module ported (`ui/panel/GroundElectricalModules.kt`). Not yet on a screen; the web uses them in the electrical and gear/ground views.
+- All of `components/panel/Overhead.tsx` is now ported as Kotlin files. The grouped overhead screen (`ui/panel/Overhead.kt`) shows only the overhead modules; brakes, fire, scenarios, faults, electrical distribution and ground are still to be placed on their section screens.
