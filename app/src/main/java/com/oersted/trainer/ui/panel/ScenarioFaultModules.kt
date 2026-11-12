@@ -1,3 +1,5 @@
+@file:OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+
 package com.oersted.trainer.ui.panel
 
 import androidx.compose.foundation.background
