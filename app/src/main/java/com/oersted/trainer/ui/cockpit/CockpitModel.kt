@@ -2,6 +2,9 @@ package com.oersted.trainer.ui.cockpit
 
 import com.oersted.trainer.platform.PhaseTimer
 import com.oersted.trainer.sim.ActiveFlightPlan
+import com.oersted.trainer.sim.AttitudeTicker
+import com.oersted.trainer.sim.FlightPhaseControl
+import com.oersted.trainer.sim.Situation
 import com.oersted.trainer.sim.CockpitReadout
 import com.oersted.trainer.sim.Derived
 import com.oersted.trainer.sim.SimActions
@@ -51,6 +54,16 @@ class CockpitModel(
     private val pedestal = Pedestal.Holder(onChange = { _pedestal.value = it })
     private val world = SimPhaseWorld(sim, mip, pedestal, nav, { clockMs() }, monoSec, { plan })
     private val controller = PhaseController(world)
+    private val situation = Situation.SituationHolder()
+    private val attitude = AttitudeTicker(
+        sim,
+        mip,
+        pedestal,
+        nav,
+        { plan },
+        { alt -> FlightPhaseControl.applyPhaseToGuidance(nav.liveGuidance(), controller.phase, alt, plan) },
+        situation,
+    )
     private val phaseTimer = PhaseTimer(scope, controller, monoSec)
     private var simJob: Job? = null
 
@@ -145,6 +158,7 @@ class CockpitModel(
     fun start() {
         if (simJob?.isActive == true) return
         phaseTimer.start()
+        attitude.start()
         simJob = scope.launch {
             var last = monoSec()
             var acc = 0.0
@@ -157,6 +171,7 @@ class CockpitModel(
                     sim.tick(min(0.25, acc))
                     acc = 0.0
                 }
+                attitude.maybeTick(now)
                 publish()
             }
         }
@@ -166,6 +181,7 @@ class CockpitModel(
         simJob?.cancel()
         simJob = null
         phaseTimer.stop()
+        attitude.stop()
     }
 
     fun startPhase(p: Phase) {
