@@ -49,7 +49,7 @@ import com.oersted.trainer.sim.PedestalLeversRules as Rules
 private val Cream = Color(0xFFCFC9B6)
 
 /** Vertical placement: the child's centre sits [y] below the top of the parent (web `-translate-y-1/2` at `top: y`). */
-private fun Modifier.centeredAtY(y: Dp): Modifier = layout { measurable, constraints ->
+internal fun Modifier.centeredAtY(y: Dp): Modifier = layout { measurable, constraints ->
     val p = measurable.measure(constraints.copy(minWidth = 0, minHeight = 0))
     layout(p.width, p.height) { p.place(0, y.roundToPx() - p.height / 2) }
 }

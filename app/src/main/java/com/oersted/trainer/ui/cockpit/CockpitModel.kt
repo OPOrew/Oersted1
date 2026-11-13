@@ -17,6 +17,7 @@ import com.oersted.trainer.sim.LogEntry
 import com.oersted.trainer.sim.SimState
 import com.oersted.trainer.sim.FlightPhases.Phase
 import com.oersted.trainer.sim.MipLocal
+import com.oersted.trainer.sim.OverheadLocal
 import com.oersted.trainer.sim.PitotStatic
 import com.oersted.trainer.sim.SixPackData
 import com.oersted.trainer.sim.Pedestal
@@ -53,6 +54,7 @@ class CockpitModel(
     private val _pedestal = MutableStateFlow(Pedestal.PedestalState())
     private val mip = MipLocal.Holder(onChange = { _mip.value = it })
     private val pedestal = Pedestal.Holder(onChange = { _pedestal.value = it })
+    private val overheadLocal = OverheadLocal.Holder()
     private val world = SimPhaseWorld(sim, mip, pedestal, nav, { clockMs() }, monoSec, { plan })
     private val controller = PhaseController(world)
     private val situation = Situation.SituationHolder()
@@ -138,6 +140,11 @@ class CockpitModel(
     fun updateMip(transform: (MipLocal.MipState) -> MipLocal.MipState) {
         mip.set(transform)
         publish()
+    }
+
+    /** Applies an overhead-local reducer (web useOverheadLocal.set), e.g. the pedestal horn cutout. Nothing in the sim reads it yet. */
+    fun updateOverhead(transform: (OverheadLocal.OverheadLocalState) -> OverheadLocal.OverheadLocalState) {
+        overheadLocal.set(transform)
     }
 
     /** Applies a pedestal reducer (WarningReducer.silenceBell and similar) and republishes the sim. */
