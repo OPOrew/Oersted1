@@ -273,7 +273,7 @@ fun SpringSwitch(up: String, down: String, value: String, onChange: (String) -> 
  * child's own size ([fx], [fy]: 0 keeps the left/top edge there, -0.5 centres it, -1 puts the right/bottom edge there).
  * The web does this with left/top calc() and translate(); the parent must be a Box with the child centred.
  */
-private fun Modifier.anchoredAt(dx: Dp, dy: Dp, fx: Float, fy: Float): Modifier = layout { measurable, constraints ->
+internal fun Modifier.anchoredAt(dx: Dp, dy: Dp, fx: Float, fy: Float): Modifier = layout { measurable, constraints ->
     val p = measurable.measure(constraints.copy(minWidth = 0, minHeight = 0))
     layout(p.width, p.height) {
         p.place(

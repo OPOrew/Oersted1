@@ -8,6 +8,7 @@ import com.oersted.trainer.sim.Situation
 import com.oersted.trainer.sim.CockpitReadout
 import com.oersted.trainer.sim.Derived
 import com.oersted.trainer.sim.SimActions
+import com.oersted.trainer.sim.FlightNavigationState
 import com.oersted.trainer.sim.FlightNavigator
 import com.oersted.trainer.sim.MipLocal.AttHdgRequest
 import com.oersted.trainer.sim.FlightPlanDraft
@@ -83,6 +84,14 @@ class CockpitModel(
     /** Derived values for the current sim state (transfer-bus power, engine running, ...). */
     val derived: StateFlow<Derived> = _derived.asStateFlow()
 
+    private val _activePlan = MutableStateFlow<ActiveFlightPlan?>(null)
+    /** The active flight plan (web readActiveFlightPlan), for the pedestal GPS. */
+    val activePlan: StateFlow<ActiveFlightPlan?> = _activePlan.asStateFlow()
+
+    private val _navState = MutableStateFlow<FlightNavigationState?>(null)
+    /** The navigator's latest state (web readFlightNavigationState), for the pedestal GPS. */
+    val navState: StateFlow<FlightNavigationState?> = _navState.asStateFlow()
+
     private val _simState = MutableStateFlow(sim.current())
     /** Latest sim state, for the TRAINING console's switch labels. */
     val simState: StateFlow<SimState> = _simState.asStateFlow()
@@ -105,6 +114,12 @@ class CockpitModel(
             c.timeScale = if (s.timeScale == 1.0) 4.0 else if (s.timeScale == 4.0) 10.0 else 1.0
             c
         }
+    }
+
+    /** Kotlin form of the web `s.patch({...}, note)`: applies the edit to a copy, writes [note] to the event log, publishes. */
+    fun patchSimNote(note: String, edit: SimState.() -> Unit) {
+        sim.update(note = note) { it.edit() }
+        publish()
     }
 
     /** Web "Set APU running" (SimActions.readyApu preset). */
@@ -211,6 +226,8 @@ class CockpitModel(
         _readout.value = snapshot()
         _sixPack.value = sixPackSnapshot()
         _log.value = sim.current().log.toList()
+        _activePlan.value = plan
+        _navState.value = nav.readState()
         _simState.value = sim.current()
         _derived.value = sim.derived(sim.current())
     }

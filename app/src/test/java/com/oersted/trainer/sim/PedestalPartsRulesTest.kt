@@ -134,4 +134,27 @@ class PedestalPartsRulesTest {
         assertEquals(20.0, R.tuneDelta(170.0, -170.0), 1e-9)
         assertEquals(-20.0, R.tuneDelta(-170.0, 170.0), 1e-9)
     }
+
+    @Test fun knobAndSwitchStateIsPersistedByKey() {
+        var s = Pedestal.PedestalState()
+        assertEquals(0.3, R.knobOf(s, "panel", 0.3), 1e-9)
+        s = R.withKnob(s, "panel", 0.8)
+        assertEquals(0.8, R.knobOf(s, "panel", 0.3), 1e-9)
+        assertEquals(0.3, R.knobOf(s, "flood", 0.3), 1e-9)
+        assertFalse(R.swOf(s, "mic", false))
+        s = R.withSw(s, "mic", true)
+        assertTrue(R.swOf(s, "mic", false))
+    }
+
+    @Test fun bat3HasThreeLeverAnglesAndShortLegends() {
+        val o = listOf("A", "NORM", "B")
+        assertEquals(-42, R.bat3Rotation(o, "A"))
+        assertEquals(0, R.bat3Rotation(o, "NORM"))
+        assertEquals(42, R.bat3Rotation(o, "B"))
+        assertEquals(-42, R.bat3Rotation(o, "junk"))
+        assertEquals("N", R.bat3Legend("NORMAL"))
+        assertEquals("N", R.bat3Legend("NORM"))
+        assertEquals("A", R.bat3Legend("A"))
+    }
 }
+

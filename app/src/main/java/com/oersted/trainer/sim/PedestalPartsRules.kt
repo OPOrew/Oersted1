@@ -172,4 +172,25 @@ object PedestalPartsRules {
         if (d < -180) d += 360
         return d
     }
+
+    // ------------------------------------------------- CenterPedestal state helpers
+
+    /** web useKnobState read: the persisted knob value for [key], else [def] */
+    fun knobOf(s: Pedestal.PedestalState, key: String, def: Double): Double = s.knobs[key] ?: def
+
+    /** web useKnobState write */
+    fun withKnob(s: Pedestal.PedestalState, key: String, v: Double): Pedestal.PedestalState = s.copy(knobs = s.knobs + (key to v))
+
+    /** web useSwState read */
+    fun swOf(s: Pedestal.PedestalState, key: String, def: Boolean): Boolean = s.sw[key] ?: def
+
+    /** web useSwState write */
+    fun withSw(s: Pedestal.PedestalState, key: String, v: Boolean): Pedestal.PedestalState = s.copy(sw = s.sw + (key to v))
+
+    /** web Bat3 lever angle: -42, 0 or 42 degrees for the first, second and third option */
+    fun bat3Rotation(options: List<String>, value: String): Int = listOf(-42, 0, 42)[max(0, options.indexOf(value))]
+
+    /** web Bat3 default legend: N for NORMAL / NORM, else the option itself */
+    fun bat3Legend(option: String): String = if (option == "NORMAL" || option == "NORM") "N" else option
 }
+
