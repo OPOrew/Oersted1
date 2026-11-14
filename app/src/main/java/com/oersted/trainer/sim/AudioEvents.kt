@@ -117,7 +117,7 @@ object AudioEvents {
         val startValve: List<Boolean> = listOf(false, false),
         val fireHandles: List<Boolean> = emptyList(),
         val bottles: List<Boolean> = emptyList(),
-        val signs: List<Boolean>? = null,
+        val signs: List<String>? = null,
         val packs: List<Boolean> = listOf(false, false),
         val fuelPumps: Double = 0.0,
         val acPower: Boolean = false,
@@ -177,7 +177,7 @@ object AudioEvents {
         val relays: List<Boolean>,
         val fire: List<Boolean>,
         val bottles: List<Boolean>,
-        val signs: List<Boolean>?,
+        val signs: List<String>?,
         val parking: Boolean,
         val brake: Double,
         val valve: List<Boolean>,
@@ -442,9 +442,9 @@ object AudioEvents {
                 val cs = cur.signs
                 val ps = p.signs
                 if (cs != null && ps != null) {
-                    if (cs.getOrElse(0) { false } != ps.getOrElse(0) { false }) {
+                    if (cs.getOrElse(0) { "OFF" } != ps.getOrElse(0) { "OFF" }) {
                         events += Ev(Kind.CHIME, 0.0, notes = listOf(1046.0, 784.0))
-                    } else if (cs.getOrElse(1) { false } != ps.getOrElse(1) { false }) {
+                    } else if (cs.getOrElse(1) { "OFF" } != ps.getOrElse(1) { "OFF" }) {
                         events += Ev(Kind.CHIME, 0.0, notes = listOf(1175.0))
                     }
                 }

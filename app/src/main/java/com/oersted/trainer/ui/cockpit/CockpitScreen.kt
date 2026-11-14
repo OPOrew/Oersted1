@@ -36,7 +36,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 
 /** Cockpit tab: phase, hint, the key readouts and the phase buttons (each gated as the web's canStart). Not compiled in the sandbox. */
 @Composable
-fun CockpitScreen(model: CockpitModel) {
+fun CockpitScreen(model: CockpitModel, audio: com.oersted.trainer.platform.AudioEngine) {
     val r by model.readout.collectAsState()
     val sixPack by model.sixPack.collectAsState()
     val log by model.log.collectAsState()
@@ -48,6 +48,7 @@ fun CockpitScreen(model: CockpitModel) {
     Column(Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState())) {
         Text("COCKPIT", style = MaterialTheme.typography.labelSmall)
         Text(r.phaseLabel, style = MaterialTheme.typography.headlineMedium)
+        SoundControls(audio)
         Text(r.hint, style = MaterialTheme.typography.bodyMedium)
         Spacer(Modifier.height(12.dp))
         SixPackView(sixPack)

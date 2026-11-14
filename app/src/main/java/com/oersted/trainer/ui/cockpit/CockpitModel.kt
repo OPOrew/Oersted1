@@ -2,6 +2,7 @@ package com.oersted.trainer.ui.cockpit
 
 import com.oersted.trainer.platform.PhaseTimer
 import com.oersted.trainer.sim.ActiveFlightPlan
+import com.oersted.trainer.sim.AudioFeed
 import com.oersted.trainer.sim.AttitudeTicker
 import com.oersted.trainer.sim.FlightPhaseControl
 import com.oersted.trainer.sim.Situation
@@ -110,7 +111,35 @@ class CockpitModel(
 
     /** Kotlin form of the web `s.patch({...})`: copy the state, apply the edit, publish. */
     fun patchSim(edit: SimState.() -> Unit) {
+        val before = sim.current()
         applySim { s -> s.copy().apply(edit) }
+        clickIfSwitch(before)
+    }
+
+    /** Called on a switch-type change (web store.ts patch -> playSwitchClick). Set by the audio layer. */
+    var onSwitchClick: (() -> Unit)? = null
+
+    /** web patch(): click for switch-type changes only (booleans, strings, small whole-number detents); sliders stay silent. */
+    private fun clickIfSwitch(before: SimState) {
+        val cb = onSwitchClick ?: return
+        if (AudioFeed.isSwitchChange(before, sim.current())) cb()
+    }
+
+    /** Inputs for the audio engine (cockpit.tsx useSimAudio argument), built from the live sim and the local panel state. */
+    fun audioFeed(): AudioFeed.Feed {
+        val st = sim.current()
+        val m = mip.state
+        val o = overheadLocal.state
+        return AudioFeed.build(
+            s = st,
+            d = sim.derived(st),
+            ped = pedestal.state,
+            apWarn = m.apWarn,
+            gpwsTest = m.gpwsTest,
+            o = AudioFeed.Overhead(hornCutout = o.hornCutout, machWarn = o.machWarn, stallTest = o.stallTest),
+            markers = m.markers,
+            navOn = m.navOn,
+        )
     }
 
     /** Web StatusStrip time button: 1x -> 4x -> 10x -> 1x. */
@@ -124,12 +153,17 @@ class CockpitModel(
 
     /** Kotlin form of the web `s.patch({...}, note)`: applies the edit to a copy, writes [note] to the event log, publishes. */
     fun patchSimNote(note: String, edit: SimState.() -> Unit) {
+        val before = sim.current()
         sim.update(note = note) { it.edit() }
         publish()
+        clickIfSwitch(before)
     }
 
     /** Web "Set APU running" (SimActions.readyApu preset). */
-    fun readyApu() = applySim { SimActions.readyApu(System.currentTimeMillis().toDouble()) }
+    fun readyApu() {
+        onSwitchClick?.invoke()
+        applySim { SimActions.readyApu(System.currentTimeMillis().toDouble()) }
+    }
 
     /** Web "Cold & dark" (reset to the initial state). */
     fun coldAndDark() = applySim { initialSimState() }

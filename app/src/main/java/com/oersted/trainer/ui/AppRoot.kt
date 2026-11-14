@@ -25,6 +25,7 @@ import com.oersted.trainer.data.Part
 import com.oersted.trainer.data.Repository
 import com.oersted.trainer.data.SystemDef
 import com.oersted.trainer.platform.PlanStore
+import com.oersted.trainer.platform.AudioEngine
 import com.oersted.trainer.ui.cockpit.CockpitModel
 import com.oersted.trainer.ui.common.StatusStrip
 import com.oersted.trainer.ui.procedures.ProceduresScreen
@@ -73,6 +74,16 @@ fun AppRoot(lightMode: Boolean, onToggleTheme: () -> Unit) {
     DisposableEffect(cockpit) {
         cockpit.start()
         onDispose { cockpit.stop() }
+    }
+    // Sound (audio.ts): off until SOUND is tapped. The engine reads the live sim through audioFeed and clicks on switch changes.
+    val audio = remember { AudioEngine(context) }
+    DisposableEffect(audio, cockpit) {
+        cockpit.onSwitchClick = { audio.switchClick() }
+        audio.start { cockpit.audioFeed() }
+        onDispose {
+            cockpit.onSwitchClick = null
+            audio.release()
+        }
     }
 
     Scaffold(
@@ -133,7 +144,7 @@ fun AppRoot(lightMode: Boolean, onToggleTheme: () -> Unit) {
                         SystemsScreen(repo.systems) { openSystemId = it }
                     }
                 }
-                Tab.FLIGHT_DECK -> CockpitScreen(cockpit)
+                Tab.FLIGHT_DECK -> CockpitScreen(cockpit, audio)
                 Tab.FLIGHT_PLAN -> FlightPlanScreen(planStore, cockpitPlanLabel) { draft -> cockpit.activate(draft) }
                 Tab.PROCEDURES -> ProceduresScreen(cockpit)
                 Tab.LIBRARY -> LibraryScreen(repo.parts, repo.systems)
