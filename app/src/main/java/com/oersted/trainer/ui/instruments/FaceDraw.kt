@@ -139,7 +139,7 @@ internal fun DrawScope.fFlag(x: Float, y: Float, text: String, w: Float = 34f, h
 }
 
 /** Vertical gradient between two viewBox y values (SVG linearGradient, objectBoundingBox on a tall rect). */
-internal fun vGrad(y0: Float, y1: Float, vararg c: Color): Brush = Brush.verticalGradient(colors = c.toList(), startY = y0, endY = y1)
+internal fun vGrad(y0: Float, y1: Float, top: Color, bottom: Color): Brush = Brush.verticalGradient(colors = listOf(top, bottom), startY = y0, endY = y1)
 
 /** Round face inside a round bezel, as the web `aspect-square rounded-full border ... shadow-[inset_0_0_0_4px_#1b2026]` wrapper. */
 internal fun DrawScope.roundInstrumentBase(ring: Color = Color(0xFF1B2026), border: Color = Color(0xFF5B656C), bg: Color = Color(0xFF05070A)) {
