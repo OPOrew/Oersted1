@@ -28,6 +28,11 @@ class FxBank(private val sr: Int, seed: Long = 1L) : AudioMixer.Voice {
             tau = r.timeConstant
         }
 
+        /** Jumps to the target (no ramp). */
+        fun snap() {
+            value = target
+        }
+
         fun step(dt: Double): Double {
             value = if (tau <= 0.0) target else value + (target - value) * (1 - exp(-dt / tau))
             return value
