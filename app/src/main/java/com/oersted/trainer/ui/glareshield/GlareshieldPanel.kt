@@ -4,7 +4,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.height
@@ -128,7 +128,9 @@ fun GlareshieldPanel(cockpit: CockpitModel, width: Dp) {
             // Design canvas: NW design px wide, scaled to the requested width, top lip moved to the top edge.
             Box(
                 Modifier
-                    .requiredSize(NW.dp, (OY + NH + 10).dp)
+                    // larger than the parent: top-left aligned and unbounded (requiredSize would centre it and shift the scaled canvas)
+                    .wrapContentSize(Alignment.TopStart, unbounded = true)
+                    .size(NW.dp, (OY + NH + 10).dp)
                     .drawBehind { drawHousing(density) }
                     .graphicsLayer {
                         scaleX = k

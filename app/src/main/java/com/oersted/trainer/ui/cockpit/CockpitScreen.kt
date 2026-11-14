@@ -31,6 +31,7 @@ import com.oersted.trainer.ui.instruments.AlertLenses
 import com.oersted.trainer.ui.instruments.AnnPanel
 import com.oersted.trainer.ui.instruments.TopStrip
 import com.oersted.trainer.ui.panel.Overhead
+import com.oersted.trainer.ui.pedestal.CenterPedestal
 import androidx.compose.foundation.layout.BoxWithConstraints
 
 /** Cockpit tab: phase, hint, the key readouts and the phase buttons (each gated as the web's canStart). Not compiled in the sandbox. */
@@ -82,6 +83,12 @@ fun CockpitScreen(model: CockpitModel) {
         Row(Modifier.fillMaxWidth().height(120.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Box(Modifier.weight(1f).fillMaxSize()) { AlertLenses(cockpit = model, left = true) }
             Box(Modifier.weight(2f).fillMaxSize()) { AnnPanel(cockpit = model, left = true) }
+        }
+        Spacer(Modifier.height(16.dp))
+        Text("CENTER PEDESTAL", style = MaterialTheme.typography.labelSmall)
+        Spacer(Modifier.height(8.dp))
+        BoxWithConstraints(Modifier.fillMaxWidth()) {
+            CenterPedestal(cockpit = model, width = maxWidth)
         }
         Spacer(Modifier.height(16.dp))
         Text("OVERHEAD PANEL", style = MaterialTheme.typography.labelSmall)
