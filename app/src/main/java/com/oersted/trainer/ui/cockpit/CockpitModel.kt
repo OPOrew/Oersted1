@@ -74,6 +74,10 @@ class CockpitModel(
     /** Primary flight instruments (attitude, heading, both sides' airspeed / altitude / VSI). */
     val sixPack: StateFlow<SixPackData> = _sixPack.asStateFlow()
 
+    private val _air = MutableStateFlow(airSnapshot())
+    /** Air data for both sides and the standby instruments (web computeAirData), for the main panel faces. */
+    val air: StateFlow<PitotStatic.AirData> = _air.asStateFlow()
+
     private val _activePlanLabel = MutableStateFlow<String?>(null)
     /** e.g. "RPLL → WSSS" when a plan is active, null otherwise. */
     val activePlanLabel: StateFlow<String?> = _activePlanLabel.asStateFlow()
@@ -215,12 +219,15 @@ class CockpitModel(
         controller.phase, controller.hint, sim.current(), { p: Phase -> controller.canStart(p) },
     )
 
-    private fun sixPackSnapshot(): SixPackData {
+    private fun airSnapshot(): PitotStatic.AirData {
         val st = sim.current()
         val d = sim.derived(st)
-        val air = PitotStatic.computeAirData(st, d.dcPower, d.acPower)
+        return PitotStatic.computeAirData(st, d.dcPower, d.acPower)
+    }
+
+    private fun sixPackSnapshot(air: PitotStatic.AirData = airSnapshot()): SixPackData {
         val m = mip.state
-        return SixPackData.build(st, m.attLive, m.att, air)
+        return SixPackData.build(sim.current(), m.attLive, m.att, air)
     }
 
     /** LOG drawer: clears the sim's event log, as the web's clearLog. */
@@ -231,7 +238,9 @@ class CockpitModel(
 
     private fun publish() {
         _readout.value = snapshot()
-        _sixPack.value = sixPackSnapshot()
+        val air = airSnapshot()
+        _air.value = air
+        _sixPack.value = sixPackSnapshot(air)
         _log.value = sim.current().log.toList()
         _activePlan.value = plan
         _navState.value = nav.readState()

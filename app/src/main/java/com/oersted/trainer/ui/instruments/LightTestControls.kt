@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.unit.dp
 import com.oersted.trainer.sim.LightTestLogic
+import com.oersted.trainer.ui.pedestal.PedestalLegend
 
 /**
  * LightTestKey (MainInstrumentPanel.tsx): a dark knob whose pointer shows BRT / DIM / TEST; a tap cycles the position.
@@ -32,9 +33,14 @@ fun LightTestKey(lightKey: Int, onChange: (Int) -> Unit, modifier: Modifier = Mo
             .border(1.dp, Color(0xFF8A8D90), RoundedCornerShape(6.dp)),
         contentAlignment = Alignment.CenterStart,
     ) {
+        // engraved legends: the lit position is printed black, as the web's text-black
+        val ink = Color(0xFF33362F)
+        PedestalLegend("LIGHT TEST", Modifier.align(Alignment.TopCenter).padding(top = 3.dp), 8, if (lightKey == 2) Color.Black else ink)
+        PedestalLegend("BRT", Modifier.align(Alignment.CenterEnd).padding(end = 4.dp), 8, if (lightKey == 0) Color.Black else ink)
+        PedestalLegend("DIM", Modifier.align(Alignment.BottomCenter).padding(bottom = 3.dp), 8, if (lightKey == 1) Color.Black else ink)
         Box(
             modifier = Modifier
-                .padding(start = 8.dp)
+                .padding(start = 24.dp)
                 .size(34.dp)
                 .background(Color(0xFF0B0C0D), CircleShape)
                 .border(2.dp, Color(0xFF6A6D70), CircleShape)
