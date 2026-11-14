@@ -6,6 +6,7 @@ import android.media.AudioFormat
 import android.media.AudioTrack
 import com.oersted.trainer.sim.ApuVoice
 import com.oersted.trainer.sim.AudioEventRender
+import com.oersted.trainer.sim.AudioEvents
 import com.oersted.trainer.sim.AudioFeed
 import com.oersted.trainer.sim.AudioMixer
 import com.oersted.trainer.sim.AudioSounds
@@ -13,6 +14,7 @@ import com.oersted.trainer.sim.AudioSwitchSounds
 import com.oersted.trainer.sim.AudioTicker
 import com.oersted.trainer.sim.EngineSampleLayer
 import com.oersted.trainer.sim.EngineSpoolAudio
+import com.oersted.trainer.sim.FxBank
 import com.oersted.trainer.sim.FxTargets
 import com.oersted.trainer.sim.MarkerBeacons
 import kotlinx.coroutines.CoroutineScope
@@ -70,6 +72,7 @@ class AudioEngine(context: Context) {
     private val apu = ApuVoice(sr.toDouble())
     private val apuStream = mixer.Stream({ out, t -> apu.render(out, t) })
     private val tone = mixer.Tone(MarkerBeacons.markerSpec(MarkerBeacons.MarkerId.OM).hz)
+    private val fx = FxBank(sr)
     private val clacker = mixer.SampleLoop(
         AudioMixer.toFloat(AudioSounds.clackLoop(sr.toDouble(), AudioTicker.Tunables.CLACK_HZ.toInt())), sr,
     ).also { it.gainTau = 0.01 }
@@ -86,6 +89,7 @@ class AudioEngine(context: Context) {
         mixer.add(apuStream)
         mixer.add(tone)
         mixer.add(clacker)
+        mixer.add(fx)
         apuStream.on = false
     }
 
@@ -224,8 +228,24 @@ class AudioEngine(context: Context) {
             clacker.targetGain = 0f
             tone.targetGain = 0f
             apuStream.on = false
+            applyLevels(AudioEvents.Levels())
         }
         markerId = null
+    }
+
+    /** web fx.gear / flap / door / spoiler / hyd / roll / skid / brake / rev / amb with this tick's levels. Mixer thread only. */
+    private fun applyLevels(lv: AudioEvents.Levels) {
+        val t = mixer.time
+        fx.gear(FxTargets.gear(lv.gearHyd, lv.gearFree, lv.gearWind), t)
+        fx.flap(FxTargets.flap(lv.flap), t)
+        fx.door(FxTargets.door(lv.door), t)
+        fx.spoiler(FxTargets.spoiler(lv.spoiler), t)
+        fx.hyd(FxTargets.hyd(lv.hydLevel, lv.hydPumps, lv.hydElecPumps), t)
+        fx.roll(FxTargets.roll(lv.roll, lv.grass), t)
+        fx.skid(FxTargets.skid(lv.skidLevel, lv.skidFreq, lv.antiskidChatter), t)
+        fx.brake(FxTargets.brake(lv.brake), t)
+        fx.rev(FxTargets.rev(lv.rev), t)
+        fx.amb(FxTargets.amb(lv.ambAc, lv.ambDc, lv.ambPacks.toDouble(), lv.ambFuelPumps), t)
     }
 
     // ── samples ───────────────────────────────────────────────────────────────
@@ -297,6 +317,7 @@ class AudioEngine(context: Context) {
 
         // loops
         val l = frame.loops
+        val lv = frame.levels
         val bellOn = r.fireBellLoopOn
         mixer.post {
             setLoop(SampleBank.Loop.FIRE_BELL, bellOn)
@@ -309,6 +330,7 @@ class AudioEngine(context: Context) {
             clacker.gainTau = ramp.timeConstant
             clacker.targetGain = ramp.target.toFloat()
             apuStream.on = apu.update(r.apuRpm, r.apuStarter, mixer.time)
+            applyLevels(lv)
         }
     }
 
