@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
@@ -42,6 +43,7 @@ import com.oersted.trainer.ui.instruments.AdiFace
 import com.oersted.trainer.ui.instruments.DialBand
 import com.oersted.trainer.ui.instruments.RoundDial
 import com.oersted.trainer.ui.instruments.AltFace
+import com.oersted.trainer.ui.glareshield.GlareshieldPanel
 import com.oersted.trainer.ui.instruments.AnnPanel
 import com.oersted.trainer.ui.instruments.AsiFace
 import com.oersted.trainer.ui.instruments.ComparatorPlate
@@ -71,6 +73,15 @@ import com.oersted.trainer.ui.pedestal.Toggle
 const val PANEL_CW = 3036
 const val PANEL_CH = 720
 
+/** web DESIGN_W: card padding 12 + panel 3036 + 12 (the 2 px borders overflow by 4 as on the web). */
+const val PANEL_DESIGN_W = 3060
+
+/** GlareshieldPanel height at full width: housing 345 * 1360 / 2172 = 216 plus 16 of shroud. */
+const val GLARE_BAND_H = 232
+
+/** 12 + glareshield band + 8 gap + panel 720 + 12 + 4 border. */
+const val PANEL_DESIGN_H = 12 + GLARE_BAND_H + 8 + PANEL_CH + 12 + 4
+
 private const val X_SB = 1100 // centre-left standby column
 private const val F0 = 2064 // first-officer panel
 
@@ -81,20 +92,32 @@ private const val F0 = 2064 // first-officer panel
 @Composable
 fun MainInstrumentPanel(cockpit: CockpitModel, scale: Float, modifier: Modifier = Modifier) {
     Box(modifier.horizontalScroll(rememberScrollState())) {
-        Box(Modifier.width((PANEL_CW * scale).dp).height((PANEL_CH * scale).dp).clipToBounds()) {
+        Box(Modifier.width((PANEL_DESIGN_W * scale).dp).height((PANEL_DESIGN_H * scale).dp).clipToBounds()) {
+            // web card: `space-y-2 rounded-[6px] border-2 border-[#15181c] bg-[#1d2127] p-3`, glareshield band above the panel body
             Box(
                 Modifier
                     .wrapContentSize(Alignment.TopStart, unbounded = true)
-                    .size(PANEL_CW.dp, PANEL_CH.dp)
+                    .size(PANEL_DESIGN_W.dp, PANEL_DESIGN_H.dp)
                     .graphicsLayer {
                         scaleX = scale
                         scaleY = scale
                         transformOrigin = TransformOrigin(0f, 0f)
                     }
-                    .background(PanelBlue)
-                    .border(2.dp, Color(0xFF15181C), RoundedCornerShape(10.dp)),
+                    .background(Color(0xFF1D2127), RoundedCornerShape(6.dp))
+                    .border(2.dp, Color(0xFF15181C), RoundedCornerShape(6.dp))
+                    .padding(12.dp),
             ) {
-                PanelBody(cockpit)
+                GlareshieldPanel(cockpit = cockpit, width = PANEL_CW.dp)
+                Box(
+                    Modifier
+                        .offset(y = (GLARE_BAND_H + 8).dp)
+                        .size(PANEL_CW.dp, PANEL_CH.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(PanelBlue)
+                        .border(2.dp, Color(0xFF15181C), RoundedCornerShape(10.dp)),
+                ) {
+                    PanelBody(cockpit)
+                }
             }
         }
     }
