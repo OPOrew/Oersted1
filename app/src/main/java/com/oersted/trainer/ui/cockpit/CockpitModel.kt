@@ -105,15 +105,15 @@ class CockpitModel(
 
     /** Applies a pure state change (TrainingConsoleRules and similar) and publishes it. */
     fun applySim(transform: (SimState) -> SimState) {
+        val before = if (onSwitchClick != null) sim.current() else null
         sim.apply(transform)
         publish()
+        if (before != null) clickIfSwitch(before)
     }
 
     /** Kotlin form of the web `s.patch({...})`: copy the state, apply the edit, publish. */
     fun patchSim(edit: SimState.() -> Unit) {
-        val before = sim.current()
         applySim { s -> s.copy().apply(edit) }
-        clickIfSwitch(before)
     }
 
     /** Called on a switch-type change (web store.ts patch -> playSwitchClick). Set by the audio layer. */
@@ -161,7 +161,6 @@ class CockpitModel(
 
     /** Web "Set APU running" (SimActions.readyApu preset). */
     fun readyApu() {
-        onSwitchClick?.invoke()
         applySim { SimActions.readyApu(System.currentTimeMillis().toDouble()) }
     }
 
