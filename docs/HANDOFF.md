@@ -38,7 +38,7 @@
    Parity note: `tools/parity/dump-section.mts` now flattens nested outputs into dotted names (e.g. `gearLights.nose.green`). Those names work directly in the generated Kotlin tests. Gear/brake logic reads `hydA`/`hydB` from `HydraulicsDerive`, so add that section's outputs to `Derived` reads, not locals. Add a stage-object check to the parity generator when convenient (extend `gen-parity-test.mts` to flatten nested objects into dotted names). Add `ElecLocals` fields as needed. Note: `s.wow`, `s.standbyPower` etc. are already in SimState. Note `derive()` in TS is a single function; port each section as a function that writes into `Derived`, then call them in the same order as the TS. Port `derive.ts` in sections (electrical → hydraulic → pneumatic → fuel → …). Each section gets a test with a hand-computed expected value taken from running the TS (`tsx` script in `tools/`).
 3. **Phase 2d — step.** Port `step(s, dt)` after derive. Keep `Date.now()` log timestamps injectable.
 4. **Phase 3 — runtime.** `SimStore` as a `StateFlow<SimState>` with a 30 Hz coroutine (`SimTicker`). Expose `patch()`, `startEngine`, `shutdownEngine`, `toggleFault`, `runScenario`.
-5. **Phase 3 — cockpit.** Start with the smallest panel: `RealisticElecPanel.tsx` (253 lines), wired to `patch()`. Then `FuelTrainerPanel` / `RealisticFuelPanel`. Leave the 3D instrument panels (`MainInstrumentPanel3D*`, three.js, React Three Fiber) for last; decide with the product owner whether they should be Sceneform/OpenGL, a WebView, or dropped.
+5. **Phase 3 — cockpit.** Start with `OverheadP5.tsx` (the cockpit page's overhead). The `Realistic*` panels are out of scope (see "Dropped from the port" at the end). Leave the 3D instrument panels (`MainInstrumentPanel3D*`, three.js, React Three Fiber) for last; decide with the product owner whether they should be Sceneform/OpenGL, a WebView, or dropped.
 
 ## Known gaps / risks
 - `derive.ts` relies on `Math.*`, `??`, optional chaining, `Record` lookups, and `Object` spreads. Map these to Kotlin carefully (`?:`, `maps.getOrDefault`, `copy`).
@@ -498,3 +498,7 @@ and the packages zustand@4.5.5, react@18.3.1, clsx, tailwind-merge installed wit
 - `stabBrakeRel` and `hornCutout` are stored but nothing in the sim reads them yet.
 - Drags use design px in the scaled stage, the web uses raw screen px, so drag speed differs with the stage scale.
 - Pedestal NAV radios for the Navigation / Autopilot training tabs (web `PedestalNavRadios`, a cut-out of the stage, NR_X 80, NR_Y 1042, 575 x 260) can reuse `PedestalNavUnit`, `PedestalAdfUnit` and `PedestalDataDisplay`; not placed yet.
+
+
+## Dropped from the port (user request, 2026-11-15)
+The "realistic" panels are not ported and will not be: `RealisticOverhead.tsx`, `RealisticTopPanel`, `RealisticAirCondPanel`, `RealisticPressPanel`, `RealisticBleedPanel`, `RealisticElecPanel`, `RealisticElecMeters`, `RealisticFuelPanel`, `RealisticHydPanel`, `RealisticFlightControlsPanel`, `RealisticLightsPanel`, `RealisticAntiIcePanel`, `RealisticOverheadStart` and `P6CircuitBreakerPanel`. On the web only `Cockpit360.tsx` uses them, and no cockpit-page section does. Nothing for them exists in the Kotlin tree, so no code was deleted. The 360 cockpit view is therefore not planned either, unless the user asks for it.
