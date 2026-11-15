@@ -30,6 +30,7 @@ import com.oersted.trainer.ui.glareshield.GlareshieldPanel
 import com.oersted.trainer.ui.instruments.AlertLenses
 import com.oersted.trainer.ui.instruments.AnnPanel
 import com.oersted.trainer.ui.instruments.TopStrip
+import com.oersted.trainer.ui.panel.MainInstrumentPanel
 import com.oersted.trainer.ui.panel.Overhead
 import com.oersted.trainer.ui.pedestal.CenterPedestal
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -85,6 +86,17 @@ fun CockpitScreen(model: CockpitModel, audio: com.oersted.trainer.platform.Audio
             Box(Modifier.weight(1f).fillMaxSize()) { AlertLenses(cockpit = model, left = true) }
             Box(Modifier.weight(2f).fillMaxSize()) { AnnPanel(cockpit = model, left = true) }
         }
+        Spacer(Modifier.height(16.dp))
+        // The main panel is a 3036 x 720 design canvas: it scrolls sideways at a readable zoom. Zoom steps of 10 % from 30 % to 100 %.
+        var panelScale by remember { mutableStateOf(0.5f) }
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("MAIN INSTRUMENT PANEL", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
+            OutlinedButton(onClick = { panelScale = (panelScale - 0.1f).coerceAtLeast(0.3f) }, enabled = panelScale > 0.31f) { Text("-") }
+            Text("${Math.round(panelScale * 100)}%", style = MaterialTheme.typography.labelSmall)
+            OutlinedButton(onClick = { panelScale = (panelScale + 0.1f).coerceAtMost(1.0f) }, enabled = panelScale < 0.99f) { Text("+") }
+        }
+        Spacer(Modifier.height(8.dp))
+        MainInstrumentPanel(cockpit = model, scale = panelScale, modifier = Modifier.fillMaxWidth())
         Spacer(Modifier.height(16.dp))
         Text("CENTER PEDESTAL", style = MaterialTheme.typography.labelSmall)
         Spacer(Modifier.height(8.dp))

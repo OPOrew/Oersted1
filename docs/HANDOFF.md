@@ -478,3 +478,6 @@ and the packages zustand@4.5.5, react@18.3.1, clsx, tailwind-merge installed wit
 - Tests (pure): AudioMixerTest, AudioFeedTest, AudioEventRenderTest, AudioSwitchSoundsTest, FxBankTest, EngineVoiceTest, plus the earlier AudioEvents/Ticker/Sounds/Dsp tests.
 - Known gaps: the engine-space reverb and echo; synth fallbacks for horn, wailer and shaker (only matter if a sample fails to decode); MP3 decoder padding may leave a tiny gap at a loop seam; only the cockpit tab's audio feed exists (it runs for the whole app once SOUND is on).
 - Status: sound port feature-complete apart from the gaps above; unverified by ear.
+
+## Main instrument panel on the cockpit tab
+- `MainInstrumentPanel` (3036 x 720 design canvas) is wired into `CockpitScreen` under the caption strips, before the CENTER PEDESTAL section. It scrolls sideways; the `-` / `+` buttons zoom from 30 % to 100 % in 10 % steps (default 50 %). Not yet viewed on a device: check scroll versus knob drag conflicts and the default zoom.
