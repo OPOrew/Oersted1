@@ -42,7 +42,7 @@
 
 ## Known gaps / risks
 - `derive.ts` relies on `Math.*`, `??`, optional chaining, `Record` lookups, and `Object` spreads. Map these to Kotlin carefully (`?:`, `maps.getOrDefault`, `copy`).
-- Audio (`audio.ts`, 1406 lines, Web Audio API) must be rewritten with `SoundPool`/`MediaPlayer`. `public/sounds/*` is already in assets.
+- Audio is ported (see the Sounds section at the end): software mixer + AudioTrack. It has never been heard: check engine level, loop seams, click latency and underruns on a real device. Not ported: the engine-space reverb/echo and the horn/wailer/shaker synth fallbacks.
 - `leaflet`/`react-leaflet` map (`InteractiveNavMap.tsx`) → MapLibre or osmdroid, or a WebView. Not started.
 - Live weather (`liveWeather.ts`) uses `fetch`. Use Ktor or `HttpURLConnection`.
 - `routes/flight-plan.tsx`, `procedures.tsx`, `library.tsx`, `systems.$id.tsx` are not ported.
@@ -470,3 +470,11 @@ and the packages zustand@4.5.5, react@18.3.1, clsx, tailwind-merge installed wit
 - `PedestalParts.tsx` ported: pure rules in `sim/PedestalPartsRules.kt` (tested) and the Compose widgets in `ui/pedestal/PedestalParts.kt` (not compiled locally). PedestalLevers is ported too (`sim/PedestalLeversRules.kt`, `ui/pedestal/PedestalLevers.kt`; CI result pending at the time of writing). Next: `CenterPedestal.tsx` (1644 lines) built on these parts, then swap the private PushButton / toggle copies in `ui/instruments/Annunciators.kt` for the shared ones.
 - `CenterPedestal.tsx` is being ported in slices. Done: stage helpers (`ui/pedestal/PedestalStage.kt`) and the TOP DECK (`PedestalTopDeck.kt`, rules in `sim/PedestalTopDeckRules.kt`). Still to do from line 475: CONTROL STAND (Detent2, thrust levers, stab trim, flap and speed brake placement), the radio stack and the remaining units, then the `CenterPedestal` stage that places them (700 x 1642 design px, scale to the screen like `GlareshieldPanel`) and its tab or section in `CockpitScreen`. Also: `PrimusWxr` WxrScope picture, and the private PushButton / toggle copies in `Annunciators.kt`.
 - CenterPedestal CONTROL STAND ported (`ui/pedestal/PedestalControlStand.kt`, rules in `sim/PedestalStandRules.kt`). Remaining in `CenterPedestal.tsx` from line 854: FIRE / OVERHEAT panel (FireHandle, FirePanel), then the radio stack and the other units, then the stage that places everything and a Flight Deck section for it.
+
+## Sounds (audio.ts, MarkerAudio.tsx)
+- Design: a software mixer (`sim/AudioMixer.kt`) renders blocks of 1024 stereo frames on a high-priority thread into a streaming `AudioTrack` (`platform/AudioEngine.kt`). All voice changes are queued with `post`, so voices live on one thread. The sim is read on the main thread through `CockpitModel.audioFeed()`; one-shots are synthesised on a worker thread.
+- Layers: recorded loops decoded once by `platform/SampleBank.kt` (fire bell, stick shaker, A/P disconnect, glideslope, GPWS, config horn; the replacement for the unused MediaPlayer `SamplePlayer`); engine voices (`sim/EngineVoice.kt`: synth + recorded idle/power loops through shelves); effect bank (`sim/FxBank.kt`); APU voice (`sim/ApuVoice.kt`); Mach clacker; marker tone (400 / 1300 / 3000 Hz keyed, gain 0.12); switch clicks (8 pre-rendered variants, 35 ms throttle) from `CockpitModel.patchSim` / `patchSimNote` / `readyApu`.
+- UI: the SOUND ON/OFF button and volume slider (`ui/cockpit/SoundControls.kt`) sit under the cockpit title. Off until tapped; volume default 0.6.
+- Tests (pure): AudioMixerTest, AudioFeedTest, AudioEventRenderTest, AudioSwitchSoundsTest, FxBankTest, EngineVoiceTest, plus the earlier AudioEvents/Ticker/Sounds/Dsp tests.
+- Known gaps: the engine-space reverb and echo; synth fallbacks for horn, wailer and shaker (only matter if a sample fails to decode); MP3 decoder padding may leave a tiny gap at a loop seam; clicks fired by store actions other than patchSim, patchSimNote and readyApu (startEngine, shutdownEngine, toggleFault) are not hooked yet; only the cockpit tab's audio feed exists (it runs for the whole app once SOUND is on).
+- Status: sound port feature-complete apart from the gaps above; unverified by ear.

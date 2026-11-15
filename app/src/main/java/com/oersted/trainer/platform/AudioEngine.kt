@@ -12,7 +12,7 @@ import com.oersted.trainer.sim.AudioMixer
 import com.oersted.trainer.sim.AudioSounds
 import com.oersted.trainer.sim.AudioSwitchSounds
 import com.oersted.trainer.sim.AudioTicker
-import com.oersted.trainer.sim.EngineSampleLayer
+import com.oersted.trainer.sim.EngineVoice
 import com.oersted.trainer.sim.EngineSpoolAudio
 import com.oersted.trainer.sim.FxBank
 import com.oersted.trainer.sim.FxTargets
@@ -38,7 +38,9 @@ import kotlin.random.Random
  *    (as useSimAudio does), the marker tone every 20 ms (MarkerAudio.tsx REFRESH_MS);
  *  - one-shots (clunks, thumps, chimes, ignition clicks, bell strikes ...) are synthesised on a worker thread and queued on the mixer;
  *  - recorded loops (fire bell, stick shaker, A/P disconnect, glideslope, GPWS, config horn) are decoded once and faded in and out;
- *  - the recorded JT8D idle and power loops are mixed and pitched from the acoustic spool (EngineSpoolAudio + EngineSampleLayer);
+ *  - each engine is an EngineVoice: JT8D synth layers plus the recorded idle and power loops, mixed and pitched from the acoustic
+ *    spool (EngineSpoolAudio + EngineSampleLayer) and shaped by low / high shelves;
+ *  - sound effects (gear, flaps, hydraulics, tyres, brakes, ambience ...) stream from FxBank with the levels of each tick;
  *  - the APU voice, the Mach clacker and the marker tone are streamed in the mixer.
  * Off until the person taps SOUND, as on the web. Volume is the web master gain (default 0.6). Not compiled in the sandbox.
  */
@@ -64,7 +66,6 @@ class AudioEngine(context: Context) {
 
     // recorded loops, created by the worker once decoded
     private val loops = java.util.concurrent.ConcurrentHashMap<SampleBank.Loop, AudioMixer.SampleLoop>()
-    @Volatile private var engineLoops: List<Pair<AudioMixer.SampleLoop, AudioMixer.SampleLoop>> = emptyList()
     @Volatile private var samplesStarted = false
     @Volatile private var clickBank: List<FloatArray> = emptyList()
 
@@ -73,6 +74,7 @@ class AudioEngine(context: Context) {
     private val apuStream = mixer.Stream({ out, t -> apu.render(out, t) })
     private val tone = mixer.Tone(MarkerBeacons.markerSpec(MarkerBeacons.MarkerId.OM).hz)
     private val fx = FxBank(sr)
+    private val engines = listOf(EngineVoice(sr, 0, 11L), EngineVoice(sr, 1, 23L))
     private val clacker = mixer.SampleLoop(
         AudioMixer.toFloat(AudioSounds.clackLoop(sr.toDouble(), AudioTicker.Tunables.CLACK_HZ.toInt())), sr,
     ).also { it.gainTau = 0.01 }
@@ -90,6 +92,7 @@ class AudioEngine(context: Context) {
         mixer.add(tone)
         mixer.add(clacker)
         mixer.add(fx)
+        for (e in engines) mixer.add(e)
         apuStream.on = false
     }
 
@@ -221,10 +224,8 @@ class AudioEngine(context: Context) {
     private fun silence() {
         mixer.post {
             for (l in loops.values) l.targetGain = 0f
-            for ((a, b) in engineLoops) {
-                a.targetGain = 0f
-                b.targetGain = 0f
-            }
+            // engines wind down to nothing; the voices fall silent and their buses close
+            for (e in engines) e.update(EngineSpoolAudio.newAcousticSpool(), false, mixer.time)
             clacker.targetGain = 0f
             tone.targetGain = 0f
             apuStream.on = false
@@ -270,20 +271,15 @@ class AudioEngine(context: Context) {
             val idle = SampleBank.decode(app, SampleBank.Loop.ENGINE_IDLE)
             val power = SampleBank.decode(app, SampleBank.Loop.ENGINE_POWER)
             if (idle != null && power != null) {
-                val pairs = (0 until 2).map { i ->
-                    val pan = (if (i == 0) -0.4 else 0.4) * 1.8
-                    val a = mixer.SampleLoop(idle.samples, idle.rate, pan)
-                    val b = mixer.SampleLoop(power.samples, power.rate, pan)
-                    for (v in listOf(a, b)) {
-                        v.gainTau = 0.12
-                        v.rateTau = 0.14
-                        // each engine starts at its own point in the loop
-                        v.startAt(random.nextDouble())
-                    }
+                // each engine gets its own pair of loops, centred (the voice pans them) and started at its own point
+                val pairs = engines.map {
+                    val a = mixer.SampleLoop(idle.samples, idle.rate)
+                    val b = mixer.SampleLoop(power.samples, power.rate)
+                    a.startAt(random.nextDouble())
+                    b.startAt(random.nextDouble())
                     a to b
                 }
-                mixer.post { for ((a, b) in pairs) { mixer.add(a); mixer.add(b) } }
-                engineLoops = pairs
+                mixer.post { for ((i, p) in pairs.withIndex()) engines[i].attach(p.first, p.second) }
             }
         }
     }
@@ -346,21 +342,11 @@ class AudioEngine(context: Context) {
         val nowNs = System.nanoTime()
         val dt = if (lastEngineNs == 0L) 0.0 else (nowNs - lastEngineNs) / 1e9
         lastEngineNs = nowNs
-        val pairs = engineLoops
         for (u in ups) {
             spools[u.engine] = EngineSpoolAudio.stepAcousticSpool(spools[u.engine], u.n1, u.n2, dt, u.snap)
             val sp = spools[u.engine]
-            if (u.engine >= pairs.size) continue
-            // effective spool, as EngineSynthTargets: N1 when running, an N2-based guess while motoring on the starter
-            val eff = (maxOf(sp.n1, sp.n2 * 0.5) / 100).coerceIn(0.0, 1.0)
-            val detune = if (u.engine == 0) 0.992 else 1.008
-            val m = EngineSampleLayer.mix(eff, sp.jet, detune)
-            val (idle, run) = pairs[u.engine]
-            idle.targetGain = m.idleGain.toFloat()
-            run.targetGain = m.runGain.toFloat()
-            idle.targetRate = m.idleRate.toFloat()
-            run.targetRate = m.runRate.toFloat()
-            if (u.snap) mixer.post { idle.snap(); run.snap() }
+            val e = engines[u.engine]
+            mixer.post { e.update(sp, u.valve, mixer.time, u.snap) }
         }
     }
 
