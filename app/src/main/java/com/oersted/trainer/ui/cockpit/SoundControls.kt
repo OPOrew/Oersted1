@@ -19,7 +19,7 @@ import com.oersted.trainer.platform.AudioEngine
 
 /**
  * Port of the SOUND ON / SOUND OFF button and volume slider of routes/cockpit.tsx (range 0..1, step 0.05, default 0.6).
- * Sound stays off until the button is tapped. Compose only; verified on CI, not compiled locally.
+ * Sound starts on (Android has no autoplay block) and the button turns it off and on. Compose only; verified on CI, not compiled locally.
  */
 @Composable
 fun SoundControls(audio: AudioEngine, modifier: Modifier = Modifier) {

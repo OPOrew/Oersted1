@@ -75,12 +75,23 @@ fun AppRoot(lightMode: Boolean, onToggleTheme: () -> Unit) {
         cockpit.start()
         onDispose { cockpit.stop() }
     }
-    // Sound (audio.ts): off until SOUND is tapped. The engine reads the live sim through audioFeed and clicks on switch changes.
+    // Sound (audio.ts): on while the app is in front unless SOUND was turned off. Reads the live sim through audioFeed and clicks on switch changes.
     val audio = remember { AudioEngine(context) }
     DisposableEffect(audio, cockpit) {
         cockpit.onSwitchClick = { audio.switchClick() }
         audio.start { cockpit.audioFeed() }
+        val owner = generateSequence(context) { (it as? android.content.ContextWrapper)?.baseContext }
+            .filterIsInstance<androidx.lifecycle.LifecycleOwner>().firstOrNull()
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            when (event) {
+                androidx.lifecycle.Lifecycle.Event.ON_START -> audio.onForeground()
+                androidx.lifecycle.Lifecycle.Event.ON_STOP -> audio.onBackground()
+                else -> {}
+            }
+        }
+        if (owner != null) owner.lifecycle.addObserver(observer) else audio.onForeground()
         onDispose {
+            owner?.lifecycle?.removeObserver(observer)
             cockpit.onSwitchClick = null
             audio.release()
         }

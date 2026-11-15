@@ -42,7 +42,7 @@ import kotlin.random.Random
  *    spool (EngineSpoolAudio + EngineSampleLayer) and shaped by low / high shelves;
  *  - sound effects (gear, flaps, hydraulics, tyres, brakes, ambience ...) stream from FxBank with the levels of each tick;
  *  - the APU voice, the Mach clacker and the marker tone are streamed in the mixer.
- * Off until the person taps SOUND, as on the web. Volume is the web master gain (default 0.6). Not compiled in the sandbox.
+ * On at launch and whenever the app is in front (no browser autoplay rule on Android); the SOUND button turns it off and on, and the choice is kept. Volume is the web master gain (default 0.6). Not compiled in the sandbox.
  */
 class AudioEngine(context: Context) {
     private val app = context.applicationContext
@@ -121,8 +121,24 @@ class AudioEngine(context: Context) {
         }
     }
 
+    /** What the person last chose with the SOUND button. Sound starts ON (a phone has no autoplay block, unlike a browser). */
+    private var userWants = true
+
     /** web audio.toggle(). */
-    fun toggle() = setEnabled(!_on.value)
+    fun toggle() {
+        userWants = !_on.value
+        setEnabled(userWants)
+    }
+
+    /** App left the foreground: stop the output and the ticks (the person's choice is kept). */
+    fun onBackground() {
+        if (_on.value) setEnabled(false)
+    }
+
+    /** App is visible again (also the first time it opens): sound comes back unless the person turned it off. */
+    fun onForeground() {
+        if (userWants) setEnabled(true)
+    }
 
     /** web setEnabled. Turning on starts the output, loads the loops and resets the snapshots so nothing bursts. */
     fun setEnabled(on: Boolean) {
