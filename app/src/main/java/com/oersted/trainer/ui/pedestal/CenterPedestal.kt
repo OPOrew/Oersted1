@@ -1,15 +1,18 @@
 package com.oersted.trainer.ui.pedestal
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
@@ -22,11 +25,11 @@ import com.oersted.trainer.ui.cockpit.CockpitModel
  * The centre pedestal stage of components/panel/CenterPedestal.tsx: a 700 x 1642 design-px canvas (the web's STAGE_W x
  * STAGE_H) holding every unit at the photograph's coordinates, scaled to [width] as a whole, like GlareshieldPanel.
  *
- * Ported so far: the TOP DECK, the CONTROL STAND and the FIRE / OVERHEAT panel (design y 0 to [PEDESTAL_VISIBLE_H]). Still to place:
- * the radio stack below it. The stage is clipped to the ported part meanwhile.
+ * Ported so far: the TOP DECK, the CONTROL STAND, the FIRE / OVERHEAT panel and the radio stack (VHF, NAV, ADF, DATA; design y 0 to
+ * [PEDESTAL_VISIBLE_H]). Still to place: the LOWER PLATE below it. The stage is clipped to the ported part meanwhile.
  * Compose only; verified on CI.
  */
-const val PEDESTAL_VISIBLE_H = 918
+const val PEDESTAL_VISIBLE_H = PEDESTAL_RADIOS_BOTTOM
 
 @Composable
 fun CenterPedestal(cockpit: CockpitModel, width: Dp) {
@@ -51,8 +54,17 @@ fun CenterPedestal(cockpit: CockpitModel, width: Dp) {
                 },
         ) {
             PedestalTopDeck(cockpit)
+            // pedestal case: lower body (web `<Box x={240} y={755} w={600} h={821}>`)
+            val body = RoundedCornerShape(10.dp)
+            Box(
+                Modifier.stageAt(240, 755, 600, 821)
+                    .shadow(6.dp, body)
+                    .background(Brush.verticalGradient(listOf(Color(0xFF252A30), Color(0xFF15181C))), body)
+                    .border(3.dp, Color(0xFF0B0C0E), body),
+            )
             PedestalControlStand(cockpit)
             PedestalFirePanel(cockpit)
+            PedestalRadios(cockpit)
         }
     }
 }

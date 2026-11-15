@@ -485,3 +485,9 @@ and the packages zustand@4.5.5, react@18.3.1, clsx, tailwind-merge installed wit
 ## Pedestal FIRE / OVERHEAT panel
 - `ui/pedestal/PedestalFirePanel.kt` (rules in `sim/FirePanelRules.kt`, tested) is placed on the pedestal stage; `PEDESTAL_VISIBLE_H` is now 918. Still to port from `CenterPedestal.tsx`: the radio stack (VhfUnit from line 982, NavUnit, AdfUnit, HfUnit, and the units above it at 258 to 980 that are not yet on the stage), placed from y 920 to about 1296.
 
+
+## Pedestal radio stack
+- `ui/pedestal/PedestalRadios.kt` (VHF COMM L/R, VHF NAV L/R with DME mode and DME / NAV test switches, ADF head, HF L/R, DATA display) with pure rules in `sim/PedestalRadioRules.kt` (tested: tune wrap/clamp, ADF mode and ANT flag, lit conditions, DATA lines). `PEDESTAL_VISIBLE_H` is now 1296 (`PEDESTAL_RADIOS_BOTTOM`). The pedestal case body (web Box 240,755,600,821) is also drawn now.
+- The web puts both HF units in the ADF box's normal flow (y 1296 and 1420), hidden behind the LOWER PLATE. They are placed at the same positions here and are clipped until the lower plate is ported.
+- HF is lit only when the `hf-1` / `hf-2` breaker is explicitly true (JS truthiness), as on the web.
+- Still to port from `CenterPedestal.tsx`: LowerPlate (line 1260 on: rudder trim, stab trim brake release, lights, flood), MicPanel L/R, DataPrinter, and the Stage assembly beyond y 1296 (`PEDESTAL_STAGE_H` 1642).
