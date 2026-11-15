@@ -481,3 +481,7 @@ and the packages zustand@4.5.5, react@18.3.1, clsx, tailwind-merge installed wit
 
 ## Main instrument panel on the cockpit tab
 - `MainInstrumentPanel` (3036 x 720 design canvas) is wired into `CockpitScreen` under the caption strips, before the CENTER PEDESTAL section. It scrolls sideways; the `-` / `+` buttons zoom from 30 % to 100 % in 10 % steps (default 50 %). Not yet viewed on a device: check scroll versus knob drag conflicts and the default zoom.
+
+## Pedestal FIRE / OVERHEAT panel
+- `ui/pedestal/PedestalFirePanel.kt` (rules in `sim/FirePanelRules.kt`, tested) is placed on the pedestal stage; `PEDESTAL_VISIBLE_H` is now 918. Still to port from `CenterPedestal.tsx`: the radio stack (VhfUnit from line 982, NavUnit, AdfUnit, HfUnit, and the units above it at 258 to 980 that are not yet on the stage), placed from y 920 to about 1296.
+
