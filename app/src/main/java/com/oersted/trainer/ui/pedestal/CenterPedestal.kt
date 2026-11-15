@@ -25,11 +25,10 @@ import com.oersted.trainer.ui.cockpit.CockpitModel
  * The centre pedestal stage of components/panel/CenterPedestal.tsx: a 700 x 1642 design-px canvas (the web's STAGE_W x
  * STAGE_H) holding every unit at the photograph's coordinates, scaled to [width] as a whole, like GlareshieldPanel.
  *
- * Ported so far: the TOP DECK, the CONTROL STAND, the FIRE / OVERHEAT panel and the radio stack (VHF, NAV, ADF, DATA; design y 0 to
- * [PEDESTAL_VISIBLE_H]). Still to place: the LOWER PLATE below it. The stage is clipped to the ported part meanwhile.
+ * The whole stage is ported: TOP DECK, CONTROL STAND, FIRE / OVERHEAT panel, radio stack, LOWER PLATE and AILERON TRIM drum.
  * Compose only; verified on CI.
  */
-const val PEDESTAL_VISIBLE_H = PEDESTAL_RADIOS_BOTTOM
+const val PEDESTAL_VISIBLE_H = PEDESTAL_STAGE_H
 
 @Composable
 fun CenterPedestal(cockpit: CockpitModel, width: Dp) {
@@ -65,6 +64,8 @@ fun CenterPedestal(cockpit: CockpitModel, width: Dp) {
             PedestalControlStand(cockpit)
             PedestalFirePanel(cockpit)
             PedestalRadios(cockpit)
+            PedestalAileronDrum(cockpit)
+            PedestalLowerPlate(cockpit)
         }
     }
 }

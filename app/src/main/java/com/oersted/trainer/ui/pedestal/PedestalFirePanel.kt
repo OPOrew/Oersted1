@@ -57,7 +57,16 @@ fun PedestalFirePanel(cockpit: CockpitModel) {
     val d by cockpit.derived.collectAsState()
     val p by cockpit.pedestalState.collectAsState()
     val pw = d.dcPower
-    // web `Date.now() < p.fireOverrideUntil`
+    // web `Date.now() < p.fireOverrideUntil`, plus the web's `setTimeout(() => usePedestal.setState({}), 12100)` repaint when it lapses
+    var lapse by remember { mutableStateOf(0) }
+    LaunchedEffect(p.fireOverrideUntil) {
+        val left = p.fireOverrideUntil - System.currentTimeMillis()
+        if (left > 0) {
+            kotlinx.coroutines.delay(left.toLong() + 100L)
+            lapse++
+        }
+    }
+    @Suppress("UNUSED_VARIABLE") val repaint = lapse
     val override = System.currentTimeMillis() < p.fireOverrideUntil
     val testOv = pw && p.fireTest == Pedestal.FireTest.OVHT_FIRE
     val testFault = pw && p.fireTest == Pedestal.FireTest.FAULT

@@ -33,6 +33,8 @@ import com.oersted.trainer.ui.instruments.TopStrip
 import com.oersted.trainer.ui.panel.MainInstrumentPanel
 import com.oersted.trainer.ui.panel.Overhead
 import com.oersted.trainer.ui.pedestal.CenterPedestal
+import com.oersted.trainer.ui.pedestal.PedestalOtherFunctions
+import com.oersted.trainer.ui.pedestal.ThrustLinkButton
 import androidx.compose.foundation.layout.BoxWithConstraints
 
 /** Cockpit tab: phase, hint, the key readouts and the phase buttons (each gated as the web's canStart). Not compiled in the sandbox. */
@@ -98,10 +100,22 @@ fun CockpitScreen(model: CockpitModel, audio: com.oersted.trainer.platform.Audio
         Spacer(Modifier.height(8.dp))
         MainInstrumentPanel(cockpit = model, scale = panelScale, modifier = Modifier.fillMaxWidth())
         Spacer(Modifier.height(16.dp))
-        Text("CENTER PEDESTAL", style = MaterialTheme.typography.labelSmall)
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("CENTER PEDESTAL", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
+            ThrustLinkButton(cockpit = model)
+        }
         Spacer(Modifier.height(8.dp))
         BoxWithConstraints(Modifier.fillMaxWidth()) {
             CenterPedestal(cockpit = model, width = maxWidth)
+        }
+        Spacer(Modifier.height(8.dp))
+        var otherOpen by remember { mutableStateOf(false) }
+        OutlinedButton(onClick = { otherOpen = !otherOpen }, modifier = Modifier.fillMaxWidth()) {
+            Text("${if (otherOpen) "▼" else "▶"} OTHER PEDESTAL FUNCTIONS", style = MaterialTheme.typography.labelSmall)
+        }
+        if (otherOpen) {
+            Spacer(Modifier.height(8.dp))
+            PedestalOtherFunctions(cockpit = model)
         }
         Spacer(Modifier.height(16.dp))
         Text("OVERHEAD PANEL", style = MaterialTheme.typography.labelSmall)

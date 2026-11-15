@@ -488,6 +488,13 @@ and the packages zustand@4.5.5, react@18.3.1, clsx, tailwind-merge installed wit
 
 ## Pedestal radio stack
 - `ui/pedestal/PedestalRadios.kt` (VHF COMM L/R, VHF NAV L/R with DME mode and DME / NAV test switches, ADF head, HF L/R, DATA display) with pure rules in `sim/PedestalRadioRules.kt` (tested: tune wrap/clamp, ADF mode and ANT flag, lit conditions, DATA lines). `PEDESTAL_VISIBLE_H` is now 1296 (`PEDESTAL_RADIOS_BOTTOM`). The pedestal case body (web Box 240,755,600,821) is also drawn now.
-- The web puts both HF units in the ADF box's normal flow (y 1296 and 1420), hidden behind the LOWER PLATE. They are placed at the same positions here and are clipped until the lower plate is ported.
+- The web puts both HF units in the ADF box's normal flow (y 1296 and 1420), so the LOWER PLATE (drawn after them) hides most of them. The Compose stage keeps the same order and positions.
 - HF is lit only when the `hf-1` / `hf-2` breaker is explicitly true (JS truthiness), as on the web.
-- Still to port from `CenterPedestal.tsx`: LowerPlate (line 1260 on: rudder trim, stab trim brake release, lights, flood), MicPanel L/R, DataPrinter, and the Stage assembly beyond y 1296 (`PEDESTAL_STAGE_H` 1642).
+
+## Pedestal lower plate and other functions
+- `ui/pedestal/PedestalLower.kt`: LowerPlate (PANEL / FLOOD bright knobs, rudder trim knob with double-tap centre, access cover that slides open, STAB BRAKE RELEASE hold-to-pull knob which sets the `stabBrakeRel` switch) and the AILERON TRIM drum (horizontal drag, 0.004 per design px). The stage is now complete (`PEDESTAL_VISIBLE_H` = `PEDESTAL_STAGE_H` = 1642).
+- `ui/pedestal/PedestalOther.kt`: the web "Other pedestal functions" (STAB TRIM cutouts and NOSE UP / DN, FIRE SWITCHES LOCK OVRD, STAB TRIM OVERRIDE + CAB DOOR, CARGO FIRE, MIC L/R, DATA PRINTER) in a collapsible section under the pedestal on the cockpit tab, plus `ThrustLinkButton` (the `thrustLinked` switch, next to the CENTER PEDESTAL title). The web grid becomes one column.
+- Rules: `sim/PedestalLowerRules.kt` (tested in PedestalLowerRulesTest). The fire panel now repaints when the 12 s lock override lapses (web setTimeout 12100).
+- `stabBrakeRel` and `hornCutout` are stored but nothing in the sim reads them yet.
+- Drags use design px in the scaled stage, the web uses raw screen px, so drag speed differs with the stage scale.
+- Pedestal NAV radios for the Navigation / Autopilot training tabs (web `PedestalNavRadios`, a cut-out of the stage, NR_X 80, NR_Y 1042, 575 x 260) can reuse `PedestalNavUnit`, `PedestalAdfUnit` and `PedestalDataDisplay`; not placed yet.
