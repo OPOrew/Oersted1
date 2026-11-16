@@ -56,6 +56,9 @@ class CockpitModel(
     private val mip = MipLocal.Holder(onChange = { _mip.value = it })
     private val pedestal = Pedestal.Holder(onChange = { _pedestal.value = it })
     private val overheadLocal = OverheadLocal.Holder()
+    private val _overhead = MutableStateFlow(OverheadLocal.OverheadLocalState())
+    /** P5 overhead-local state (web useOverheadLocal) as a flow, so the overhead panel recomposes. */
+    val overheadState: StateFlow<OverheadLocal.OverheadLocalState> = _overhead.asStateFlow()
     private val world = SimPhaseWorld(sim, mip, pedestal, nav, { clockMs() }, monoSec, { plan })
     private val controller = PhaseController(world)
     private val situation = Situation.SituationHolder()
@@ -182,6 +185,7 @@ class CockpitModel(
     /** Applies an overhead-local reducer (web useOverheadLocal.set), e.g. the pedestal horn cutout. Nothing in the sim reads it yet. */
     fun updateOverhead(transform: (OverheadLocal.OverheadLocalState) -> OverheadLocal.OverheadLocalState) {
         overheadLocal.set(transform)
+        _overhead.value = overheadLocal.state
     }
 
     /** Applies a pedestal reducer (WarningReducer.silenceBell and similar) and republishes the sim. */

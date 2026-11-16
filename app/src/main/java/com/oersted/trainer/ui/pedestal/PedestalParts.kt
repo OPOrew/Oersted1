@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -92,9 +93,9 @@ fun BoxScope.Screws(n: Int = 4) {
 
 /** web Plate: a grey pedestal plate with screws and an optional centred title. */
 @Composable
-fun Plate(title: String? = null, modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+fun Plate(title: String? = null, modifier: Modifier = Modifier, color: Color = PlateColor, content: @Composable ColumnScope.() -> Unit) {
     val shape = RoundedCornerShape(3.dp)
-    Box(modifier.background(PlateColor, shape).border(1.dp, PlateBorder, shape).padding(8.dp)) {
+    Box(modifier.background(color, shape).border(1.dp, PlateBorder, shape).padding(8.dp)) {
         Screws()
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             if (title != null) PedestalLegend(title, Modifier.padding(bottom = 4.dp), textAlign = TextAlign.Center)
@@ -140,7 +141,7 @@ fun Annun(label: String, on: Boolean, tone: AnnunTone = AnnunTone.AMBER, modifie
     val c = tone(tone)
     val shape = RoundedCornerShape(2.dp)
     val base = modifier
-        .height(if (small) 16.dp else 20.dp)
+        .heightIn(min = if (small) 16.dp else 20.dp)
         .background(if (on) c.fill else Color(0xFF0B0C0D), shape)
         .border(1.dp, if (on) c.border else Color(0xFF55585C), shape)
         .let { if (onClick != null) it.clickable { onClick() } else it }

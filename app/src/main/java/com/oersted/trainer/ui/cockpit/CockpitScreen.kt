@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +28,8 @@ import androidx.compose.foundation.border
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.oersted.trainer.ui.overhead.OverheadP5
+import com.oersted.trainer.ui.overhead.OverheadZoom
 import com.oersted.trainer.ui.panel.MainInstrumentPanel
 import com.oersted.trainer.ui.pedestal.CenterPedestal
 import com.oersted.trainer.ui.pedestal.PedestalOtherFunctions
@@ -70,12 +73,20 @@ fun CockpitScreen(model: CockpitModel, audio: com.oersted.trainer.platform.Audio
             MainInstrumentPanel(cockpit = model, scale = panelScale, modifier = Modifier.fillMaxWidth())
         }
         Spacer(Modifier.height(16.dp))
+        var overheadZoom by remember { mutableStateOf(OverheadZoom.FIT) }
         PanelSection(
             eyebrow = "P5 · FORWARD OVERHEAD · 737-200",
             title = "Interactive overhead — every control is live",
+            trailing = {
+                Text("SIZE", style = MaterialTheme.typography.labelSmall)
+                OverheadZoom.values().forEach { z ->
+                    if (z == overheadZoom) Button(onClick = { overheadZoom = z }) { Text(z.label) }
+                    else OutlinedButton(onClick = { overheadZoom = z }) { Text(z.label) }
+                }
+            },
             caption = "Lights and displays need DC power — flip BAT first. Tap a switch to move it; knobs turn by dragging around them.",
         ) {
-            // OverheadP5 goes here (web components/panel/OverheadP5.tsx): not ported yet
+            OverheadP5(cockpit = model, zoom = overheadZoom)
         }
         Spacer(Modifier.height(16.dp))
         PanelSection(
