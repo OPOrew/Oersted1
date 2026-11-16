@@ -50,7 +50,8 @@ class OverheadP5RulesTest {
         assertEquals(-118.0, R.gaugeTickAngle(0, 5), 0.0)
         assertEquals(118.0, R.gaugeTickAngle(4, 5), 0.0)
         assertEquals(-118.0, R.gaugeTickAngle(0, 1), 0.0)
-        assertEquals(120.0, R.gaugeTickValue(4, 5, 40.0, 160.0), 0.0)
+        assertEquals(160.0, R.gaugeTickValue(4, 5, 40.0, 160.0), 0.0)
+        assertEquals(100.0, R.gaugeTickValue(2, 5, 40.0, 160.0), 0.0)
     }
 
     @Test
@@ -65,7 +66,10 @@ class OverheadP5RulesTest {
         assertEquals("PSI", R.gaugeUnit("TANK 1 FUEL °C", "PSI"))
         assertEquals("", R.gaugeUnit("Q", null))
         assertEquals("", R.gaugeSubLine("APU EGT", "EGT"))
-        assertEquals("RISE 0–30 · IN 40–160", R.gaugeSubLine("GEN DRIVE OIL TEMP °C", "RISE 0–30 · IN 40–160"))
+        // no preset: the sub text is the unit, so no second line (web `sub !== cfg.unit`)
+        assertEquals("", R.gaugeSubLine("GEN DRIVE OIL TEMP °C", "RISE 0–30 · IN 40–160"))
+        assertEquals("RISE 0–30 · IN 40–160", R.gaugeUnit("GEN DRIVE OIL TEMP °C", "RISE 0–30 · IN 40–160"))
+        assertEquals("X", R.gaugeSubLine("APU EGT", "X"))
         assertEquals("AC AMPS", R.gaugeTitle("  AC\n AMPS "))
     }
 
