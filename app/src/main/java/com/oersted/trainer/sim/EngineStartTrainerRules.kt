@@ -27,11 +27,6 @@ object EngineStartTrainerRules {
     /** web `fuelOn={e.lever && e.n2 > 18 && !e.fire}` for the cutaway */
     fun fuelOn(lever: Boolean, n2: Double, firePulled: Boolean): Boolean = lever && n2 > 18 && !firePulled
 
-    /** web Tape: value as a percentage of [max], clamped 0..100 */
-    fun tapePercent(value: Double, max: Double): Double = max(0.0, min(100.0, value / max * 100))
-
-    fun tapeValue(v: Double): Long = round(v)
-
     /** Bottom line of the engine block. */
     fun readoutLine(ff: Double, oil: Double, starterPsi: Double): String =
         "FF ${round(ff)} PPH · OIL ${round(oil)} PSI · STARTER AIR ${round(starterPsi)} PSI (≥ 30 REQUIRED)"

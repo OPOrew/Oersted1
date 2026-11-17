@@ -128,7 +128,7 @@ private fun RingLight(x: Int, y: Int, size: Int, lit: Boolean, litBrush: Brush, 
 }
 
 @Composable
-private fun ThrustLever(cockpit: CockpitModel, n: Int, cx: Int) {
+internal fun ThrustLever(cockpit: CockpitModel, n: Int, cx: Int) {
     val s by cockpit.simState.collectAsState()
     val d by cockpit.derived.collectAsState()
     val p by cockpit.pedestalState.collectAsState()

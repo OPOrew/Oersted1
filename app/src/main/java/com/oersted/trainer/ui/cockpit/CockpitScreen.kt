@@ -125,7 +125,7 @@ fun CockpitScreen(model: CockpitModel, audio: com.oersted.trainer.platform.Audio
             d = derived,
             change = model::applySim,
             note = { text, edit -> model.patchSimNote(text, edit) },
-            pedestal = { BoxWithConstraints(Modifier.fillMaxWidth()) { CenterPedestal(cockpit = model, width = maxWidth) } },
+            cockpit = model,
             onClose = { trainingOpen = false },
         )
     } else {

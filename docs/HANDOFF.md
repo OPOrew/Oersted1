@@ -523,3 +523,15 @@ The overhead module grid (ELECTRICAL / FLIGHT CONTROLS / HYDRAULIC / APU / BLEED
 - Rules and tests: `TrainerGearRules` / `TrainerGearRulesTest`, `EngineStartTrainerRules` / `EngineStartTrainerRulesTest`.
 - Still placeholders in the console: Electrical, Pneumatic, Air Conditioning, Cabin Pressurization, APU, Fire Protection, Ice & Rain, Pitot/Static, Navigation, Autopilot, Lights, Fault Injection, Component Flow (check `TrainingConsoleRules.SECTIONS`; some have rule objects already).
 - Not verified on a device: mechanism drawing proportions, T-handle hit targets, lever size inside the card.
+
+## Training console uses the real panel parts (2026-11-17)
+
+Principle (user request): a training section reuses the actual panel controls instead of custom buttons, so there is one implementation of each control.
+- `P5Cutout(cockpit, col) { p -> ... }` (ui/overhead/OverheadP5.kt) stacks real P5 panels in one column and scales it to the width. Used by Flight Controls (`FltCtrlPanel`), Hydraulics (`HydDoorsCvr`) and Fuel (`FuelPanel`). `P5EngineStartKnobs` is the real ENGINE START knob pair of the P5 bottom strip (Engine Start).
+- `MipCutout` and `MipEngineGauges` / `MipBrakePanel` / `MipHydDials` (ui/panel/MainPanelEngines.kt) render the real `MainPanelEngines` and show one window of it: engine gauges (EPR, N1, N2, FF, oil, EGT, hydraulics), the anti-skid toggles with the AUTO BRAKE knob, the hydraulic dials.
+- `PedestalThrustLevers` (ui/pedestal/PedestalThrustCrop.kt) shows only the two real thrust levers (drag, A/T DISENGAGE, reverse fork) of the control stand, with the real `ThrustLinkButton`.
+- Engine Start no longer has custom tapes or the full pedestal; the engine cutaway / CompactEngineParams stay deferred (the real gauges replace the parameter block).
+- Landing Gear already used the real `GearLever`; its lamps are still simple lights (real `GearPairMini` is private to MainPanelEngines; use `MipCutout` if exact lamps are wanted).
+- Remaining placeholder sections will follow the same rule: Electrical (GenPanel / MeterPanel), Pneumatic (BleedPanel), Air Conditioning (AirCondPanel), Cabin Pressurization (PressPanel), APU, Fire Protection (pedestal FIRE panel), Ice & Rain (IcePanel), Lights, Pitot/Static.
+- Windows are cut by coordinates; if a design position moves, update the constants next to each `Mip*` function.
+- Not verified on a device: crop window edges and touch handling inside scaled cutouts.

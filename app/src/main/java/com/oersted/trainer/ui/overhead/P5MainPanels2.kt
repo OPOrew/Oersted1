@@ -513,6 +513,18 @@ private fun StartKnob(p: P5, n: Int) {
     }
 }
 
+/** The real ENGINE START knobs of the P5 bottom strip (same Knob, same patch + log note), on their own plate, for the Training Console. */
+@Composable
+fun P5EngineStartKnobs(p: P5, modifier: Modifier = Modifier) {
+    P5Plate(modifier, pad = 8.dp) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally), verticalAlignment = Alignment.Bottom) {
+            P5Cap("ENGINE START", Modifier.align(Alignment.Top))
+            StartKnob(p, 1)
+            StartKnob(p, 2)
+        }
+    }
+}
+
 @Composable
 fun BottomStrip(p: P5, modifier: Modifier = Modifier) {
     val s = p.s

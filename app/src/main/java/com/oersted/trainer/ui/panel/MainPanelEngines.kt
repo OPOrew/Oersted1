@@ -22,6 +22,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
@@ -320,5 +324,55 @@ private fun GearPairMini(text: String, red: Boolean, green: Boolean) {
     Column(Modifier.width(64.dp), verticalArrangement = Arrangement.spacedBy(1.dp)) {
         Annun(text, red, AnnunTone.RED, Modifier.fillMaxWidth().height(26.dp), small = true)
         Annun(text, green, AnnunTone.GREEN, Modifier.fillMaxWidth().height(26.dp), small = true)
+    }
+}
+
+/**
+ * A cut-out of the main instrument panel's engine area (the cream strip with EPR / N1 / N2 / fuel flow and the dark panel's oil,
+ * EGT and hydraulic dials) for the Training Console. It renders the real [MainPanelEngines] in the 3036 x 720 panel canvas and
+ * shows only the window ([CROP_X], [CROP_Y]) .. +[CROP_W] x [CROP_H], scaled to [width]. Compose only; verify on CI.
+ */
+private const val CROP_X = X_CREAM
+private const val CROP_Y = 14
+private const val CROP_W = 414
+private const val CROP_H = 636
+
+/** The engine gauges region (cream strip + dark panel dials). */
+@Composable
+fun MipEngineGauges(cockpit: CockpitModel, width: androidx.compose.ui.unit.Dp) = MipCutout(cockpit, width, CROP_X, CROP_Y, CROP_W, CROP_H)
+
+/** The anti-skid toggles, auto brake knob and brake lights of the dark panel's right column. */
+@Composable
+fun MipBrakePanel(cockpit: CockpitModel, width: androidx.compose.ui.unit.Dp) = MipCutout(cockpit, width, X_DARK + 204 - 4, 238, 190, 296)
+
+/** The two hydraulic pressure dials. */
+@Composable
+fun MipHydDials(cockpit: CockpitModel, width: androidx.compose.ui.unit.Dp) = MipCutout(cockpit, width, X_DARK + 50 - 46, 520, 204, 114)
+
+/** Renders the real [MainPanelEngines] in the 3036 x 720 canvas and shows only the window ([x], [y]) .. +[w] x [h], scaled to [width]. */
+@Composable
+fun MipCutout(cockpit: CockpitModel, width: androidx.compose.ui.unit.Dp, x: Int, y: Int, w: Int, h: Int) {
+    val k = width.value / w
+    Box(
+        Modifier
+            .width(width)
+            .height((h * k).dp)
+            .clipToBounds()
+            .background(Color(0xFF0B0D10)),
+    ) {
+        Box(
+            Modifier
+                .wrapContentSize(Alignment.TopStart, unbounded = true)
+                .size(3036.dp, 720.dp)
+                .graphicsLayer {
+                    scaleX = k
+                    scaleY = k
+                    transformOrigin = TransformOrigin(0f, 0f)
+                    translationX = -(x * k).dp.toPx()
+                    translationY = -(y * k).dp.toPx()
+                },
+        ) {
+            MainPanelEngines(cockpit)
+        }
     }
 }

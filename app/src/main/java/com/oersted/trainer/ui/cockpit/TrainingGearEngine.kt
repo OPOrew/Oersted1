@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -49,8 +50,11 @@ import com.oersted.trainer.sim.TrainingConsoleRules
 import com.oersted.trainer.ui.instruments.GearLever
 import com.oersted.trainer.ui.panel.LightTone
 import com.oersted.trainer.ui.panel.PanelCaptionLight
-import com.oersted.trainer.ui.panel.PanelOption
-import com.oersted.trainer.ui.panel.PanelRotary
+import com.oersted.trainer.ui.panel.MipEngineGauges
+import com.oersted.trainer.ui.overhead.P5EngineStartKnobs
+import com.oersted.trainer.ui.overhead.rememberP5
+import com.oersted.trainer.ui.pedestal.PedestalThrustLevers
+import com.oersted.trainer.ui.pedestal.ThrustLinkButton
 import kotlin.math.PI
 import kotlin.math.cos
 
@@ -451,24 +455,6 @@ private fun GearMechanism(
 
 // ───────────────────────────── Engine Start ─────────────────────────────
 
-private val START_OPTIONS = listOf(
-    PanelOption("GRD", "GRD"), PanelOption("OFF", "OFF"), PanelOption("IGN_L", "L IGN"), PanelOption("IGN_R", "R IGN"), PanelOption("FLT", "FLT"),
-)
-
-@Composable
-private fun Tape(label: String, value: Double, unit: String, max: Double, modifier: Modifier = Modifier) {
-    Column(modifier.border(1.dp, CardLine, RoundedCornerShape(4.dp)).padding(6.dp)) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(label, color = Subtle, fontFamily = FontFamily.Monospace, fontSize = 8.sp)
-            Text("${EngineStartTrainerRules.tapeValue(value)}$unit", color = Color(0xFFE6E1D2), fontFamily = FontFamily.Monospace, fontSize = 9.sp)
-        }
-        Spacer(Modifier.height(3.dp))
-        Box(Modifier.fillMaxWidth().height(4.dp).background(Color(0xFF1A1F26), RoundedCornerShape(2.dp))) {
-            Box(Modifier.fillMaxWidth((EngineStartTrainerRules.tapePercent(value, max) / 100.0).toFloat()).height(4.dp).background(Color(0xFFE0A42E), RoundedCornerShape(2.dp)))
-        }
-    }
-}
-
 @Composable
 private fun SubTitle(title: String, content: @Composable () -> Unit) {
     Column(Modifier.fillMaxWidth().padding(vertical = 4.dp).border(1.dp, CardLine, RoundedCornerShape(6.dp)).padding(8.dp)) {
@@ -479,7 +465,7 @@ private fun SubTitle(title: String, content: @Composable () -> Unit) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-internal fun EngineStartTrainerSection(s: SimState, d: Derived, change: Change, note: Note, pedestal: @Composable () -> Unit) {
+internal fun EngineStartTrainerSection(s: SimState, d: Derived, change: Change, cockpit: CockpitModel) {
     Text("Engine Start", style = MaterialTheme.typography.titleMedium)
     val nowMs = System.currentTimeMillis().toDouble()
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -487,24 +473,28 @@ internal fun EngineStartTrainerSection(s: SimState, d: Derived, change: Change, 
         Chip(EngineStartTrainerRules.ductChip("L", d.leftDuctPsi), EngineStartTrainerRules.ductOk(d.leftDuctPsi), Modifier.weight(1f))
         Chip(EngineStartTrainerRules.ductChip("R", d.rightDuctPsi), EngineStartTrainerRules.ductOk(d.rightDuctPsi), Modifier.weight(1f))
     }
+    // the real P5 ENGINE START knobs
     SubTitle("Engine start switches · P5") {
-        PanelRotary("ENGINE START 1", s.start1, START_OPTIONS) { id -> change { st -> st.copy().apply { start1 = id } } }
+        P5EngineStartKnobs(rememberP5(cockpit))
+        Spacer(Modifier.height(6.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             PanelCaptionLight("START VLV 1", d.startValveOpen1)
             PanelCaptionLight("IGN 1", d.ignition1On)
-        }
-        PanelRotary("ENGINE START 2", s.start2, START_OPTIONS) { id -> change { st -> st.copy().apply { start2 = id } } }
-        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             PanelCaptionLight("START VLV 2", d.startValveOpen2)
             PanelCaptionLight("IGN 2", d.ignition2On)
         }
-        Text(
-            "737-200 arrangement: rotary engine-start selectors remain on the forward overhead; thrust, fuel cutoff and reverse levers are on the center control stand.",
-            color = Subtle, fontSize = 7.sp,
-        )
+    }
+    // the real main instrument panel engine gauges (EPR, N1, N2, fuel flow, oil, EGT, hydraulics)
+    SubTitle("Engine gauges · main instrument panel") {
+        BoxWithConstraints(Modifier.fillMaxWidth()) { MipEngineGauges(cockpit, maxWidth) }
+    }
+    // the real thrust levers cut out of the centre pedestal
+    SubTitle("Thrust levers · center pedestal") {
+        BoxWithConstraints(Modifier.fillMaxWidth()) { PedestalThrustLevers(cockpit, maxWidth) }
+        Spacer(Modifier.height(6.dp))
+        ThrustLinkButton(cockpit)
     }
     EngineBlock(1, s, d, change, nowMs)
-    SubTitle("Center pedestal") { pedestal() }
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         ActionButton(EngineStartTrainerRules.batteryLabel(s.battery), onClick = { change(com.oersted.trainer.sim.ElectricalTrainerRules::toggleBattery) }, modifier = Modifier.weight(1f))
         ActionButton(EngineStartTrainerRules.groundAirLabel(s.groundPneumaticConnected), s.wow, { change(FuelAndGroundRules::toggleGroundAirCart) }, Modifier.weight(1f))
@@ -520,9 +510,7 @@ internal fun EngineStartTrainerSection(s: SimState, d: Derived, change: Change, 
 @Composable
 private fun EngineBlock(side: Int, s: SimState, d: Derived, change: Change, nowMs: Double) {
     val one = side == 1
-    val n1 = if (one) s.n1_1 else s.n1_2
     val n2 = if (one) s.n2_1 else s.n2_2
-    val egt = if (one) s.egt1 else s.egt2
     val ff = if (one) s.ff1 else s.ff2
     val oil = if (one) s.oilPsi1 else s.oilPsi2
     val sw = if (one) s.start1 else s.start2
@@ -544,12 +532,6 @@ private fun EngineBlock(side: Int, s: SimState, d: Derived, change: Change, nowM
             )
         }
         Spacer(Modifier.height(6.dp))
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Tape("N2-$side", n2, "%", 100.0, Modifier.weight(1f))
-            Tape("N1-$side", n1, "%", 100.0, Modifier.weight(1f))
-            Tape("EGT $side", egt, "°C", 600.0, Modifier.weight(1f))
-        }
-        Spacer(Modifier.height(6.dp))
         FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             PanelCaptionLight("START VLV $side", valve)
             PanelCaptionLight("START SW GRD", sw == "GRD")
@@ -558,8 +540,5 @@ private fun EngineBlock(side: Int, s: SimState, d: Derived, change: Change, nowM
         }
         Text(EngineStartTrainerRules.readoutLine(ff, oil, psi), color = Subtle, fontFamily = FontFamily.Monospace, fontSize = 8.sp, modifier = Modifier.padding(top = 6.dp))
         if (side == 2) Text(EngineStartTrainerRules.START_HINT, color = Subtle, fontSize = 10.sp, modifier = Modifier.padding(top = 6.dp))
-    }
-    SubTitle("Engine parameters") {
-        Text("Compact engine parameters: not ported yet.", color = Subtle, fontSize = 9.sp)
     }
 }

@@ -2,6 +2,7 @@ package com.oersted.trainer.ui.cockpit
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -30,6 +31,12 @@ import com.oersted.trainer.sim.SimActions
 import com.oersted.trainer.sim.HydraulicTrainerRules
 import com.oersted.trainer.sim.SimState
 import com.oersted.trainer.sim.TrainingConsoleRules
+import com.oersted.trainer.ui.overhead.FltCtrlPanel
+import com.oersted.trainer.ui.overhead.FuelPanel
+import com.oersted.trainer.ui.overhead.HydDoorsCvr
+import com.oersted.trainer.ui.overhead.P5Cutout
+import com.oersted.trainer.ui.panel.MipBrakePanel
+import com.oersted.trainer.ui.panel.MipHydDials
 
 private val ConsoleBg = Color(0xFF171816)
 
@@ -45,7 +52,7 @@ fun TrainingConsoleView(
     d: Derived,
     change: ((SimState) -> SimState) -> Unit,
     note: (String, SimState.() -> Unit) -> Unit,
-    pedestal: @Composable () -> Unit,
+    cockpit: CockpitModel,
     onClose: () -> Unit,
 ) {
     var section by remember { mutableStateOf(TrainingConsoleRules.DEFAULT_SECTION) }
@@ -83,12 +90,12 @@ fun TrainingConsoleView(
         Spacer(Modifier.height(8.dp))
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
             when (section) {
-                "Flight Controls" -> FlightControlsSection(s, change)
+                "Flight Controls" -> FlightControlsSection(s, change, cockpit)
                 "Landing Gear" -> LandingGearTrainerSection(s, d, change, note)
-                "Brakes / Antiskid" -> BrakesSection(s, change)
-                "Hydraulics" -> HydraulicsSection(s, d, change)
-                "Fuel" -> FuelSection(s, d, change)
-                "Engine Start" -> EngineStartTrainerSection(s, d, change, note, pedestal)
+                "Brakes / Antiskid" -> BrakesSection(s, change, cockpit)
+                "Hydraulics" -> HydraulicsSection(s, d, change, cockpit)
+                "Fuel" -> FuelSection(s, d, change, cockpit)
+                "Engine Start" -> EngineStartTrainerSection(s, d, change, cockpit)
                 else -> Text("$section: not ported yet.", style = MaterialTheme.typography.bodyMedium)
             }
         }
@@ -110,26 +117,11 @@ private fun StateButton(text: String, enabled: Boolean = true, onClick: () -> Un
 }
 
 @Composable
-private fun HydraulicsSection(s: SimState, d: Derived, change: ((SimState) -> SimState) -> Unit) {
+private fun HydraulicsSection(s: SimState, d: Derived, change: ((SimState) -> SimState) -> Unit, cockpit: CockpitModel) {
     Text("Hydraulics", style = MaterialTheme.typography.titleMedium)
-    SwitchButton("ENG 1 PUMP (SYSTEM A)", s.engHyd1) { change { HydraulicTrainerRules.toggle(it, "engHyd1") } }
-    SwitchButton("ENG 2 PUMP (SYSTEM A)", s.engHyd2) { change { HydraulicTrainerRules.toggle(it, "engHyd2") } }
-    SwitchButton("ELEC 1 PUMP (SYSTEM B)", s.elecHyd1, HydraulicTrainerRules.elecPumpEnabled(d, 1)) {
-        change { HydraulicTrainerRules.toggle(it, "elecHyd1") }
-    }
-    SwitchButton("ELEC 2 PUMP (SYSTEM B)", s.elecHyd2, HydraulicTrainerRules.elecPumpEnabled(d, 2)) {
-        change { HydraulicTrainerRules.toggle(it, "elecHyd2") }
-    }
-    Text("STBY HYD", style = MaterialTheme.typography.labelLarge)
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        HydraulicTrainerRules.STBY_MODES.forEach { mode ->
-            val lit = s.stbyHyd == mode
-            OutlinedButton(
-                onClick = { change { st -> HydraulicTrainerRules.setStbyHyd(st, mode) } },
-                modifier = Modifier.weight(1f),
-            ) { Text(if (lit) "[$mode]" else mode, style = MaterialTheme.typography.labelSmall) }
-        }
-    }
+    // the real P5 hydraulic panel (engine / electric pumps, standby) and the real MIP pressure dials
+    P5Cutout(cockpit, 3) { p -> HydDoorsCvr(p, true) }
+    BoxWithConstraints(Modifier.fillMaxWidth()) { MipHydDials(cockpit, maxWidth) }
     StateButton("GND INTERCONNECT · ${HydraulicTrainerRules.interconnectState(s.groundInterconnect)}") {
         change { HydraulicTrainerRules.toggle(it, "groundInterconnect") }
     }
@@ -141,12 +133,10 @@ private fun HydraulicsSection(s: SimState, d: Derived, change: ((SimState) -> Si
 }
 
 @Composable
-private fun FlightControlsSection(s: SimState, change: ((SimState) -> SimState) -> Unit) {
+private fun FlightControlsSection(s: SimState, change: ((SimState) -> SimState) -> Unit, cockpit: CockpitModel) {
     Text("Flight Controls", style = MaterialTheme.typography.titleMedium)
-    SwitchButton("FLT CTRL A", s.fltCtrlA) { change(TrainingConsoleRules::toggleFltCtrlA) }
-    SwitchButton("FLT CTRL B", s.fltCtrlB) { change(TrainingConsoleRules::toggleFltCtrlB) }
-    SwitchButton("SPOILER A", s.spoilerA) { change(TrainingConsoleRules::toggleSpoilerA) }
-    SwitchButton("SPOILER B", s.spoilerB) { change(TrainingConsoleRules::toggleSpoilerB) }
+    // the real P5 FLIGHT CONTROL panel (FLT CONTROL A / B, spoilers, alternate flaps)
+    P5Cutout(cockpit, 0) { p -> FltCtrlPanel(p) }
     Button(onClick = { change(TrainingConsoleRules::centerFlightControls) }, modifier = Modifier.fillMaxWidth()) {
         Text("Center flight controls", style = MaterialTheme.typography.labelSmall)
     }
@@ -158,49 +148,19 @@ private fun FlightControlsSection(s: SimState, change: ((SimState) -> SimState) 
 }
 
 @Composable
-private fun BrakesSection(s: SimState, change: ((SimState) -> SimState) -> Unit) {
+private fun BrakesSection(s: SimState, change: ((SimState) -> SimState) -> Unit, cockpit: CockpitModel) {
     Text("Brakes / Antiskid", style = MaterialTheme.typography.titleMedium)
-    SwitchButton("INBD ANTISKID", s.antiskidInbd) { change(TrainingConsoleRules::toggleAntiskidInbd) }
-    SwitchButton("OUTBD ANTISKID", s.antiskidOutbd) { change(TrainingConsoleRules::toggleAntiskidOutbd) }
-    Text("AUTOBRAKE", style = MaterialTheme.typography.labelLarge)
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        TrainingConsoleRules.AUTOBRAKE_LABELS.forEach { (level, label) ->
-            val selected = s.autobrake.toInt() == level
-            OutlinedButton(
-                onClick = { change { st -> TrainingConsoleRules.setAutobrake(st, level) } },
-                modifier = Modifier.weight(1f),
-            ) { Text(if (selected) "[$label]" else label, style = MaterialTheme.typography.labelSmall) }
-        }
-    }
+    // the real main instrument panel anti-skid toggles, AUTO BRAKE knob and brake lights
+    BoxWithConstraints(Modifier.fillMaxWidth()) { MipBrakePanel(cockpit, maxWidth) }
 }
 
 @Composable
-private fun FuelSection(s: SimState, d: Derived, change: ((SimState) -> SimState) -> Unit) {
+private fun FuelSection(s: SimState, d: Derived, change: ((SimState) -> SimState) -> Unit, cockpit: CockpitModel) {
     Text("Fuel", style = MaterialTheme.typography.titleMedium)
     val pct = { v: Double -> if (d.fuelQuantityIndicationPowered) "%.1f%%".format(v) else "NO IND" }
     Text("TANK 1 ${pct(s.fuelTank1)}   CTR ${pct(s.fuelTankCenter)}   TANK 2 ${pct(s.fuelTank2)}", style = MaterialTheme.typography.bodySmall)
-    val labels = mapOf(
-        "fuelPump1Fwd" to "TANK 1 FWD BOOST", "fuelPump1Aft" to "TANK 1 AFT BOOST",
-        "fuelPumpCenter1" to "CTR LEFT BOOST", "fuelPumpCenter2" to "CTR RIGHT BOOST",
-        "fuelPump2Fwd" to "TANK 2 FWD BOOST", "fuelPump2Aft" to "TANK 2 AFT BOOST",
-    )
-    fun pumpOn(k: String): Boolean = when (k) {
-        "fuelPump1Fwd" -> s.fuelPump1Fwd
-        "fuelPump1Aft" -> s.fuelPump1Aft
-        "fuelPumpCenter1" -> s.fuelPumpCenter1
-        "fuelPumpCenter2" -> s.fuelPumpCenter2
-        "fuelPump2Fwd" -> s.fuelPump2Fwd
-        else -> s.fuelPump2Aft
-    }
-    for (k in FuelAndGroundRules.BOOST_PUMPS) {
-        StateButton("${labels[k]} · ${TrainingConsoleRules.onOff(pumpOn(k))}") {
-            change { FuelAndGroundRules.toggleBoostPump(it, k) }
-        }
-    }
-    val shutoffOpen = d.fuelShutoff1Open || d.fuelShutoff2Open
-    StateButton("CROSSFEED VALVE · ${FuelAndGroundRules.crossfeedLabel(s.fuelCrossfeed, shutoffOpen)}") {
-        change { FuelAndGroundRules.toggleCrossfeed(it) }
-    }
+    // the real P5 FUEL panel (six boost pumps, crossfeed)
+    P5Cutout(cockpit, 0) { p -> FuelPanel(p, true) }
     StateButton("SET LOW FUEL · 25%") { change { FuelAndGroundRules.setLowFuel(it) } }
     StateButton("RESET QUANTITY · 100%") { change { FuelAndGroundRules.resetQuantity(it) } }
 }

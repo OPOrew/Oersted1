@@ -29,10 +29,6 @@ class EngineStartTrainerRulesTest {
         assertFalse(R.fuelOn(true, 18.0, false))
         assertFalse(R.fuelOn(true, 50.0, true))
         assertFalse(R.fuelOn(false, 50.0, false))
-        assertEquals(50.0, R.tapePercent(300.0, 600.0), 0.0)
-        assertEquals(100.0, R.tapePercent(900.0, 600.0), 0.0)
-        assertEquals(0.0, R.tapePercent(-5.0, 100.0), 0.0)
-        assertEquals(12L, R.tapeValue(11.5))
     }
 
     @Test

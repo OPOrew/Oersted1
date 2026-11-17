@@ -120,3 +120,24 @@ fun OverheadP5(cockpit: CockpitModel, zoom: OverheadZoom, modifier: Modifier = M
         }
     }
 }
+
+/**
+ * A cut-out of the real P5 forward overhead for the Training Console: the panels in [content] stacked in the column of design
+ * width [OverheadP5Rules.COLS]`[col]`, scaled to the available width. The panels are the same composables the cockpit tab uses
+ * (same switches, same patch + log notes), so there is one implementation of each control.
+ */
+@Composable
+fun P5Cutout(cockpit: CockpitModel, col: Int, modifier: Modifier = Modifier, content: @Composable ColumnScope.(P5) -> Unit) {
+    val p = rememberP5(cockpit)
+    val w = OverheadP5Rules.COLS[col]
+    val shape = RoundedCornerShape(6.dp)
+    BoxWithConstraints(modifier.fillMaxWidth()) {
+        val scale = (maxWidth.value / (w + 12f)).coerceIn(0.5f, 1.8f)
+        Box(Modifier.scaledDesign((w + 12).dp, scale)) {
+            Column(
+                Modifier.width((w + 12).dp).background(Color(0xFF55585C), shape).border(2.dp, Color(0xFF202225), shape).padding(6.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) { content(p) }
+        }
+    }
+}
