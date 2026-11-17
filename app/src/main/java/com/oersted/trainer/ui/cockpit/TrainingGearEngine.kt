@@ -494,7 +494,8 @@ internal fun EngineStartTrainerSection(s: SimState, d: Derived, change: Change, 
         Spacer(Modifier.height(6.dp))
         ThrustLinkButton(cockpit)
     }
-    EngineBlock(1, s, d, change, nowMs)
+    var showCutaway by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(true) }
+    EngineBlock(1, s, d, change, nowMs, showCutaway)
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         ActionButton(EngineStartTrainerRules.batteryLabel(s.battery), onClick = { change(com.oersted.trainer.sim.ElectricalTrainerRules::toggleBattery) }, modifier = Modifier.weight(1f))
         ActionButton(EngineStartTrainerRules.groundAirLabel(s.groundPneumaticConnected), s.wow, { change(FuelAndGroundRules::toggleGroundAirCart) }, Modifier.weight(1f))
@@ -503,12 +504,13 @@ internal fun EngineStartTrainerSection(s: SimState, d: Derived, change: Change, 
         ActionButton(EngineStartTrainerRules.groundPowerLabel(s.externalPowerConnected), onClick = { change(FuelAndGroundRules::toggleGroundPowerCart) }, modifier = Modifier.weight(1f))
         ActionButton(EngineStartTrainerRules.apuLabel(s.apuMaster == "OFF", d.apuAvailable), onClick = { change(FuelAndGroundRules::toggleApuAndBleed) }, modifier = Modifier.weight(1f))
     }
-    EngineBlock(2, s, d, change, nowMs)
+    ActionButton(EngineStartTrainerRules.cutawayLabel(showCutaway), onClick = { showCutaway = !showCutaway })
+    EngineBlock(2, s, d, change, nowMs, showCutaway)
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun EngineBlock(side: Int, s: SimState, d: Derived, change: Change, nowMs: Double) {
+private fun EngineBlock(side: Int, s: SimState, d: Derived, change: Change, nowMs: Double, showCutaway: Boolean) {
     val one = side == 1
     val n2 = if (one) s.n2_1 else s.n2_2
     val ff = if (one) s.ff1 else s.ff2
@@ -529,6 +531,18 @@ private fun EngineBlock(side: Int, s: SimState, d: Derived, change: Change, nowM
                 FuelAndGroundRules.shutdownEnabled(running, auto, n2),
                 { change { SimActions.shutdownEngine(it, side, nowMs) } },
                 Modifier.weight(1f),
+            )
+        }
+        if (showCutaway) {
+            Spacer(Modifier.height(6.dp))
+            EngineCutaway(
+                side = side,
+                n1 = if (one) s.n1_1 else s.n1_2,
+                n2 = n2,
+                egt = if (one) s.egt1 else s.egt2,
+                starterOn = valve,
+                fuelOn = EngineStartTrainerRules.fuelOn(lever, n2, fire),
+                running = running,
             )
         }
         Spacer(Modifier.height(6.dp))
