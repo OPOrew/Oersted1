@@ -47,7 +47,6 @@ import com.oersted.trainer.ui.pedestal.PedestalRadiosCutout
  * controller, Autopilot simulator panel) are not ported yet; see docs/HANDOFF.md. Compose only; verify on CI.
  */
 
-private typealias Change = ((SimState) -> SimState) -> Unit
 
 @Composable
 private fun Title(text: String) = Text(text, style = MaterialTheme.typography.titleMedium)

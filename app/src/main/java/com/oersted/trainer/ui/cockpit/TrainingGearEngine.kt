@@ -73,7 +73,7 @@ private val OkGreen = Color(0xFF65C798)
 private val Red = Color(0xFFE24B4B)
 private val Grey = Color(0xFF8995A1)
 
-private typealias Change = ((SimState) -> SimState) -> Unit
+internal typealias Change = ((SimState) -> SimState) -> Unit
 private typealias Note = (String, SimState.() -> Unit) -> Unit
 
 @Composable
