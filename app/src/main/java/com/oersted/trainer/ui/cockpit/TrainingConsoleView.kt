@@ -44,6 +44,8 @@ fun TrainingConsoleView(
     s: SimState,
     d: Derived,
     change: ((SimState) -> SimState) -> Unit,
+    note: (String, SimState.() -> Unit) -> Unit,
+    pedestal: @Composable () -> Unit,
     onClose: () -> Unit,
 ) {
     var section by remember { mutableStateOf(TrainingConsoleRules.DEFAULT_SECTION) }
@@ -82,11 +84,11 @@ fun TrainingConsoleView(
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
             when (section) {
                 "Flight Controls" -> FlightControlsSection(s, change)
-                "Landing Gear" -> LandingGearSection(s, change)
+                "Landing Gear" -> LandingGearTrainerSection(s, d, change, note)
                 "Brakes / Antiskid" -> BrakesSection(s, change)
                 "Hydraulics" -> HydraulicsSection(s, d, change)
                 "Fuel" -> FuelSection(s, d, change)
-                "Engine Start" -> EngineStartSection(s, d, change)
+                "Engine Start" -> EngineStartTrainerSection(s, d, change, note, pedestal)
                 else -> Text("$section: not ported yet.", style = MaterialTheme.typography.bodyMedium)
             }
         }
@@ -156,21 +158,6 @@ private fun FlightControlsSection(s: SimState, change: ((SimState) -> SimState) 
 }
 
 @Composable
-private fun LandingGearSection(s: SimState, change: ((SimState) -> SimState) -> Unit) {
-    Text("Landing Gear", style = MaterialTheme.typography.titleMedium)
-    SwitchButton("PARKING BRAKE", s.parkingBrake) { change(TrainingConsoleRules::toggleParkingBrake) }
-    Text("Servicing / Test", style = MaterialTheme.typography.labelLarge)
-    SwitchButton("Ground hydraulic servicing", s.hydServicingConnected) { change(TrainingConsoleRules::toggleHydServicingConnected) }
-    SwitchButton("Ground-sensing test override", s.groundSenseTest) { change(TrainingConsoleRules::toggleGroundSenseTest) }
-    SwitchButton("Airborne test override", s.airborneTest) { change(TrainingConsoleRules::toggleAirborneTest) }
-    SwitchButton("Ground power cart (GPU)", s.externalPowerConnected) { change(TrainingConsoleRules::toggleExternalPowerConnected) }
-    Button(onClick = { change(TrainingConsoleRules::centerTillerAndPedals) }, modifier = Modifier.fillMaxWidth()) {
-        Text("Center tiller & pedals", style = MaterialTheme.typography.labelSmall)
-    }
-    Text("Gear wheel and brake dynamics: not ported yet.", style = MaterialTheme.typography.bodySmall)
-}
-
-@Composable
 private fun BrakesSection(s: SimState, change: ((SimState) -> SimState) -> Unit) {
     Text("Brakes / Antiskid", style = MaterialTheme.typography.titleMedium)
     SwitchButton("INBD ANTISKID", s.antiskidInbd) { change(TrainingConsoleRules::toggleAntiskidInbd) }
@@ -216,33 +203,5 @@ private fun FuelSection(s: SimState, d: Derived, change: ((SimState) -> SimState
     }
     StateButton("SET LOW FUEL · 25%") { change { FuelAndGroundRules.setLowFuel(it) } }
     StateButton("RESET QUANTITY · 100%") { change { FuelAndGroundRules.resetQuantity(it) } }
-}
-
-@Composable
-private fun EngineStartSection(s: SimState, d: Derived, change: ((SimState) -> SimState) -> Unit) {
-    Text("Engine Start", style = MaterialTheme.typography.titleMedium)
-    val nowMs = System.currentTimeMillis().toDouble()
-    val engines = listOf(
-        Triple(1, Triple(d.eng1Running, s.autoStart1, s.engine1FirePulled), s.n2_1),
-        Triple(2, Triple(d.eng2Running, s.autoStart2, s.engine2FirePulled), s.n2_2),
-    )
-    for ((side, flags, n2) in engines) {
-        val (running, auto, fire) = flags
-        val status = when {
-            running -> "RUNNING"
-            fire -> "FIRE HANDLE PULLED"
-            auto -> if (n2 < 20) "MOTORING ON STARTER" else "LIGHT-OFF / ACCELERATING"
-            n2 > 1 -> "SPOOLING DOWN"
-            else -> "SHUT DOWN"
-        }
-        Text("Engine $side · $status", style = MaterialTheme.typography.labelLarge)
-        StateButton("START ENG $side", FuelAndGroundRules.startEnabled(running, auto, fire)) {
-            change { SimActions.startEngine(it, side, nowMs) }
-        }
-        StateButton(
-            "${FuelAndGroundRules.shutdownLabel(running, auto)} ENG $side",
-            FuelAndGroundRules.shutdownEnabled(running, auto, n2),
-        ) { change { SimActions.shutdownEngine(it, side, nowMs) } }
-    }
 }
 

@@ -120,7 +120,14 @@ fun CockpitScreen(model: CockpitModel, audio: com.oersted.trainer.platform.Audio
         onClear = { model.clearLog() },
     )
     if (trainingOpen) {
-        TrainingConsoleView(s = simState, d = derived, change = model::applySim, onClose = { trainingOpen = false })
+        TrainingConsoleView(
+            s = simState,
+            d = derived,
+            change = model::applySim,
+            note = { text, edit -> model.patchSimNote(text, edit) },
+            pedestal = { BoxWithConstraints(Modifier.fillMaxWidth()) { CenterPedestal(cockpit = model, width = maxWidth) } },
+            onClose = { trainingOpen = false },
+        )
     } else {
         OutlinedButton(
             onClick = { trainingOpen = true },

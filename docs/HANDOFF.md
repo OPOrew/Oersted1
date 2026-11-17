@@ -514,3 +514,12 @@ The overhead module grid (ELECTRICAL / FLIGHT CONTROLS / HYDRAULIC / APU / BLEED
 - `Annun` now uses a minimum height like the web (two-line labels used to clip), and `Plate` takes an optional colour.
 - Not verified on a device: drag vs horizontal-scroll conflicts on knobs at FIT, tap latency, text sizes at small scale.
 
+
+## Training: Landing Gear and Engine Start (2026-11-17)
+
+- `ui/cockpit/TrainingGearEngine.kt` replaces the small `LandingGearSection` / `EngineStartSection` of `TrainingConsoleView.kt`. Landing Gear now has the component view (header and HYD A chip, mechanism Canvas, gear lamps and lever, manual-extension T-handles, 9 readouts, caption), the ANGLE / SOURCE chips, and the existing servicing buttons. Engine Start has the DC / duct chips, P5 start rotaries with lamps, per-engine blocks (status, START / SHUTDOWN, N2 / N1 / EGT tapes, caption lights, readout line, hint), the center pedestal, and the battery / ground air / GPU / APU + BLEED buttons.
+- `TrainingConsoleView` now takes `note` (writes to the event log, `model.patchSimNote`) and `pedestal` (a composable slot) in addition to `change`.
+- Deferred: `EngineCutaway.tsx` and `CompactEngineParams` (EngineInstrumentPanel.tsx). The "Engine parameters" block shows a placeholder.
+- Rules and tests: `TrainerGearRules` / `TrainerGearRulesTest`, `EngineStartTrainerRules` / `EngineStartTrainerRulesTest`.
+- Still placeholders in the console: Electrical, Pneumatic, Air Conditioning, Cabin Pressurization, APU, Fire Protection, Ice & Rain, Pitot/Static, Navigation, Autopilot, Lights, Fault Injection, Component Flow (check `TrainingConsoleRules.SECTIONS`; some have rule objects already).
+- Not verified on a device: mechanism drawing proportions, T-handle hit targets, lever size inside the card.
