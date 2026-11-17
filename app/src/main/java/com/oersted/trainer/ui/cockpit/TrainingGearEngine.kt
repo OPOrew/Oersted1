@@ -22,6 +22,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
@@ -494,7 +498,7 @@ internal fun EngineStartTrainerSection(s: SimState, d: Derived, change: Change, 
         Spacer(Modifier.height(6.dp))
         ThrustLinkButton(cockpit)
     }
-    var showCutaway by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(true) }
+    var showCutaway by remember { mutableStateOf(true) }
     EngineBlock(1, s, d, change, nowMs, showCutaway)
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         ActionButton(EngineStartTrainerRules.batteryLabel(s.battery), onClick = { change(com.oersted.trainer.sim.ElectricalTrainerRules::toggleBattery) }, modifier = Modifier.weight(1f))
