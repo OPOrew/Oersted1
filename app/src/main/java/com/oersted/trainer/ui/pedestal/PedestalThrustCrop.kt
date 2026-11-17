@@ -29,13 +29,14 @@ private const val CROP_Y = 315
 private const val CROP_W = 280
 private const val CROP_H = 305
 
+/** A window ([x], [y]) .. +[w] x [h] (stage px) of the centre pedestal stage, scaled to [width]; [content] is placed in stage coordinates. */
 @Composable
-fun PedestalThrustLevers(cockpit: CockpitModel, width: Dp) {
-    val k = width.value / CROP_W
+fun PedestalCutout(width: Dp, x: Int, y: Int, w: Int, h: Int, content: @Composable () -> Unit) {
+    val k = width.value / w
     Box(
         Modifier
             .width(width)
-            .height((CROP_H * k).dp)
+            .height((h * k).dp)
             .clipToBounds()
             .background(Color(0xFF111316)),
     ) {
@@ -47,15 +48,28 @@ fun PedestalThrustLevers(cockpit: CockpitModel, width: Dp) {
                     scaleX = k
                     scaleY = k
                     transformOrigin = TransformOrigin(0f, 0f)
-                    translationX = -((CROP_X - PEDESTAL_OX) * k).dp.toPx()
-                    translationY = -(CROP_Y * k).dp.toPx()
+                    translationX = -((x - PEDESTAL_OX) * k).dp.toPx()
+                    translationY = -(y * k).dp.toPx()
                 },
-        ) {
-            // throttle quadrant body, as in PedestalControlStand
-            val body = RoundedCornerShape(10.dp)
-            Box(Modifier.stageAt(398, 333, 350, 437).background(PanelPaint, body).border(1.dp, Color(0xFF141A17), body))
-            ThrustLever(cockpit, 1, 475)
-            ThrustLever(cockpit, 2, 600)
-        }
+        ) { content() }
     }
+}
+
+/** The FIRE / OVERHEAT panel of the pedestal (real handles, bottle switches, lights). */
+@Composable
+fun PedestalFireCutout(cockpit: CockpitModel, width: Dp) =
+    PedestalCutout(width, FIRE_PANEL_X - 4, FIRE_PANEL_Y - 4, FIRE_PANEL_W + 8, FIRE_PANEL_H + 8) { PedestalFirePanel(cockpit) }
+
+/** The radio stack of the pedestal (VHF, NAV, ADF, HF, DATA). */
+@Composable
+fun PedestalRadiosCutout(cockpit: CockpitModel, width: Dp) =
+    PedestalCutout(width, 254, 916, 572, 634) { PedestalRadios(cockpit) }
+
+@Composable
+fun PedestalThrustLevers(cockpit: CockpitModel, width: Dp) = PedestalCutout(width, CROP_X, CROP_Y, CROP_W, CROP_H) {
+    // throttle quadrant body, as in PedestalControlStand
+    val body = RoundedCornerShape(10.dp)
+    Box(Modifier.stageAt(398, 333, 350, 437).background(PanelPaint, body).border(1.dp, Color(0xFF141A17), body))
+    ThrustLever(cockpit, 1, 475)
+    ThrustLever(cockpit, 2, 600)
 }

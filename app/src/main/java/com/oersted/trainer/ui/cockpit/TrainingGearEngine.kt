@@ -77,14 +77,14 @@ private typealias Change = ((SimState) -> SimState) -> Unit
 private typealias Note = (String, SimState.() -> Unit) -> Unit
 
 @Composable
-private fun ActionButton(text: String, enabled: Boolean = true, onClick: () -> Unit, modifier: Modifier = Modifier.fillMaxWidth()) {
+internal fun ActionButton(text: String, enabled: Boolean = true, onClick: () -> Unit, modifier: Modifier = Modifier.fillMaxWidth()) {
     OutlinedButton(onClick = onClick, enabled = enabled, modifier = modifier) {
         Text(text, style = MaterialTheme.typography.labelSmall)
     }
 }
 
 @Composable
-private fun Chip(text: String, ok: Boolean, modifier: Modifier = Modifier) {
+internal fun Chip(text: String, ok: Boolean, modifier: Modifier = Modifier) {
     Text(
         text,
         color = if (ok) OkGreen else Subtle,
@@ -456,7 +456,7 @@ private fun GearMechanism(
 // ───────────────────────────── Engine Start ─────────────────────────────
 
 @Composable
-private fun SubTitle(title: String, content: @Composable () -> Unit) {
+internal fun SubTitle(title: String, content: @Composable () -> Unit) {
     Column(Modifier.fillMaxWidth().padding(vertical = 4.dp).border(1.dp, CardLine, RoundedCornerShape(6.dp)).padding(8.dp)) {
         Text(title, color = Color(0xFFB7AB87), fontSize = 10.sp, modifier = Modifier.padding(bottom = 6.dp))
         content()

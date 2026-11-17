@@ -513,6 +513,17 @@ private fun StartKnob(p: P5, n: Int) {
     }
 }
 
+/** The real APU master switch (OFF / ON / START) of the P5 bottom strip, on its own plate. */
+@Composable
+fun P5ApuControls(p: P5, modifier: Modifier = Modifier) {
+    P5Plate(modifier, pad = 8.dp) {
+        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            P5Cap("APU")
+            VSwitch(listOf("OFF", "ON", "START"), p.s.apuMaster, { v -> p.patch("APU MASTER → $v") { apuMaster = v } }, null, small = true, legends = listOf("OFF", "ON", "START"))
+        }
+    }
+}
+
 /** The real ENGINE START knobs of the P5 bottom strip (same Knob, same patch + log note), on their own plate, for the Training Console. */
 @Composable
 fun P5EngineStartKnobs(p: P5, modifier: Modifier = Modifier) {

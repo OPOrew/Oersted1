@@ -141,3 +141,20 @@ fun P5Cutout(cockpit: CockpitModel, col: Int, modifier: Modifier = Modifier, con
         }
     }
 }
+
+/** Like [P5Cutout] but at the full 1008 px width of the face (for the bottom strip). */
+@Composable
+fun P5WideCutout(cockpit: CockpitModel, modifier: Modifier = Modifier, content: @Composable ColumnScope.(P5) -> Unit) {
+    val p = rememberP5(cockpit)
+    val w = OverheadP5Rules.DESIGN_W
+    val shape = RoundedCornerShape(6.dp)
+    BoxWithConstraints(modifier.fillMaxWidth()) {
+        val scale = (maxWidth.value / w).coerceIn(0.2f, 1.8f)
+        Box(Modifier.scaledDesign(w.dp, scale)) {
+            Column(
+                Modifier.width(w.dp).background(Color(0xFF55585C), shape).border(2.dp, Color(0xFF202225), shape).padding(10.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) { content(p) }
+        }
+    }
+}

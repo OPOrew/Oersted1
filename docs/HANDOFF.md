@@ -535,3 +535,9 @@ Principle (user request): a training section reuses the actual panel controls in
 - Remaining placeholder sections will follow the same rule: Electrical (GenPanel / MeterPanel), Pneumatic (BleedPanel), Air Conditioning (AirCondPanel), Cabin Pressurization (PressPanel), APU, Fire Protection (pedestal FIRE panel), Ice & Rain (IcePanel), Lights, Pitot/Static.
 - Windows are cut by coordinates; if a design position moves, update the constants next to each `Mip*` function.
 - Not verified on a device: crop window edges and touch handling inside scaled cutouts.
+
+### Remaining training sections as cut-outs (2026-11-17)
+
+`ui/cockpit/TrainingSystemSections.kt` fills the sections that were placeholders, using cut-outs of the real panels: Electrical Power (P5 meter, standby and generator panels + distribution module), Pneumatic (P5 bleed panel + duct chips), Air Conditioning (P5 air cond panel), Cabin Pressurization (P5 pressurization panel), APU (real P5 APU master switch), Fire Protection (pedestal FIRE panel cut-out, P5 cargo fire panel, FireModule), Ice & Rain and Pitot / Static (P5 ice panel), Navigation (pedestal radio stack cut-out), Autopilot (real glareshield), Lights (P5 bottom strip, dome light, cabin service panel), Fault Injection (FaultModule + ScenarioModule).
+- New helpers: `PedestalCutout`, `PedestalFireCutout`, `PedestalRadiosCutout`, `P5WideCutout`, `P5ApuControls`.
+- Still not ported: the web flow drawings (HydraulicNode diagrams) of the Electrical / Pneumatic / Air Conditioning / Cabin Pressurization trainers, the APU start-step checklist, Pitot / Static fault and test controls, Ice & Rain scenarios, Lights scenarios, the Navigation phase controller + VHF COM trainer, the Autopilot simulator panel, BrakeRunwayTrainer / BrakeWheelPanel, and "Component / System Flow" (still a placeholder).

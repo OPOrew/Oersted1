@@ -96,6 +96,18 @@ fun TrainingConsoleView(
                 "Hydraulics" -> HydraulicsSection(s, d, change, cockpit)
                 "Fuel" -> FuelSection(s, d, change, cockpit)
                 "Engine Start" -> EngineStartTrainerSection(s, d, change, cockpit)
+                "Electrical Power" -> ElectricalTrainerSection(s, d, change, cockpit)
+                "Pneumatic" -> PneumaticTrainerSection(s, d, change, cockpit)
+                "Air Conditioning" -> AirConditioningTrainerSection(cockpit)
+                "Cabin Pressurization" -> CabinPressTrainerSection(cockpit)
+                "APU" -> ApuTrainerSection(s, d, change, cockpit)
+                "Fire Protection" -> FireTrainerSection(s, d, cockpit)
+                "Ice & Rain" -> IceRainTrainerSection(cockpit)
+                "Pitot / Static" -> PitotStaticTrainerSection(cockpit)
+                "Navigation" -> NavigationTrainerSection(cockpit)
+                "Autopilot" -> AutopilotTrainerSection(cockpit)
+                "Lights" -> LightsTrainerSection(cockpit)
+                "Fault Injection" -> FaultInjectionSection(s, d, cockpit)
                 else -> Text("$section: not ported yet.", style = MaterialTheme.typography.bodyMedium)
             }
         }
