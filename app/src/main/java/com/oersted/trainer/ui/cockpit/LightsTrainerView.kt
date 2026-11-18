@@ -1,5 +1,10 @@
 package com.oersted.trainer.ui.cockpit
 
+import com.oersted.trainer.ui.overhead.P5Cutout
+import com.oersted.trainer.ui.overhead.P5WideCutout
+import com.oersted.trainer.ui.overhead.BottomStrip
+import com.oersted.trainer.ui.overhead.DomeWhite
+import com.oersted.trainer.ui.overhead.CabinServicePanel
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -221,21 +226,14 @@ internal fun LightsTrainerSection(s: SimState, d: Derived, cockpit: CockpitModel
 
     @Composable
     fun ExteriorSwitches() = LBox("P5 · Exterior lights") {
-        val retOpts = listOf("RETRACT" to "RETR", "EXT" to "EXT", "ON" to "ON")
-        Pair2({ m -> Seg("Retract L", s.ltRetL, retOpts, stat("ldg-ret-l"), m) { v -> p { ltRetL = v } } }, { m -> Seg("Retract R", s.ltRetR, retOpts, stat("ldg-ret-r"), m) { v -> p { ltRetR = v } } })
-        Pair2({ m -> Tog("Fixed L", s.ltFixedL, stat("ldg-fix-l"), m) { p { ltFixedL = !s.ltFixedL } } }, { m -> Tog("Fixed R", s.ltFixedR, stat("ldg-fix-r"), m) { p { ltFixedR = !s.ltFixedR } } })
-        Pair2({ m -> Tog("Rwy turnoff L", s.ltTurnoffL, stat("rwy-l"), m) { p { ltTurnoffL = !s.ltTurnoffL } } }, { m -> Tog("Rwy turnoff R", s.ltTurnoffR, stat("rwy-r"), m) { p { ltTurnoffR = !s.ltTurnoffR } } })
-        Pair2({ m -> Tog("Taxi", s.ltTaxi, stat("taxi"), m) { p { ltTaxi = !s.ltTaxi } } }, { m -> Tog("Wing illum", s.ltWing, stat("wing"), m) { p { ltWing = !s.ltWing } } })
-        Pair2({ m -> Tog("Logo", s.ltLogo, stat("logo"), m) { p { ltLogo = !s.ltLogo } } }, { m -> Tog("Wheel well", s.ltWheelWell, stat("wheelwell"), m) { p { ltWheelWell = !s.ltWheelWell } } })
-        Pair2(
-            { m -> Tog("Anti collision", s.ltAntiCol, "TOP ${stat("beacon-top")} · BOT ${stat("beacon-bot")}", m) { p { ltAntiCol = !s.ltAntiCol } } },
-            { m -> Seg("Position", s.ltPosition, listOf("OFF" to "OFF", "STEADY" to "STDY", "STROBE_STEADY" to "STRB+S"), "L ${stat("pos-l")}", m) { v -> p { ltPosition = v } } },
-        )
+        P5WideCutout(cockpit) { pp -> BottomStrip(pp) }
+        Spacer(Modifier.height(4.dp))
+        Tog("Logo", s.ltLogo, stat("logo"), Modifier.fillMaxWidth()) { p { ltLogo = !s.ltLogo } }
     }
 
     @Composable
     fun DeckSwitches() = LBox("Flight deck lighting") {
-        Pair2({ m -> Seg("Dome", s.ltDome, listOf("OFF" to "OFF", "DIM" to "DIM", "BRT" to "BRT"), stat("dome"), m) { v -> p { ltDome = v } } }, { m -> Seg("Master dim", s.ltMasterDim, listOf("BRT" to "BRT", "DIM" to "DIM"), null, m) { v -> p { ltMasterDim = v } } })
+        Seg("Master dim", s.ltMasterDim, listOf("BRT" to "BRT", "DIM" to "DIM"), null, Modifier.fillMaxWidth()) { v -> p { ltMasterDim = v } } 
         Pair2({ m -> Tog("Map L (Capt)", s.ltMapCapt, stat("map-capt"), m) { p { ltMapCapt = !s.ltMapCapt } } }, { m -> Tog("Map R (F/O)", s.ltMapFo, stat("map-fo"), m) { p { ltMapFo = !s.ltMapFo } } })
         Pair2({ m -> Tog("Storm", s.ltStorm, stat("storm"), m) { p { ltStorm = !s.ltStorm } } }, { m -> Tog("Compass", s.ltCompass, stat("compass"), m) { p { ltCompass = !s.ltCompass } } })
         Pair2({ m -> Tog("Observer read", s.ltObserver, stat("observer"), m) { p { ltObserver = !s.ltObserver } } }, { m -> Tog("Lightshield emer", s.ltShieldEmer, stat("shield-emer"), m) { p { ltShieldEmer = !s.ltShieldEmer } } })
@@ -250,7 +248,6 @@ internal fun LightsTrainerSection(s: SimState, d: Derived, cockpit: CockpitModel
     @Composable
     fun CabinSwitches() = LBox("Cabin · signs · emergency") {
         val three = listOf("OFF" to "OFF", "DIM" to "DIM", "BRT" to "BRT")
-        val signs = listOf("OFF" to "OFF", "AUTO" to "AUTO", "ON" to "ON")
         Pair2({ m -> Seg("Cabin lights", s.ltCabin, three, stat("cab-main"), m) { v -> p { ltCabin = v } } }, { m -> Tog("Entry", s.ltEntry, stat("cab-entry"), m) { p { ltEntry = !s.ltEntry } } })
         Pair2({ m -> Tog("Galley", s.ltGalley, stat("cab-galley"), m) { p { ltGalley = !s.ltGalley } } }, { m -> Tog("Lavatory", s.ltLav, stat("cab-lav"), m) { p { ltLav = !s.ltLav } } })
         Pair2({ m -> Tog("Reading lights", s.ltReading, stat("cab-read"), m) { p { ltReading = !s.ltReading } } }, { m -> Tog("Sidewall / cove", s.ltSidewall, stat("cab-sidewall"), m) { p { ltSidewall = !s.ltSidewall } } })
@@ -259,11 +256,8 @@ internal fun LightsTrainerSection(s: SimState, d: Derived, cockpit: CockpitModel
         Pair2({ m -> Tog("Threshold", s.ltThreshold, stat("threshold"), m) { p { ltThreshold = !s.ltThreshold } } }, { m -> Tog("Closets", s.ltCloset, stat("closet"), m) { p { ltCloset = !s.ltCloset } } })
         Pair2({ m -> Tog("Cargo compartments", s.ltCargo, stat("fwd-cargo-dome"), m) { p { ltCargo = !s.ltCargo } } }, { m -> Tog("Equipment comp", s.ltEquip, stat("equip-flood"), m) { p { ltEquip = !s.ltEquip } } })
         Pair2({ m -> Tog("Aft accessory", s.ltAftAccessory, stat("aft-accessory"), m) { p { ltAftAccessory = !s.ltAftAccessory } } }, { m -> Tog("APU compartment", s.ltApuComp, stat("apu-comp"), m) { p { ltApuComp = !s.ltApuComp } } })
-        Pair2({ m -> Tog("Tail cone", s.ltTailCone, stat("tail-cone"), m) { p { ltTailCone = !s.ltTailCone } } }, { m -> Seg("No smoking", s.ltNoSmoking, signs, stat("sign-ns"), m) { v -> p { ltNoSmoking = v } } })
-        Pair2(
-            { m -> Seg("Seat belts", s.ltSeatBelt, signs, stat("sign-sb"), m) { v -> p { ltSeatBelt = v } } },
-            { m -> Seg("Emer lights", s.ltEmergency, listOf("OFF" to "OFF", "ARMED" to "ARMED", "ON" to "ON"), stat("emer-aisle"), m) { v -> p { ltEmergency = v } } },
-        )
+        Tog("Tail cone", s.ltTailCone, stat("tail-cone"), Modifier.fillMaxWidth()) { p { ltTailCone = !s.ltTailCone } }
+        P5Cutout(cockpit, 2) { pp -> DomeWhite(pp); CabinServicePanel(pp) }
         Text("AUTO SIGNS FOLLOW GEAR (NOT UP) AND FLAPS. ARMED LIGHTS THE EMERGENCY LIGHTS WHEN DC POWER IS LOST.", color = SubtleC, fontFamily = FontFamily.Monospace, fontSize = 8.sp)
     }
 

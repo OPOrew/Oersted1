@@ -561,3 +561,8 @@ User asked for modern controls cut out of the real flight-deck panels. Ice & Rai
 Switches that have no counterpart on the P5 module (elevator pitot, temp probe, alpha vanes, fuel heat) use the real P5 `OffOn` bat-handle switch on a `P5Plate`
 (`P5RockerSwitch` in IceRainTrainerView). `PanelRocker` is still used by other legacy panel modules. Next: do the same for the Lights, Pitot/Static and
 Navigation sections (reuse P5 / pedestal cutouts instead of generic buttons); also fixed the missing `@OptIn(ExperimentalLayoutApi)` on `ApTrainerView`.
+
+## Lights: real panel switches (2026-11-19)
+`LightsTrainerView` now embeds `P5WideCutout { BottomStrip }` (landing / taxi / strobe / nav / anti-coll / wing / wheel-well switches) and
+`P5Cutout(col 2) { DomeWhite; CabinServicePanel }` (dome, signs, emergency exit lights, panel bright). Generic Seg/Tog buttons remain only for lights that have
+no switch on the P5 (logo, map / storm / compass / observer / lightshield, cabin and cargo lamps). Unverified on device.
