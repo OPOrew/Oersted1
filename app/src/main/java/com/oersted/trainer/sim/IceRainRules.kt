@@ -90,13 +90,14 @@ object IceRainRules {
         edited(s) { if (engine == 1) antiIce1 = on else antiIce2 = on }
 
     /**
-     * Web wing anti-ice switches. On the ground the valve is inhibited, so the message says so.
+     * Web wing anti-ice switches. On the ground the valve is inhibited, so the message says so. [wow] is the panel's
+     * ground flag, which the "Airborne logic" trainer override can turn off while the sim sits on the ground.
      */
-    fun setWingAntiIce(s: SimState, left: Boolean, on: Boolean): Outcome {
+    fun setWingAntiIce(s: SimState, left: Boolean, on: Boolean, wow: Boolean = s.wow): Outcome {
         val next = edited(s) { if (left) wingAntiIceL = on else wingAntiIceR = on }
         val side = if (left) "LEFT" else "RIGHT"
         val msg = if (on) {
-            if (s.wow) "$side WING ANTI-ICE SELECTED \u2014 valve inhibited on ground." else "$side WING ANTI-ICE ON."
+            if (wow) "$side WING ANTI-ICE SELECTED \u2014 valve inhibited on ground." else "$side WING ANTI-ICE ON."
         } else "$side WING ANTI-ICE OFF."
         return Outcome(next, msg)
     }

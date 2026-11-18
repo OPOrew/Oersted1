@@ -102,7 +102,7 @@ fun TrainingConsoleView(
                 "Cabin Pressurization" -> CabinPressTrainerSection(cockpit)
                 "APU" -> ApuTrainerSection(s, d, change, cockpit)
                 "Fire Protection" -> FireTrainerSection(s, d, cockpit)
-                "Ice & Rain" -> IceRainTrainerSection(cockpit)
+                "Ice & Rain" -> IceRainTrainerSection(s, d, cockpit)
                 "Pitot / Static" -> PitotStaticTrainerSection(s, d, cockpit)
                 "Navigation" -> NavigationTrainerSection(cockpit)
                 "Autopilot" -> AutopilotTrainerSection(cockpit)

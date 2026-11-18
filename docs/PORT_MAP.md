@@ -175,7 +175,8 @@
 | components/panel/ApuTrainer.tsx (rules only) | sim/ApuTrainerRules.kt (pure) | ApuTrainerRulesTest.kt | Rules in sim; the view and the ApuDiagram cutaway not written yet. |
 | components/panel/FireProtectionTrainer.tsx (handlers only) | sim/FireProtectionRules.kt (pure) | FireProtectionRulesTest.kt | Rules in sim; the view, the status cards and the mist animation not written yet. |
 | components/panel/PitotStaticTrainer.tsx (handlers only) | sim/PitotStaticRules.kt (pure) | PitotStaticRulesTest.kt | Rules in sim; the view and schematic not written yet. |
-| components/panel/IceRainTrainer.tsx (handlers only) | sim/IceRainRules.kt (pure) | IceRainRulesTest.kt | Rules in sim; the view and animated drawings not written yet. |
+| components/panel/IceRainTrainer.tsx (handlers only) | sim/IceRainRules.kt (pure) | IceRainRulesTest.kt | Rules in sim; view: ui/cockpit/IceRainTrainerView.kt. SVG drawings not ported. |
+| components/panel/IceRainDiagrams.tsx (thermal / ice model + wiper phase) and the derived logic in IceRainTrainer.tsx | sim/IceRainModel.kt (pure) | IceRainModelTest.kt | Done; the four SVG diagram components are not ported. |
 | components/panel/ElectricalPowerTrainer.tsx (control handlers only) | sim/ElectricalTrainerRules.kt (pure) | ElectricalTrainerRulesTest.kt | Rules in sim; the view and wiring diagram not written yet. |
 | components/panel/Overhead.tsx FaultModule and ScenarioModule (remaining rules) | sim/FaultInjectionRules.kt (pure); toggleFault, gear fault and runScenario already in sim/SimActions.kt | FaultInjectionRulesTest.kt | Rules in sim; the module views not written yet. |
 | routes/cockpit.tsx FuelTrainerPanel, EngineStartTrainerPanel, ground-service buttons (rules only) | sim/FuelAndGroundRules.kt (pure); engine START/SHUTDOWN already in sim/SimActions.kt | FuelAndGroundRulesTest.kt | Rules in sim; the panel views not written yet. |

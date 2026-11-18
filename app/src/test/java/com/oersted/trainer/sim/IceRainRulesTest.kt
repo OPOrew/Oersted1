@@ -81,4 +81,13 @@ class IceRainRulesTest {
         assertFalse(off.windowHeatLFwd)
         assertEquals("PARK", off.wiperR)
     }
+
+    @Test fun wingAntiIceMessageFollowsThePanelGroundFlag() {
+        val s = initialSimState()
+        s.wow = true
+        assertEquals("LEFT WING ANTI-ICE SELECTED \u2014 valve inhibited on ground.", rules.setWingAntiIce(s, true, true).message)
+        // trainer "Airborne logic" override: the panel treats the airplane as airborne
+        assertEquals("RIGHT WING ANTI-ICE ON.", rules.setWingAntiIce(s, false, true, wow = false).message)
+        assertTrue(rules.setWingAntiIce(s, false, true, wow = false).state.wingAntiIceR)
+    }
 }

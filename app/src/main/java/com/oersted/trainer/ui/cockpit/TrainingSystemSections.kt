@@ -24,7 +24,6 @@ import com.oersted.trainer.ui.overhead.CabinServicePanel
 import com.oersted.trainer.ui.overhead.CargoFirePanel
 import com.oersted.trainer.ui.overhead.DomeWhite
 import com.oersted.trainer.ui.overhead.GenPanel
-import com.oersted.trainer.ui.overhead.IcePanel
 import com.oersted.trainer.ui.overhead.MeterPanel
 import com.oersted.trainer.ui.overhead.P5ApuControls
 import com.oersted.trainer.ui.overhead.P5Cutout
@@ -125,13 +124,6 @@ internal fun FireTrainerSection(s: SimState, d: Derived, cockpit: CockpitModel) 
     BoxWithConstraints(Modifier.fillMaxWidth()) { PedestalFireCutout(cockpit, maxWidth) }
     P5Cutout(cockpit, 1) { p -> CargoFirePanel(p) }
     FireModule(cockpit, s, d)
-}
-
-@Composable
-internal fun IceRainTrainerSection(cockpit: CockpitModel) {
-    Title("Ice & Rain Protection")
-    P5Cutout(cockpit, 3) { p -> IcePanel(p) }
-    Todo("Ice and rain scenario controls: not ported yet.")
 }
 
 @Composable
