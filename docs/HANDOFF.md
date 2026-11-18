@@ -544,3 +544,8 @@ Principle (user request): a training section reuses the actual panel controls in
 
 ### Engine cutaway (2026-11-17)
 `EngineCutaway` is ported (`EngineCutawayView.kt`, rules in `sim/EngineCutawayRules.kt`) and shown in each Engine Start block with the ENGINE CUTAWAY SHOWN / HIDDEN toggle. The photo is `res/drawable-nodpi/jt8d_cutaway.webp`. Not verified on a device: frame rate (about 550 blade quads are rebuilt per frame per engine; if it is slow, cache paths per rounded phi or lower the redraw rate), blend look of the burner glow, tag legibility. `CompactEngineParams` is still deferred (the real MIP gauges cover the same readings).
+
+### Pitot / Static trainer (2026-11-18)
+`ui/cockpit/PitotStaticTrainerView.kt` ports PitotStaticTrainer.tsx: flight-condition sliders and presets, quick fault scenarios, captain / first officer air data, P5-9 probe heat and CB / CADC controls, covers and blockages, static ports, alternate selectors, maintenance test network. The logic was already in `PitotStaticRules`; new pure helpers (`isSet`, card state texts, `anyFault`, `groupedRound`) are tested in `PitotStaticTrainerTextTest`. `CockpitModel.applySimNote(note, transform)` applies a pure state change and writes the log note.
+Not ported: `PitotStaticSchematic` (plumbing drawing); the six-pack is the existing simplified `SixPackView`, not the web `SixPack`. The Pitot/Static section no longer shows the P5 ice panel cut-out.
+Next: Ice & Rain trainer (IceRainTrainer.tsx, 756 lines, plus IceRainDiagrams) and Lights trainer (LightsTrainer.tsx, 371 lines, plus ExteriorLightsDiagram).

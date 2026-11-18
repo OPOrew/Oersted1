@@ -185,4 +185,49 @@ object PitotStaticRules {
         psPitotCaptCover = true; psPitotFoCover = true; psPitotAux1Cover = true; psPitotAux2Cover = true
         psFlightCasKt = 80.0
     }
+
+    // ───────────────────────── trainer view text (PitotStaticTrainer.tsx) ─────────────────────────
+
+    /** Current value of one of the flags [flip] accepts. */
+    fun isSet(s: SimState, key: String): Boolean = (FLAGS[key] ?: throw IllegalArgumentException("not a Pitot/Static flag: $key")).get(s)
+
+    /** web `anyFault` */
+    fun anyFault(air: PitotStatic.AirData): Boolean =
+        listOf(air.capt, air.fo).any { !it.pitotOk || !it.staticOk } || !air.aux1PitotOk || !air.aux2PitotOk || !air.elevPitotLOk || !air.elevPitotROk
+
+    fun flightConditionState(air: PitotStatic.AirData): String =
+        if (air.coverOnInMotion) "COVER ON — REMOVE" else if (anyFault(air)) "AIR DATA FAULT" else "NORMAL"
+
+    fun plumbingState(air: PitotStatic.AirData): String = if (anyFault(air)) "AIR DATA FAULT" else "4 COMBINED PROBES"
+
+    /** web `captOne` / `foOne`: exactly one of a side's two static ports is blocked. */
+    fun oneStaticPortBlocked(s: SimState): Boolean = s.psStaticCaptL != s.psStaticCaptR || s.psStaticFoL != s.psStaticFoR
+    fun staticSourcesState(s: SimState): String = if (oneStaticPortBlocked(s)) "ONE PORT BLOCKED" else "NORMAL"
+    fun alternateState(s: SimState): String = if (s.psAltStaticCapt || s.psAltStaticFo) "ALTERNATE SELECTED" else "NORMAL SOURCE"
+    fun testNetworkState(s: SimState): String = if (s.psTestPressureSource || s.psTestVacuumSource) "TEST SOURCE CONNECTED" else "NORMAL"
+    fun heatCardState(dc: Boolean): String = if (dc) "POWER AVAILABLE" else "NO DC"
+    fun sixPackCardState(dc: Boolean): String = if (dc) "POWERED" else "NO DC"
+    fun dcChip(dc: Boolean): String = "TRAINER DC · ${if (dc) "AVAILABLE" else "OFF"}"
+
+    /** SidePanel: a hard fault is any of these flags. */
+    fun hardFault(flags: List<String>): Boolean = flags.any { it == "PITOT BLOCKED" || it == "PITOT ICE" || it == "STATIC BLOCKED" || it == "COVER" }
+
+    /** SidePanel flag chip colour: caution for these two, warn for the rest. */
+    fun flagIsCaution(flag: String): Boolean = flag == "ALT STATIC" || flag == "ONE PORT BLOCKED"
+
+    fun onOff(v: Boolean): String = if (v) "ON" else "OFF"
+
+    /** web `Math.round(x).toLocaleString()` for the en-US locale (thousands separators, JS rounding). */
+    fun groupedRound(v: Double): String {
+        val r = Math.floor(v + 0.5).toLong()
+        val digits = Math.abs(r).toString()
+        val sb = StringBuilder()
+        for ((i, ch) in digits.withIndex()) {
+            if (i > 0 && (digits.length - i) % 3 == 0) sb.append(',')
+            sb.append(ch)
+        }
+        return (if (r < 0) "-" else "") + sb
+    }
+
+    fun stepSnap(v: Double, step: Double): Double = Math.floor(v / step + 0.5) * step
 }

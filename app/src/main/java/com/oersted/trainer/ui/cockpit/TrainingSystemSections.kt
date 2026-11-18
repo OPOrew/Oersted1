@@ -135,14 +135,6 @@ internal fun IceRainTrainerSection(cockpit: CockpitModel) {
 }
 
 @Composable
-internal fun PitotStaticTrainerSection(cockpit: CockpitModel) {
-    Title("Pitot / Static")
-    // probe heat lives on the real P5 ice panel
-    P5Cutout(cockpit, 3) { p -> IcePanel(p) }
-    Todo("Pitot / static fault and test controls (PitotStaticRules): not ported yet.")
-}
-
-@Composable
 internal fun NavigationTrainerSection(cockpit: CockpitModel) {
     Title("Navigation")
     BoxWithConstraints(Modifier.fillMaxWidth()) { PedestalRadiosCutout(cockpit, maxWidth) }

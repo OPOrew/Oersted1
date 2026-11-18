@@ -114,6 +114,14 @@ class CockpitModel(
         if (before != null) clickIfSwitch(before)
     }
 
+    /** A pure state change that also writes [note] to the event log (web `s.patch(next, note)` for rules that return a new state). */
+    fun applySimNote(note: String, transform: (SimState) -> SimState) {
+        val before = sim.current()
+        sim.apply { s -> com.oersted.trainer.sim.StepSim.pushLog(transform(s), note, "info", nowMs = clockMs().toDouble()) }
+        publish()
+        clickIfSwitch(before)
+    }
+
     /** Kotlin form of the web `s.patch({...})`: copy the state, apply the edit, publish. */
     fun patchSim(edit: SimState.() -> Unit) {
         applySim { s -> s.copy().apply(edit) }
