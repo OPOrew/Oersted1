@@ -205,6 +205,39 @@ class CockpitModel(
     private val _readout = MutableStateFlow(snapshot())
     val readout: StateFlow<CockpitReadout> = _readout.asStateFlow()
 
+    /** Flight-phase store (web usePhase) as shown by the Navigation section: phase, hint, AUTO PHASES, plan checklist and log. */
+    data class PhaseView(
+        val phase: Phase,
+        val hint: String,
+        val auto: Boolean,
+        val checklist: List<PhaseController.Checklist>,
+        val log: List<PhaseController.LogEntry>,
+    )
+
+    private fun phaseViewSnapshot() = PhaseView(controller.phase, controller.hint, controller.auto, controller.checklist, controller.log)
+
+    private val _phaseView = MutableStateFlow(phaseViewSnapshot())
+    val phaseView: StateFlow<PhaseView> = _phaseView.asStateFlow()
+
+    /** Web setAutoPhases: TAKEOFF to CLIMB to CRUISE to DESCENT to APPROACH to LAND advance by themselves. */
+    fun setAutoPhases(on: Boolean) {
+        controller.setAutoPhases(on)
+        publish()
+    }
+
+    /** Web "Load plan into controls" / "Reload plan / reset". */
+    fun reloadPlan() {
+        controller.loadPlanIntoControls()
+        publish()
+    }
+
+    /** Web "Ready for departure": the sim's preparation preset, then park at the departure runway. */
+    fun readyForDeparture() {
+        sim.apply { s -> com.oersted.trainer.sim.SimActions.readyForDeparture(s, clockMs().toDouble()) }
+        controller.parkAtDeparture()
+        publish()
+    }
+
     /**
      * Activates a draft, as the web's publishAndArm: publish the plan, set PLAN NAV and the runway-heading request,
      * then load the plan into the controls. The aircraft stays parked until TAKEOFF is pressed.
@@ -283,6 +316,7 @@ class CockpitModel(
 
     private fun publish() {
         _readout.value = snapshot()
+        _phaseView.value = phaseViewSnapshot()
         val air = airSnapshot()
         _air.value = air
         _sixPack.value = sixPackSnapshot(air)

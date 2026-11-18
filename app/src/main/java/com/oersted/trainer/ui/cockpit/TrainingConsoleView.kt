@@ -104,7 +104,7 @@ fun TrainingConsoleView(
                 "Fire Protection" -> FireTrainerSection(s, d, cockpit)
                 "Ice & Rain" -> IceRainTrainerSection(s, d, cockpit)
                 "Pitot / Static" -> PitotStaticTrainerSection(s, d, cockpit)
-                "Navigation" -> NavigationTrainerSection(cockpit)
+                "Navigation" -> NavigationTrainerSection(s, d, cockpit)
                 "Autopilot" -> AutopilotTrainerSection(cockpit)
                 "Lights" -> LightsTrainerSection(s, d, cockpit)
                 "Fault Injection" -> FaultInjectionSection(s, d, cockpit)

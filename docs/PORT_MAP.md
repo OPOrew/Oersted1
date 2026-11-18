@@ -170,7 +170,8 @@
 
 | routes/cockpit.tsx LogDrawer (lines 356-421, row labels and CAUSE/COMMAND line) | sim/LogDrawerRules.kt (pure) | LogDrawerRulesTest.kt | Rules in sim; drawer view in ui/cockpit/LogDrawerView.kt, wired through CockpitModel.log and CockpitScreen (Compose only, verify on CI). |
 | routes/cockpit.tsx TrainingConsole (section list, Flight Controls / Landing Gear / Brakes toggles) | sim/TrainingConsoleRules.kt (pure) | TrainingConsoleRulesTest.kt | Rules in sim; console view in ui/cockpit/TrainingConsoleView.kt (Compose only, verify on CI); most section panels not ported yet. |
-| components/panel/NavigationTrainer.tsx (switch rules only) | sim/NavigationTrainerRules.kt (pure) | NavigationTrainerRulesTest.kt | Rules in sim; the section view waits on NavSharedDisplay, FlightPhasePanel, ApTrainerView, NavAutopilotDiagram. |
+| components/panel/NavigationTrainer.tsx (switch rules only) | sim/NavigationTrainerRules.kt (pure) | NavigationTrainerRulesTest.kt | Rules in sim; view: ui/cockpit/NavigationTrainerView.kt (map, situation display and NavAutopilotDiagram not ported). |
+| components/panel/FlightPhasePanel.tsx text + ApTrainerView.tsx | sim/NavigationPhaseText.kt (pure); ui/cockpit/NavigationTrainerView.kt | NavigationPhaseTextTest.kt | Done except the max-FL input. |
 | lib/sim/lights.ts toggles + components/panel/LightsTrainer.tsx presets and reset (rules only) | sim/LightsTrainerRules.kt (pure) | LightsTrainerRulesTest.kt | Rules in sim; view: ui/cockpit/LightsTrainerView.kt (ExteriorLightsDiagram not ported). |
 | components/panel/ApuTrainer.tsx (rules only) | sim/ApuTrainerRules.kt (pure) | ApuTrainerRulesTest.kt | Rules in sim; the view and the ApuDiagram cutaway not written yet. |
 | components/panel/FireProtectionTrainer.tsx (handlers only) | sim/FireProtectionRules.kt (pure) | FireProtectionRulesTest.kt | Rules in sim; the view, the status cards and the mist animation not written yet. |

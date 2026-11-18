@@ -90,8 +90,8 @@ private const val F0 = 2064 // first-officer panel
  * the caller usually keeps [scale] around 0.4 to 0.6.
  */
 @Composable
-fun MainInstrumentPanel(cockpit: CockpitModel, scale: Float, modifier: Modifier = Modifier) {
-    Box(modifier.horizontalScroll(rememberScrollState())) {
+fun MainInstrumentPanel(cockpit: CockpitModel, scale: Float, modifier: Modifier = Modifier, scrollState: androidx.compose.foundation.ScrollState = rememberScrollState()) {
+    Box(modifier.horizontalScroll(scrollState)) {
         Box(Modifier.width((PANEL_DESIGN_W * scale).dp).height((PANEL_DESIGN_H * scale).dp).clipToBounds()) {
             // web card: `space-y-2 rounded-[6px] border-2 border-[#15181c] bg-[#1d2127] p-3`, glareshield band above the panel body
             Box(

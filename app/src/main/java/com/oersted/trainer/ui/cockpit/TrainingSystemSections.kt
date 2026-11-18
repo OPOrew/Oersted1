@@ -36,7 +36,6 @@ import com.oersted.trainer.ui.panel.FaultModule
 import com.oersted.trainer.ui.panel.FireModule
 import com.oersted.trainer.ui.panel.ScenarioModule
 import com.oersted.trainer.ui.pedestal.PedestalFireCutout
-import com.oersted.trainer.ui.pedestal.PedestalRadiosCutout
 
 /**
  * Remaining Training Console sections, built from cut-outs of the real panels (P5 overhead panels, pedestal FIRE and radio
@@ -124,13 +123,6 @@ internal fun FireTrainerSection(s: SimState, d: Derived, cockpit: CockpitModel) 
     BoxWithConstraints(Modifier.fillMaxWidth()) { PedestalFireCutout(cockpit, maxWidth) }
     P5Cutout(cockpit, 1) { p -> CargoFirePanel(p) }
     FireModule(cockpit, s, d)
-}
-
-@Composable
-internal fun NavigationTrainerSection(cockpit: CockpitModel) {
-    Title("Navigation")
-    BoxWithConstraints(Modifier.fillMaxWidth()) { PedestalRadiosCutout(cockpit, maxWidth) }
-    Todo("Navigation phase controller and VHF COM trainer: not ported yet.")
 }
 
 @Composable
