@@ -66,7 +66,7 @@ class IceRainModelTest {
 
     @Test fun rampResetsAfterFiveSecondsOff() {
         var st = m.initialState(75.0)
-        st = st.copy(win = st.win + ("L1" to st.win.getValue("L1").copy(ramp = 0.8)))
+        st = st.copy(win = st.win + ("L1" to st.win.getValue("L1").copy(ramp = 0.8, offT = 0.0)))
         st = m.step(st, inputs(), 4.0, none)
         assertEquals(0.8, st.win.getValue("L1").ramp, 0.0)
         st = m.step(st, inputs(), 2.0, none)
