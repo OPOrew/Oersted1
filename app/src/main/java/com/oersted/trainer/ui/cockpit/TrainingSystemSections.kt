@@ -150,15 +150,6 @@ internal fun AutopilotTrainerSection(cockpit: CockpitModel) {
 }
 
 @Composable
-internal fun LightsTrainerSection(cockpit: CockpitModel) {
-    Title("Lights")
-    // real P5 exterior lights / engine start strip, dome light and cabin service panel
-    P5WideCutout(cockpit) { p -> BottomStrip(p) }
-    P5Cutout(cockpit, 2) { p -> DomeWhite(p); CabinServicePanel(p) }
-    Todo("Lights scenario controls (LightsTrainerRules): not ported yet.")
-}
-
-@Composable
 internal fun FaultInjectionSection(s: SimState, d: Derived, cockpit: CockpitModel) {
     FaultModule(cockpit, s)
     Spacer(Modifier.height(8.dp))

@@ -106,7 +106,7 @@ fun TrainingConsoleView(
                 "Pitot / Static" -> PitotStaticTrainerSection(s, d, cockpit)
                 "Navigation" -> NavigationTrainerSection(cockpit)
                 "Autopilot" -> AutopilotTrainerSection(cockpit)
-                "Lights" -> LightsTrainerSection(cockpit)
+                "Lights" -> LightsTrainerSection(s, d, cockpit)
                 "Fault Injection" -> FaultInjectionSection(s, d, cockpit)
                 else -> Text("$section: not ported yet.", style = MaterialTheme.typography.bodyMedium)
             }
