@@ -64,4 +64,13 @@ object TrainingConsoleRules {
 
     /** Web button text, e.g. "FLT CTRL A · ON". */
     fun onOff(on: Boolean): String = if (on) "ON" else "OFF"
+
+    /** Web "Live component flow" rows (routes/cockpit.tsx, section "Component / System Flow"). */
+    fun componentFlowRows(s: SimState, d: Derived): List<String> = listOf(
+        "HYD A → ${if (s.hydAPress > 1500) "PRESSURIZED" else "OFF"}",
+        "HYD B → ${if (s.hydBPress > 1500) "PRESSURIZED" else "OFF"}",
+        "PNEU L → ${if (d.leftManifold) "SUPPLIED" else "OFF"}",
+        "PNEU R → ${if (d.rightManifold) "SUPPLIED" else "OFF"}",
+        "AUTOBRAKE → ${if (d.autobrakeActive) "ACTIVE" else if (d.autobrakeArmed) "ARMED" else "OFF"}",
+    )
 }

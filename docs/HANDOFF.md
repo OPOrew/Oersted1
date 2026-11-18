@@ -580,3 +580,5 @@ Shown under the real MIP brake panel in the Brakes / Antiskid section. Flat fill
 Unverified: CI not run (user asked not to monitor it) and the pedal gestures are untested on a device.
 Remaining not ported: Component / System Flow section, web flow drawings (Electrical, Hydraulics, Pneumatic, A/C, Pressurization), Pitot schematic,
 Ice & Rain SVG diagrams, ExteriorLightsDiagram, Navigation map / situation display, APU diagram art.
+
+Component / System Flow: live rows (`TrainingConsoleRules.componentFlowRows`, `ComponentFlowRowsTest`) shown by `ComponentFlowSection`; the masterlist drawing (cockpit.tsx ~2101-2550) is still not ported.

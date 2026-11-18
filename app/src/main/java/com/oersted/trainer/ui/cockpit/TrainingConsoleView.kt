@@ -108,6 +108,7 @@ fun TrainingConsoleView(
                 "Autopilot" -> AutopilotTrainerSection(s, cockpit)
                 "Lights" -> LightsTrainerSection(s, d, cockpit)
                 "Fault Injection" -> FaultInjectionSection(s, d, cockpit)
+                "Component / System Flow" -> ComponentFlowSection(s, d)
                 else -> Text("$section: not ported yet.", style = MaterialTheme.typography.bodyMedium)
             }
         }
@@ -179,3 +180,14 @@ private fun FuelSection(s: SimState, d: Derived, change: ((SimState) -> SimState
     StateButton("RESET QUANTITY · 100%") { change { FuelAndGroundRules.resetQuantity(it) } }
 }
 
+
+/** Web "Live component flow" group. The component masterlist drawing is not ported yet. */
+@Composable
+private fun ComponentFlowSection(s: SimState, d: Derived) {
+    Text("LIVE COMPONENT FLOW", style = MaterialTheme.typography.labelMedium)
+    Spacer(Modifier.height(6.dp))
+    for (row in TrainingConsoleRules.componentFlowRows(s, d)) {
+        Text(row, style = MaterialTheme.typography.bodySmall, modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp))
+    }
+    Text("Component masterlist / flow drawing: not ported yet.", style = MaterialTheme.typography.bodySmall)
+}
