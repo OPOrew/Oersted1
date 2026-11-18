@@ -554,3 +554,10 @@ Not ported: the SVG diagrams (`CockpitWindowsDiagram`, `FrontOverviewDiagram`, `
 Navigation trainer ported: `ui/cockpit/NavigationTrainerView.kt` (NavigationTrainer.tsx + FlightPhasePanel.tsx + ApTrainerView.tsx): flight phases panel (plan header, load/reload, AUTO PHASES, ready for departure, phase buttons with start gates and progress colours, hint, live readout, plan checklist with live config line, plan cells, flight log), the real pedestal NAV radios, the real instrument panel with Captain / A/P / First officer jump buttons and size buttons (`ApTrainerView(cockpit, focus)`, reusable for the Autopilot section), ILS notes, and the failure / CB / fast-erect / sync-flag / compass / RMI / LRRA controls (`NavigationTrainerRules`). New pure text rules `sim/NavigationPhaseText.kt` with `NavigationPhaseTextTest.kt`. `CockpitModel` gained `phaseView`, `setAutoPhases`, `reloadPlan`, `readyForDeparture`; `MainInstrumentPanel` gained an optional `scrollState`.
 Not ported: the interactive map, the situation display, the NavAutopilotDiagram component-flow drawing, and the max-flight-level input (FlightLevelInput). Not verified on a device.
 Next candidates: Autopilot simulator panel (can reuse `ApTrainerView(cockpit, "ap")`), APU start checklist, BrakeRunwayTrainer / BrakeWheelPanel, the web flow drawings, Component / System Flow.
+
+## Ice & Rain: real panel switches (2026-11-19)
+User asked for modern controls cut out of the real flight-deck panels. Ice & Rain now opens with `P5Cutout(cockpit, 3) { IcePanel(it) }`
+(window heat, pitot-static heat A/B, wing + engine anti-ice, exactly as in the cockpit tab). Duplicate generic rockers for those switches were removed.
+Switches that have no counterpart on the P5 module (elevator pitot, temp probe, alpha vanes, fuel heat) use the real P5 `OffOn` bat-handle switch on a `P5Plate`
+(`P5RockerSwitch` in IceRainTrainerView). `PanelRocker` is still used by other legacy panel modules. Next: do the same for the Lights, Pitot/Static and
+Navigation sections (reuse P5 / pedestal cutouts instead of generic buttons); also fixed the missing `@OptIn(ExperimentalLayoutApi)` on `ApTrainerView`.

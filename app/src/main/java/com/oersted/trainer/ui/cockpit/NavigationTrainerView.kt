@@ -205,6 +205,7 @@ private val JUMP = mapOf("capt" to 640, "ap" to 1530, "fo" to 2560)
  * buttons and size buttons. [focus] is "nav" (captain's HSI / RMI) or "ap" (glareshield A/P controls).
  */
 @Composable
+@OptIn(ExperimentalLayoutApi::class)
 internal fun ApTrainerView(cockpit: CockpitModel, focus: String) {
     var scale by remember { mutableStateOf(0.5f) }
     val scroll: ScrollState = rememberScrollState()

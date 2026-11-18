@@ -1,5 +1,7 @@
 package com.oersted.trainer.ui.cockpit
 
+import com.oersted.trainer.ui.overhead.P5Cutout
+import com.oersted.trainer.ui.overhead.IcePanel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -40,7 +43,9 @@ import com.oersted.trainer.sim.IceRainRules
 import com.oersted.trainer.sim.SimState
 import com.oersted.trainer.ui.panel.LightTone
 import com.oersted.trainer.ui.panel.PanelCaptionLight
-import com.oersted.trainer.ui.panel.PanelRocker
+import com.oersted.trainer.ui.overhead.OffOn
+import com.oersted.trainer.ui.overhead.P5Plate
+import com.oersted.trainer.ui.overhead.P5Cap
 
 /**
  * Port of IceRainTrainer.tsx (ATA 30): window heat P5-9, probe heat, wing slat / engine cowl anti-ice, wipers and rain
@@ -56,6 +61,18 @@ private val WarnC = Color(0xFFE24B4B)
 private val CautionC = Color(0xFFFFB340)
 private val FgC = Color(0xFFE6E1D2)
 private val AccentC = Color(0xFFD6A845)
+
+/** A single real P5 bat-handle switch (the overhead's own [OffOn]) on a plate, with an amber heat lamp above it. */
+@Composable
+private fun P5RockerSwitch(label: String, on: Boolean, onChange: (Boolean) -> Unit, lit: Boolean) {
+    P5Plate(Modifier.width(96.dp), pad = 6.dp, screws = 2) {
+        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Box(Modifier.size(8.dp).background(if (lit) Color(0xFFFFB347) else Color(0xFF2A2218), CircleShape).border(1.dp, Color(0xFF050607), CircleShape))
+            OffOn(on, onChange, null, small = true)
+            P5Cap(label)
+        }
+    }
+}
 
 @Composable
 private fun IBtn(text: String, on: Boolean = false, warn: Boolean = false, enabled: Boolean = true, modifier: Modifier = Modifier, onClick: () -> Unit) {
@@ -281,22 +298,19 @@ internal fun IceRainTrainerSection(s: SimState, d: Derived, cockpit: CockpitMode
         )
     }
 
+    // ——— The real P5 ice module (window heat, pitot-static heat, wing / engine anti-ice) ———
+    ICard("P5 overhead · window heat / probe heat / anti-ice", "REAL PANEL", "ok") {
+        Sub("Cut-out of the flight-deck panel — same switches and lights as the cockpit tab")
+        P5Cutout(cockpit, 3) { pp -> IcePanel(pp) }
+    }
+
     // ——— Window heat P5-9 ———
     ICard("Window heat · P5-9 (ATA 30-41)", if (anyOvht) "OVERHEAT" else if (anyWindowOn && ac) "HEAT APPLIED" else "OFF", if (anyOvht) "caution" else "ok") {
         Grid(3, listOf(winChip("L NO.1", "L1"), winChip("L NO.2", "L2"), winChip("L NO.4/5", "L4", "L5"), winChip("R NO.1", "R1"), winChip("R NO.2", "R2"), winChip("R NO.4/5", "R4", "R5")))
         for (side in listOf("L", "R")) {
-            val fwdOn = if (side == "L") s.windowHeatLFwd else s.windowHeatRFwd
-            val sideOn = if (side == "L") s.windowHeatLSide else s.windowHeatRSide
-            val fwdKey = "windowHeat${side}Fwd"
-            val sideKey = "windowHeat${side}Side"
             val f = "${side}1"; val sd = "${side}2"
             Column(Modifier.fillMaxWidth().padding(bottom = 6.dp).background(Color(0xFF0E1013), RoundedCornerShape(6.dp)).border(1.dp, LineC, RoundedCornerShape(6.dp)).padding(8.dp)) {
                 Sub(if (side == "L") "Left" else "Right")
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                    PanelRocker("$side FWD", fwdOn, onChange = { v -> act { IceRainRules.setWindowHeat(it, fwdKey, v) } }, lit = winEnabled.getValue(f))
-                    PanelRocker("$side SIDE", sideOn, onChange = { v -> act { IceRainRules.setWindowHeat(it, sideKey, v) } }, lit = winEnabled.getValue(sd))
-                }
-                Spacer(Modifier.height(4.dp))
                 Grid(2, listOf(
                     { m -> PanelCaptionLight("$side FWD ON", lampTest || (dc && onLight(f) && !ovht.getValue(f)), LightTone.OK, m) },
                     { m -> PanelCaptionLight("$side FWD OVHT", lampTest || (dc && ovht.getValue(f)), LightTone.CAUTION, m) },
@@ -322,13 +336,11 @@ internal fun IceRainTrainerSection(s: SimState, d: Derived, cockpit: CockpitMode
     // ——— Probe / pitot heat ———
     ICard("Probe / pitot heat · P5-9 (ATA 30-31)", if (anyProbe) "HEAT ON" else "OFF", "ok") {
         FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            PanelRocker("CAPT PITOT / P5-9 A", s.psPitotStaticA, onChange = { v -> p { psPitotStaticA = v } }, lit = ac && s.psPitotStaticA && s.psCbCaptUpperL)
-            PanelRocker("F/O PITOT / P5-9 B", s.psPitotStaticB, onChange = { v -> p { psPitotStaticB = v } }, lit = ac && s.psPitotStaticB && s.psCbFoUpperR)
-            PanelRocker("L ELEV PITOT (TAIL)", s.probeHeatElevL, onChange = { v -> act { IceRainRules.setProbeHeat(it, "probeHeatElevL", v) } }, lit = ac && s.probeHeatElevL && s.psPitotStaticA && s.psCbElevL)
-            PanelRocker("R ELEV PITOT (TAIL)", s.probeHeatElevR, onChange = { v -> act { IceRainRules.setProbeHeat(it, "probeHeatElevR", v) } }, lit = ac && s.probeHeatElevR && s.psPitotStaticB && s.psCbElevR)
-            PanelRocker("TEMP PROBE", s.probeHeatTemp, onChange = { v -> act { IceRainRules.setProbeHeat(it, "probeHeatTemp", v) } }, lit = ac && s.probeHeatTemp && s.psCbTempL && s.psCbTempR)
-            PanelRocker("L ALPHA VANE", s.probeHeatAlphaL, onChange = { v -> act { IceRainRules.setProbeHeat(it, "probeHeatAlphaL", v) } }, lit = d.alphaVaneHeatedL)
-            PanelRocker("R ALPHA VANE", s.probeHeatAlphaR, onChange = { v -> act { IceRainRules.setProbeHeat(it, "probeHeatAlphaR", v) } }, lit = d.alphaVaneHeatedR)
+            P5RockerSwitch("L ELEV PITOT (TAIL)", s.probeHeatElevL, onChange = { v -> act { IceRainRules.setProbeHeat(it, "probeHeatElevL", v) } }, lit = ac && s.probeHeatElevL && s.psPitotStaticA && s.psCbElevL)
+            P5RockerSwitch("R ELEV PITOT (TAIL)", s.probeHeatElevR, onChange = { v -> act { IceRainRules.setProbeHeat(it, "probeHeatElevR", v) } }, lit = ac && s.probeHeatElevR && s.psPitotStaticB && s.psCbElevR)
+            P5RockerSwitch("TEMP PROBE", s.probeHeatTemp, onChange = { v -> act { IceRainRules.setProbeHeat(it, "probeHeatTemp", v) } }, lit = ac && s.probeHeatTemp && s.psCbTempL && s.psCbTempR)
+            P5RockerSwitch("L ALPHA VANE", s.probeHeatAlphaL, onChange = { v -> act { IceRainRules.setProbeHeat(it, "probeHeatAlphaL", v) } }, lit = d.alphaVaneHeatedL)
+            P5RockerSwitch("R ALPHA VANE", s.probeHeatAlphaR, onChange = { v -> act { IceRainRules.setProbeHeat(it, "probeHeatAlphaR", v) } }, lit = d.alphaVaneHeatedR)
         }
         Spacer(Modifier.height(6.dp))
         fun on(b: Boolean) = if (b) "ON" else "OFF"
@@ -347,12 +359,8 @@ internal fun IceRainTrainerSection(s: SimState, d: Derived, cockpit: CockpitMode
     else if (anyEngineAi || anyWingAi) "SELECTED" else "OFF"
     ICard("Wing slats / engine cowl anti-ice (ATA 30-11)", wingState, if (wingInhibited) "caution" else "ok") {
         FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            PanelRocker("ENG 1 ANTI-ICE", s.antiIce1, onChange = { v -> cockpit.applySim { IceRainRules.setEngineAntiIce(it, 1, v) } }, lit = ac && s.antiIce1)
-            PanelRocker("ENG 2 ANTI-ICE", s.antiIce2, onChange = { v -> cockpit.applySim { IceRainRules.setEngineAntiIce(it, 2, v) } }, lit = ac && s.antiIce2)
-            PanelRocker("WING ANTI-ICE L", s.wingAntiIceL, onChange = { v -> act { IceRainRules.setWingAntiIce(it, left = true, on = v, wow = wow) } }, lit = ac && s.wingAntiIceL)
-            PanelRocker("WING ANTI-ICE R", s.wingAntiIceR, onChange = { v -> act { IceRainRules.setWingAntiIce(it, left = false, on = v, wow = wow) } }, lit = ac && s.wingAntiIceR)
-            PanelRocker("ENG 1 FUEL HEAT", s.fuelHeat, onChange = { v -> cockpit.applySim { IceRainRules.setFuelHeat(it, 1, v) } }, lit = d.fuelHeatValveOpen)
-            PanelRocker("ENG 2 FUEL HEAT", s.fuelHeat2, onChange = { v -> cockpit.applySim { IceRainRules.setFuelHeat(it, 2, v) } }, lit = d.fuelHeatValve2Open)
+            P5RockerSwitch("ENG 1 FUEL HEAT", s.fuelHeat, onChange = { v -> cockpit.applySim { IceRainRules.setFuelHeat(it, 1, v) } }, lit = d.fuelHeatValveOpen)
+            P5RockerSwitch("ENG 2 FUEL HEAT", s.fuelHeat2, onChange = { v -> cockpit.applySim { IceRainRules.setFuelHeat(it, 2, v) } }, lit = d.fuelHeatValve2Open)
         }
         Spacer(Modifier.height(6.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
