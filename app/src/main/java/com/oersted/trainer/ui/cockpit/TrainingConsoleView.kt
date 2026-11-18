@@ -92,7 +92,7 @@ fun TrainingConsoleView(
             when (section) {
                 "Flight Controls" -> FlightControlsSection(s, change, cockpit)
                 "Landing Gear" -> LandingGearTrainerSection(s, d, change, note)
-                "Brakes / Antiskid" -> BrakesSection(s, change, cockpit)
+                "Brakes / Antiskid" -> BrakesSection(s, d, change, cockpit)
                 "Hydraulics" -> HydraulicsSection(s, d, change, cockpit)
                 "Fuel" -> FuelSection(s, d, change, cockpit)
                 "Engine Start" -> EngineStartTrainerSection(s, d, change, cockpit)
@@ -160,10 +160,12 @@ private fun FlightControlsSection(s: SimState, change: ((SimState) -> SimState) 
 }
 
 @Composable
-private fun BrakesSection(s: SimState, change: ((SimState) -> SimState) -> Unit, cockpit: CockpitModel) {
+private fun BrakesSection(s: SimState, d: Derived, change: ((SimState) -> SimState) -> Unit, cockpit: CockpitModel) {
     Text("Brakes / Antiskid", style = MaterialTheme.typography.titleMedium)
     // the real main instrument panel anti-skid toggles, AUTO BRAKE knob and brake lights
     BoxWithConstraints(Modifier.fillMaxWidth()) { MipBrakePanel(cockpit, maxWidth) }
+    Spacer(Modifier.height(8.dp))
+    BrakeRunwayTrainer(s, d, cockpit)
 }
 
 @Composable

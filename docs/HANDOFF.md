@@ -572,3 +572,11 @@ no switch on the P5 (logo, map / storm / compass / observer / lightshield, cabin
 - Autopilot: `AutopilotTrainerSection(s, cockpit)` = `FlightPhasePanel` + `ApTrainerView(cockpit, "ap")` + glareshield. Not ported: map, runway view, FLY THE PLAN.
 - APU: new `ui/cockpit/ApuTrainerView.kt` (gauges, caption lights, nine-step tracker, AUTO START demo, real P5 APU switch + engine start knobs). Not ported: ApuDiagram art.
 CI is not being monitored per the user's request (2026-11-19); check `gh run list` before relying on these.
+
+## Brakes / Antiskid landing trainer (2026-11-19)
+`sim/BrakeRunwayRules.kt` (wheel status, hints, pedal ramp, scenario start/reset patches; `BrakeRunwayRulesTest.kt`) and
+`ui/cockpit/BrakeRunwayView.kt` (Canvas top-down scene, readouts, per-wheel cards, rudder pedals + toe brakes with Latch, scenarios).
+Shown under the real MIP brake panel in the Brakes / Antiskid section. Flat fills replace the web's metal gradient and ICE hatch pattern.
+Unverified: CI not run (user asked not to monitor it) and the pedal gestures are untested on a device.
+Remaining not ported: Component / System Flow section, web flow drawings (Electrical, Hydraulics, Pneumatic, A/C, Pressurization), Pitot schematic,
+Ice & Rain SVG diagrams, ExteriorLightsDiagram, Navigation map / situation display, APU diagram art.
