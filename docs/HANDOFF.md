@@ -566,3 +566,9 @@ Navigation sections (reuse P5 / pedestal cutouts instead of generic buttons); al
 `LightsTrainerView` now embeds `P5WideCutout { BottomStrip }` (landing / taxi / strobe / nav / anti-coll / wing / wheel-well switches) and
 `P5Cutout(col 2) { DomeWhite; CabinServicePanel }` (dome, signs, emergency exit lights, panel bright). Generic Seg/Tog buttons remain only for lights that have
 no switch on the P5 (logo, map / storm / compass / observer / lightshield, cabin and cargo lamps). Unverified on device.
+
+## Pitot/Static, Autopilot, APU (2026-11-19)
+- Pitot/Static: the P5-9 heat A/B buttons are replaced by `P5Cutout(col 3) { IcePanel }` (real module). The rest of that section is maintenance buttons in the web too.
+- Autopilot: `AutopilotTrainerSection(s, cockpit)` = `FlightPhasePanel` + `ApTrainerView(cockpit, "ap")` + glareshield. Not ported: map, runway view, FLY THE PLAN.
+- APU: new `ui/cockpit/ApuTrainerView.kt` (gauges, caption lights, nine-step tracker, AUTO START demo, real P5 APU switch + engine start knobs). Not ported: ApuDiagram art.
+CI is not being monitored per the user's request (2026-11-19); check `gh run list` before relying on these.

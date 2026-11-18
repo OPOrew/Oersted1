@@ -1,5 +1,7 @@
 package com.oersted.trainer.ui.cockpit
 
+import com.oersted.trainer.ui.overhead.P5Cutout
+import com.oersted.trainer.ui.overhead.IcePanel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -239,12 +241,9 @@ internal fun PitotStaticTrainerSection(s: SimState, d: Derived, cockpit: Cockpit
             HeatGroup("RIGHT P5-9 GROUP", "UPPER RIGHT / F/O", air.fo.probe.heaterOn, "LOWER RIGHT / AUX 1", Modifier.weight(1f))
         }
         Spacer(Modifier.height(6.dp))
-        BtnGrid(
-            listOf(
-                onOffBtn("PITOT-STATIC A", "P5-9 PITOT-STATIC A", "psPitotStaticA"),
-                onOffBtn("PITOT-STATIC B", "P5-9 PITOT-STATIC B", "psPitotStaticB"),
-            ),
-        )
+        // the real P5 module: PITOT STATIC HEAT A / B switches with the CAPT / F/O / ELEV / TEMP / ALPHA lamps
+        P5Cutout(cockpit, 3) { pp -> IcePanel(pp) }
+        Spacer(Modifier.height(6.dp))
         BtnGrid(
             listOf(
                 cbBtn("CAPT UPPER-L CB", "P18 CAPT UPPER-L HEATER CB", "psCbCaptUpperL"),

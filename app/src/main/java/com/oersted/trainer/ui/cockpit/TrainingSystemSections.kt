@@ -97,24 +97,6 @@ internal fun CabinPressTrainerSection(cockpit: CockpitModel) {
 }
 
 @Composable
-internal fun ApuTrainerSection(s: SimState, d: Derived, change: Change, cockpit: CockpitModel) {
-    Title("APU")
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        Chip("APU ${if (s.apuMaster == "OFF") "OFF" else if (d.apuAvailable) "AVAILABLE" else "STARTING"}", d.apuAvailable, Modifier.weight(1f))
-        Chip("RPM ${Math.round(s.apuRpm)}%", d.apuAvailable, Modifier.weight(1f))
-        Chip("EGT ${Math.round(s.apuEgt)}°C", false, Modifier.weight(1f))
-    }
-    // real P5 APU master switch
-    BoxWithConstraints(Modifier.fillMaxWidth()) { com.oersted.trainer.ui.overhead.P5ApuControls(rememberP5(cockpit), Modifier.fillMaxWidth(0.4f)) }
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        ActionButton(EngineStartTrainerRules.batteryLabel(s.battery), onClick = { change(ElectricalTrainerRules::toggleBattery) }, modifier = Modifier.weight(1f))
-        ActionButton("APU BLEED · ${com.oersted.trainer.sim.TrainingConsoleRules.onOff(s.apuBleed)}", onClick = { change(com.oersted.trainer.sim.ApuTrainerRules::toggleApuBleed) }, modifier = Modifier.weight(1f))
-    }
-    ActionButton("Set APU running", onClick = { cockpit.readyApu() })
-    Todo("APU start-step checklist and APU panel drawing: not ported yet.")
-}
-
-@Composable
 internal fun FireTrainerSection(s: SimState, d: Derived, cockpit: CockpitModel) {
     Title("Fire Protection")
     Chip("FIRE WARN ${if (d.fireWarn) "ACTIVE" else "CLEAR"}", !d.fireWarn)
@@ -126,11 +108,15 @@ internal fun FireTrainerSection(s: SimState, d: Derived, cockpit: CockpitModel) 
 }
 
 @Composable
-internal fun AutopilotTrainerSection(cockpit: CockpitModel) {
-    Title("Autopilot / Flight Director")
-    // the real glareshield (MCP, flight mode annunciators)
+internal fun AutopilotTrainerSection(s: SimState, cockpit: CockpitModel) {
+    Title("Autopilot Simulator / Flight Director")
+    // flight phases + live readout, then the real glareshield (MCP, flight mode annunciators) and the real instrument panel
+    FlightPhasePanel(s, cockpit)
+    Spacer(Modifier.height(6.dp))
+    ApTrainerView(cockpit, "ap")
+    Spacer(Modifier.height(6.dp))
     BoxWithConstraints(Modifier.fillMaxWidth()) { GlareshieldPanel(cockpit, maxWidth) }
-    Todo("Autopilot simulator panel: not ported yet.")
+    Todo("Interactive map, runway view and the FLY THE PLAN button: not ported yet.")
 }
 
 @Composable

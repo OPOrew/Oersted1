@@ -106,7 +106,7 @@ private val PHASE_BUTTONS = FlightPhases.PHASE_BUTTONS
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun FlightPhasePanel(s: SimState, cockpit: CockpitModel) {
+internal fun FlightPhasePanel(s: SimState, cockpit: CockpitModel) {
     val plan by cockpit.activePlan.collectAsState()
     val nav by cockpit.navState.collectAsState()
     val pv by cockpit.phaseView.collectAsState()
