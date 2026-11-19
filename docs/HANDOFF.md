@@ -586,3 +586,5 @@ Component / System Flow: live rows (`TrainingConsoleRules.componentFlowRows`, `C
 - Hydraulics flow drawing ported (FlowWires.kt router + FlowDiagram.kt engine + HydraulicsFlowView.kt). Not CI-verified. Next: reuse engine for Pneumatic / Air Cond / Cabin Pressurization / Electrical flow drawings.
 
 - Pneumatic flow drawing ported (sim/PneumaticFlowWires.kt + PneumaticFlowWiresTest, ui/cockpit/PneumaticFlowView.kt), hooked into PneumaticTrainerSection. Not CI-verified. Next: Air Conditioning (buildAirCondWires, cockpit.tsx 835/1052), Cabin Pressurization (1210/1231), Electrical.
+
+- Air Conditioning + Cabin Pressurization drawings ported (sim/AirCondFlowWires.kt with AirCondFlowWires + CabinFlowWires, tests in AirCondFlowWiresTest.kt; ui/cockpit/AirCondFlowView.kt). Sections now take (s, d, change, cockpit) and carry pack toggles/trip resets/selector modes/press mode/outflow buttons from AirConditioningRules. Still missing there: auto selector + fine-mix sliders and the temp-control fault selector. Not CI-verified. Remaining flow drawing: Electrical.

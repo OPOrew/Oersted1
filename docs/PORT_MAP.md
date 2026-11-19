@@ -204,3 +204,5 @@
 
 | HydraulicsTrainerPanel drawing (cockpit.tsx) | ui/cockpit/HydraulicsFlowView.kt, sim/FlowWires.kt, ui/cockpit/FlowDiagram.kt, FlowIcons.kt | ported, unverified by CI |
 | buildPneumaticWires / PneumaticTrainerPanel / PneuEngineSection (cockpit.tsx) | sim/PneumaticFlowWires.kt, ui/cockpit/PneumaticFlowView.kt | ported, unverified by CI |
+| buildAirCondWires / AcPackSection / AirConditioningTrainerPanel (cockpit.tsx) | sim/AirCondFlowWires.kt, ui/cockpit/AirCondFlowView.kt | ported (drawing + buttons), sliders/fault select pending |
+| buildCabinWires / CabinPressurizationTrainerPanel (cockpit.tsx) | sim/AirCondFlowWires.kt (CabinFlowWires), ui/cockpit/AirCondFlowView.kt | ported |

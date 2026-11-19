@@ -6,11 +6,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.oersted.trainer.sim.AirConditioningRules
 import com.oersted.trainer.sim.Derived
 import com.oersted.trainer.sim.ElectricalTrainerRules
 import com.oersted.trainer.sim.EngineStartTrainerRules
@@ -84,17 +87,48 @@ internal fun PneumaticTrainerSection(s: SimState, d: Derived, change: Change, co
 }
 
 @Composable
-internal fun AirConditioningTrainerSection(cockpit: CockpitModel) {
+internal fun AirConditioningTrainerSection(s: SimState, d: Derived, change: Change, cockpit: CockpitModel) {
     Title("Air Conditioning")
     P5Cutout(cockpit, 4) { p -> AirCondPanel(p) }
-    Todo("Pack flow drawing: not ported yet.")
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        ActionButton("L PACK · ${if (s.packL) "ON" else "OFF"}", onClick = { change { AirConditioningRules.togglePack(it, true) } }, modifier = Modifier.weight(1f))
+        ActionButton("R PACK · ${if (s.packR) "ON" else "OFF"}", onClick = { change { AirConditioningRules.togglePack(it, false) } }, modifier = Modifier.weight(1f))
+    }
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        ActionButton("L PACK TRIP RESET", onClick = { change { AirConditioningRules.resetPackTrip(it, true) } }, modifier = Modifier.weight(1f))
+        ActionButton("R PACK TRIP RESET", onClick = { change { AirConditioningRules.resetPackTrip(it, false) } }, modifier = Modifier.weight(1f))
+    }
+    for (left in listOf(true, false)) {
+        val mode = AirConditioningRules.tempMode(s, left)
+        Text("${if (left) "CONT" else "PASS"} CABIN · P5-17 SELECTOR (ATA 21)", color = FlowSubtle, fontSize = 8.sp, modifier = Modifier.padding(top = 4.dp))
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+            for (m in AirConditioningRules.TEMP_MODES) {
+                val label = if (m == "MANUAL_COOL") "MAN COOL" else if (m == "MANUAL_WARM") "MAN WARM" else m
+                ActionButton(if (AirConditioningRules.modeButtonLit(mode, m)) "● $label" else label, onClick = { change { AirConditioningRules.setTempMode(it, left, m) } }, modifier = Modifier.weight(1f))
+            }
+        }
+    }
+    Todo("Auto selector / fine-mix sliders and the temperature-control fault selector: not ported yet.")
+    Spacer(Modifier.height(8.dp))
+    AirCondFlowDiagram(s, d)
 }
 
 @Composable
-internal fun CabinPressTrainerSection(cockpit: CockpitModel) {
+internal fun CabinPressTrainerSection(s: SimState, d: Derived, change: Change, cockpit: CockpitModel) {
     Title("Cabin Pressurization")
     P5Cutout(cockpit, 4) { p -> PressPanel(p, true) }
-    Todo("Pressurization flow drawing: not ported yet.")
+    val labels = mapOf("AUTO" to "AUTO", "STBY" to "STANDBY", "MAN_AC" to "MANUAL AC", "MAN_DC" to "MANUAL DC")
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+        for (m in AirConditioningRules.PRESS_MODES)
+            ActionButton(if (s.pressMode == m) "● ${labels[m]}" else labels[m]!!, onClick = { change { AirConditioningRules.setPressMode(it, m) } }, modifier = Modifier.weight(1f))
+    }
+    val manual = AirConditioningRules.outflowEnabled(s)
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        ActionButton("OUTFLOW VALVE · OPEN", manual, { change { AirConditioningRules.stepOutflow(it, true) } }, Modifier.weight(1f))
+        ActionButton("OUTFLOW VALVE · CLOSE", manual, { change { AirConditioningRules.stepOutflow(it, false) } }, Modifier.weight(1f))
+    }
+    Spacer(Modifier.height(8.dp))
+    CabinFlowDiagram(s, d)
 }
 
 @Composable
