@@ -60,13 +60,9 @@ internal fun ElectricalTrainerSection(s: SimState, d: Derived, change: Change, c
     Title("Electrical Power")
     // real P5 meter, standby power and generator panels
     P5Cutout(cockpit, 1) { p -> MeterPanel(p); StandbyPanel(p); GenPanel(p, true) }
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        ActionButton(EngineStartTrainerRules.batteryLabel(s.battery), onClick = { change(ElectricalTrainerRules::toggleBattery) }, modifier = Modifier.weight(1f))
-        ActionButton(EngineStartTrainerRules.groundPowerLabel(s.externalPowerConnected), onClick = { change(FuelAndGroundRules::toggleGroundPowerCart) }, modifier = Modifier.weight(1f))
-    }
     Spacer(Modifier.height(6.dp))
-    ElectricalDistributionModule(s, d)
-    Todo("Electrical flow drawing: not ported yet.")
+    // web ElectricalPowerTrainer: header, live flow diagram, controls, relationships and the apply-power walkthrough
+    ElectricalPowerFlowPanel(s, d, cockpit, change)
 }
 
 @Composable

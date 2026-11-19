@@ -206,3 +206,4 @@
 | buildPneumaticWires / PneumaticTrainerPanel / PneuEngineSection (cockpit.tsx) | sim/PneumaticFlowWires.kt, ui/cockpit/PneumaticFlowView.kt | ported, unverified by CI |
 | buildAirCondWires / AcPackSection / AirConditioningTrainerPanel (cockpit.tsx) | sim/AirCondFlowWires.kt, ui/cockpit/AirCondFlowView.kt | ported (drawing + buttons), sliders/fault select pending |
 | buildCabinWires / CabinPressurizationTrainerPanel (cockpit.tsx) | sim/AirCondFlowWires.kt (CabinFlowWires), ui/cockpit/AirCondFlowView.kt | ported |
+| components/panel/ElectricalPowerTrainer.tsx (full) | sim/ElectricalFlowWires.kt, sim/ElectricalTrainerRules.kt, ui/cockpit/ElectricalFlowView.kt, ElectricalIcons.kt | ported, unverified by CI |
