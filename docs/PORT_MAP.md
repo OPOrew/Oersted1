@@ -203,3 +203,4 @@
 | components/panel/ApuTrainer.tsx | sim/ApuTrainerRules.kt; ui/cockpit/ApuTrainerView.kt | ApuTrainerRulesTest.kt | ApuDiagram art not ported. |
 
 | HydraulicsTrainerPanel drawing (cockpit.tsx) | ui/cockpit/HydraulicsFlowView.kt, sim/FlowWires.kt, ui/cockpit/FlowDiagram.kt, FlowIcons.kt | ported, unverified by CI |
+| buildPneumaticWires / PneumaticTrainerPanel / PneuEngineSection (cockpit.tsx) | sim/PneumaticFlowWires.kt, ui/cockpit/PneumaticFlowView.kt | ported, unverified by CI |

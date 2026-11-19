@@ -79,7 +79,8 @@ internal fun PneumaticTrainerSection(s: SimState, d: Derived, change: Change, co
         ActionButton(EngineStartTrainerRules.groundAirLabel(s.groundPneumaticConnected), s.wow, { change(FuelAndGroundRules::toggleGroundAirCart) }, Modifier.weight(1f))
         ActionButton(EngineStartTrainerRules.apuLabel(s.apuMaster == "OFF", d.apuAvailable), onClick = { change(FuelAndGroundRules::toggleApuAndBleed) }, modifier = Modifier.weight(1f))
     }
-    Todo("Bleed air distribution drawing: not ported yet.")
+    Spacer(Modifier.height(8.dp))
+    PneumaticFlowDiagram(s, d)
 }
 
 @Composable

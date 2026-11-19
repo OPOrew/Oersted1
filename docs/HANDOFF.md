@@ -584,3 +584,5 @@ Ice & Rain SVG diagrams, ExteriorLightsDiagram, Navigation map / situation displ
 Component / System Flow: live rows (`TrainingConsoleRules.componentFlowRows`, `ComponentFlowRowsTest`) shown by `ComponentFlowSection`; the masterlist drawing (cockpit.tsx ~2101-2550) is still not ported.
 
 - Hydraulics flow drawing ported (FlowWires.kt router + FlowDiagram.kt engine + HydraulicsFlowView.kt). Not CI-verified. Next: reuse engine for Pneumatic / Air Cond / Cabin Pressurization / Electrical flow drawings.
+
+- Pneumatic flow drawing ported (sim/PneumaticFlowWires.kt + PneumaticFlowWiresTest, ui/cockpit/PneumaticFlowView.kt), hooked into PneumaticTrainerSection. Not CI-verified. Next: Air Conditioning (buildAirCondWires, cockpit.tsx 835/1052), Cabin Pressurization (1210/1231), Electrical.
