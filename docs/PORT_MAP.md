@@ -201,3 +201,5 @@
 
 | components/panel/BrakeRunwayTrainer.tsx | sim/BrakeRunwayRules.kt (pure); ui/cockpit/BrakeRunwayView.kt | BrakeRunwayRulesTest.kt | Scene uses flat fills (no gradient / ice pattern). |
 | components/panel/ApuTrainer.tsx | sim/ApuTrainerRules.kt; ui/cockpit/ApuTrainerView.kt | ApuTrainerRulesTest.kt | ApuDiagram art not ported. |
+
+| HydraulicsTrainerPanel drawing (cockpit.tsx) | ui/cockpit/HydraulicsFlowView.kt, sim/FlowWires.kt, ui/cockpit/FlowDiagram.kt, FlowIcons.kt | ported, unverified by CI |

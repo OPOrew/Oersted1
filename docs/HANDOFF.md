@@ -582,3 +582,5 @@ Remaining not ported: Component / System Flow section, web flow drawings (Electr
 Ice & Rain SVG diagrams, ExteriorLightsDiagram, Navigation map / situation display, APU diagram art.
 
 Component / System Flow: live rows (`TrainingConsoleRules.componentFlowRows`, `ComponentFlowRowsTest`) shown by `ComponentFlowSection`; the masterlist drawing (cockpit.tsx ~2101-2550) is still not ported.
+
+- Hydraulics flow drawing ported (FlowWires.kt router + FlowDiagram.kt engine + HydraulicsFlowView.kt). Not CI-verified. Next: reuse engine for Pneumatic / Air Cond / Cabin Pressurization / Electrical flow drawings.

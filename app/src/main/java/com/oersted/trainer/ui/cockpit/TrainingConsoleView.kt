@@ -142,7 +142,8 @@ private fun HydraulicsSection(s: SimState, d: Derived, change: ((SimState) -> Si
     SwitchButton("GND SERVICING", s.hydServicingConnected, onGround) { change { HydraulicTrainerRules.toggle(it, "hydServicingConnected") } }
     SwitchButton("GND HYD POWER", s.hydGroundPowerConnected, onGround) { change { HydraulicTrainerRules.toggle(it, "hydGroundPowerConnected") } }
     SwitchButton("GND AIR CART", s.groundPneumaticConnected, onGround) { change { HydraulicTrainerRules.toggleGroundAirCart(it) } }
-    Text("Hydraulic flow drawing: not ported yet.", style = MaterialTheme.typography.bodySmall)
+    Spacer(Modifier.height(8.dp))
+    HydraulicsFlowDiagram(s, d)
 }
 
 @Composable
