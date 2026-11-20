@@ -206,5 +206,4 @@ private fun ComponentFlowSection(s: SimState, d: Derived) {
     for (row in TrainingConsoleRules.componentFlowRows(s, d)) {
         Text(row, style = MaterialTheme.typography.bodySmall, modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp))
     }
-    Text("Component masterlist / flow drawing: not ported yet.", style = MaterialTheme.typography.bodySmall)
 }
