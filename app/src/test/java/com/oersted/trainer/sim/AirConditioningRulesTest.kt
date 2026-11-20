@@ -61,4 +61,28 @@ class AirConditioningRulesTest {
         assertEquals(4, rules.PRESS_MODES.size)
         assertEquals(4, rules.TEMP_MODES.size)
     }
+
+    @Test fun tempFaultOptionsMatchTheWebList() {
+        assertEquals(12, rules.TEMP_FAULT_OPTIONS.size)
+        assertEquals("NONE" to "NORMAL", rules.TEMP_FAULT_OPTIONS.first())
+        assertEquals("F35_VALVE_FAIL", rules.TEMP_FAULT_OPTIONS.last().first)
+    }
+
+    @Test fun faultAndSelectorDefaultsAndSetters() {
+        val s = initialSimState()
+        assertEquals("NONE", rules.tempControlFault(s, true))
+        assertEquals(75.0, rules.tempSelector(s, false), 0.0)
+        val n = rules.setTempControlFault(rules.setTempSelector(s, false, 70.0), true, "STUCK_HOT")
+        assertEquals("STUCK_HOT", rules.tempControlFault(n, true))
+        assertEquals("NONE", rules.tempControlFault(n, false))
+        assertEquals(70.0, rules.tempSelector(n, false), 0.0)
+        assertEquals(75.0, rules.tempSelector(n, true), 0.0)
+    }
+
+    @Test fun airMixCaptionRoundsAndNamesTheMode() {
+        val d = Derived().apply { packLAirMixValve = 0.456; packRAirMixValve = 0.0 }
+        assertEquals("AIR MIX VALVE 46% HOT · MANUAL COOL", rules.airMixCaption(d, "MANUAL_COOL", true))
+        assertEquals("AIR MIX VALVE 0% HOT · MANUAL", rules.airMixCaption(d, "MANUAL", false))
+        assertEquals("AIR MIX VALVE 46% HOT · AUTO", rules.airMixCaption(d, "AUTO", true))
+    }
 }

@@ -69,6 +69,34 @@ object AirConditioningRules {
         if (left) tempControlFaultL = value else tempControlFaultR = value
     }
 
+    /** Web TEMP CONTROL FAULT options: value to label, in web order. */
+    val TEMP_FAULT_OPTIONS: List<Pair<String, String>> = listOf(
+        "NONE" to "NORMAL",
+        "STUCK_COLD" to "MIX VALVE STUCK COLD",
+        "STUCK_HOT" to "MIX VALVE STUCK HOT",
+        "SENSOR_FAIL" to "TEMP SENSOR FAIL",
+        "REGULATOR_FAIL" to "TEMP REGULATOR FAIL",
+        "DUCT_OVERHEAT" to "FORCE 190°F DUCT OVERHEAT",
+        "DUCT_OVERHEAT_250" to "FORCE 250°F DUCT PACK TRIP",
+        "COMPRESSOR_OVERHEAT" to "FORCE 365°F COMPRESSOR OVERHEAT",
+        "TURBINE_OVERHEAT" to "FORCE 210°F TURBINE INLET OVERHEAT",
+        "PACK_OVERHEAT" to "FORCE PACK OVERHEAT",
+        "F35_SENSOR_FAIL" to "35°F SENSOR FAIL",
+        "F35_VALVE_FAIL" to "35°F VALVE FAIL",
+    )
+
+    /** The fault value with the web default (a missing value reads as NONE). */
+    fun tempControlFault(s: SimState, left: Boolean): String = (if (left) s.tempControlFaultL else s.tempControlFaultR) ?: "NONE"
+
+    /** Web AUTO SELECTOR slider value (default 75 F) and step of 1 within 65..85. */
+    fun tempSelector(s: SimState, left: Boolean): Double = (if (left) s.tempSelectL else s.tempSelectR) ?: 75.0
+
+    /** Web "AIR MIX VALVE n% HOT · MODE" caption text. */
+    fun airMixCaption(d: Derived, mode: String, left: Boolean): String {
+        val pct = Math.round((if (left) d.packLAirMixValve else d.packRAirMixValve) * 100)
+        return "AIR MIX VALVE $pct% HOT · ${if (mode == "MANUAL") "MANUAL" else mode.replace("_", " ")}"
+    }
+
     /** Web pressurization mode buttons. */
     fun setPressMode(s: SimState, mode: String): SimState = edited(s) { pressMode = mode }
 

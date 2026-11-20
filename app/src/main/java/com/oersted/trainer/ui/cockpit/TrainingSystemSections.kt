@@ -94,17 +94,7 @@ internal fun AirConditioningTrainerSection(s: SimState, d: Derived, change: Chan
         ActionButton("L PACK TRIP RESET", onClick = { change { AirConditioningRules.resetPackTrip(it, true) } }, modifier = Modifier.weight(1f))
         ActionButton("R PACK TRIP RESET", onClick = { change { AirConditioningRules.resetPackTrip(it, false) } }, modifier = Modifier.weight(1f))
     }
-    for (left in listOf(true, false)) {
-        val mode = AirConditioningRules.tempMode(s, left)
-        Text("${if (left) "CONT" else "PASS"} CABIN · P5-17 SELECTOR (ATA 21)", color = FlowSubtle, fontSize = 8.sp, modifier = Modifier.padding(top = 4.dp))
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
-            for (m in AirConditioningRules.TEMP_MODES) {
-                val label = if (m == "MANUAL_COOL") "MAN COOL" else if (m == "MANUAL_WARM") "MAN WARM" else m
-                ActionButton(if (AirConditioningRules.modeButtonLit(mode, m)) "● $label" else label, onClick = { change { AirConditioningRules.setTempMode(it, left, m) } }, modifier = Modifier.weight(1f))
-            }
-        }
-    }
-    Todo("Auto selector / fine-mix sliders and the temperature-control fault selector: not ported yet.")
+    AirCondTempControls(s, d, change)
     Spacer(Modifier.height(8.dp))
     AirCondFlowDiagram(s, d)
 }
