@@ -209,3 +209,4 @@
 | components/panel/ElectricalPowerTrainer.tsx (full) | sim/ElectricalFlowWires.kt, sim/ElectricalTrainerRules.kt, ui/cockpit/ElectricalFlowView.kt, ElectricalIcons.kt | ported, unverified by CI |
 | components/panel/FlightModeControl.tsx (goGround / sliders), FlightControlInputs.tsx, SteeringControls.tsx | sim/FlightInputRules.kt, ui/cockpit/FlightControlInputsView.kt | FlightInputRulesTest.kt | Compose unverified; FlightControlsModule + spoiler stand not ported here. |
 | components/panel/Overhead.tsx WheelDynamics / BrakeWheelPanel | ui/cockpit/BrakeWheelDynamicsView.kt, ui/panel/BrakeFireModules.kt (BrakeWheelReadout) | — | Dial animation in Compose; unverified. |
+| components/panel/PitotStaticDiagram.tsx | sim/PitotSchematicRules.kt, sim/SvgLines.kt, ui/cockpit/PitotSchematicView.kt | PitotSchematicRulesTest.kt, SvgLinesTest.kt | Compose unverified. |

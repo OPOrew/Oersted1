@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.oersted.trainer.sim.Derived
 import com.oersted.trainer.sim.PitotStatic
+import com.oersted.trainer.sim.PitotSchematicRules
 import com.oersted.trainer.sim.PitotStaticRules
 import com.oersted.trainer.sim.SimState
 import com.oersted.trainer.sim.TrainerGearRules
@@ -214,7 +215,13 @@ internal fun PitotStaticTrainerSection(s: SimState, d: Derived, cockpit: Cockpit
     }
 
     TCard("Probe → instrument plumbing", PitotStaticRules.plumbingState(air), if (anyFault) 1 else 0) {
-        Note("Plumbing drawing (PitotStaticSchematic): not ported yet. The captain and first officer air data below show its result.")
+        PitotStaticSchematicView(air, s, dc, PitotSchematicRules.shown(air.capt, dc), PitotSchematicRules.shown(air.fo, dc))
+        Note(
+            "Pitot (green) runs from the CAPT upper-left and F/O upper-right probes to their airspeed indicators. Static (blue) is cross-connected: " +
+                "CAPT = upper-left + lower-right, F/O = upper-right + lower-left, each through its source selector to the airspeed indicator, altimeter and VSI. " +
+                "Block a probe, ice a pitot, trap a static line or select ALTERNATE and the line colour and the instrument at its end change. " +
+                "Orange halo = P5-9 heat on; red RBF tag = cover fitted. AUX and elevator pitots show health only; the manual excerpt does not define their downstream users.",
+        )
     }
 
     SidePanel("Captain air data", air.capt, s.psBaroCaptHpa)
