@@ -50,8 +50,8 @@ import com.oersted.trainer.ui.overhead.P5Cap
 /**
  * Port of IceRainTrainer.tsx (ATA 30): window heat P5-9, probe heat, wing slat / engine cowl anti-ice, wipers and rain
  * repellent, trainer conditions and quick setups. The thermal / ice model is [IceRainModel] (IceRainDiagrams.tsx step) and the
- * switch handlers are [IceRainRules]. NOT ported: the SVG diagrams (cockpit windows, front overview, wing plan, probe
- * locations); the chips and caption lights carry the same numbers. Compose only; verify on CI.
+ * switch handlers are [IceRainRules]. The four animated diagrams (cockpit windows, front overview, wing plan, probe locations) are in IceRainDiagramsView.kt;
+ * the chips and caption lights carry the same numbers. Compose only; verify on CI.
  */
 
 private val LineC = Color(0xFF39414B)
@@ -183,6 +183,7 @@ internal fun IceRainTrainerSection(s: SimState, d: Derived, cockpit: CockpitMode
     // Animation loop (web useIceRainAnim): thermal / ice state steps every frame and is published about 10 times a second.
     var anim by remember { mutableStateOf(IceRainModel.initialState(inputs.oatF)) }
     val loop = remember { LoopState(anim) }
+    val wiperPhases = remember { WiperPhases() }
     LaunchedEffect(Unit) {
         var last = androidx.compose.runtime.withFrameNanos { it }
         var acc = 0.0
@@ -193,6 +194,7 @@ internal fun IceRainTrainerSection(s: SimState, d: Derived, cockpit: CockpitMode
                 val l = IceRainModel.wiperStep(loop.phaseL, wipersNow.first, dt)
                 val r = IceRainModel.wiperStep(loop.phaseR, wipersNow.second, dt)
                 loop.phaseL = l.phase; loop.phaseR = r.phase
+                wiperPhases.l = l.phase; wiperPhases.r = r.phase
                 loop.st = IceRainModel.step(loop.st, inputsNow, dt, mapOf("L" to l.strokesPerSec, "R" to r.strokesPerSec))
                 acc += dt
                 if (acc >= 0.1) { acc = 0.0; anim = loop.st }
@@ -306,6 +308,7 @@ internal fun IceRainTrainerSection(s: SimState, d: Derived, cockpit: CockpitMode
 
     // ——— Window heat P5-9 ———
     ICard("Window heat · P5-9 (ATA 30-41)", if (anyOvht) "OVERHEAT" else if (anyWindowOn && ac) "HEAT APPLIED" else "OFF", if (anyOvht) "caution" else "ok") {
+        CockpitWindowsDiagram(anim, ovht, wiperPhases)
         Grid(3, listOf(winChip("L NO.1", "L1"), winChip("L NO.2", "L2"), winChip("L NO.4/5", "L4", "L5"), winChip("R NO.1", "R1"), winChip("R NO.2", "R2"), winChip("R NO.4/5", "R4", "R5")))
         for (side in listOf("L", "R")) {
             val f = "${side}1"; val sd = "${side}2"
@@ -335,6 +338,7 @@ internal fun IceRainTrainerSection(s: SimState, d: Derived, cockpit: CockpitMode
 
     // ——— Probe / pitot heat ———
     ICard("Probe / pitot heat · P5-9 (ATA 30-31)", if (anyProbe) "HEAT ON" else "OFF", "ok") {
+        ProbeHeatDiagram(anim, probeHeated)
         FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             P5RockerSwitch("L ELEV PITOT (TAIL)", s.probeHeatElevL, onChange = { v -> act { IceRainRules.setProbeHeat(it, "probeHeatElevL", v) } }, lit = ac && s.probeHeatElevL && s.psPitotStaticA && s.psCbElevL)
             P5RockerSwitch("R ELEV PITOT (TAIL)", s.probeHeatElevR, onChange = { v -> act { IceRainRules.setProbeHeat(it, "probeHeatElevR", v) } }, lit = ac && s.probeHeatElevR && s.psPitotStaticB && s.psCbElevR)
@@ -358,6 +362,8 @@ internal fun IceRainTrainerSection(s: SimState, d: Derived, cockpit: CockpitMode
     else if (valveOpen.getValue("L") || valveOpen.getValue("R") || cowlHeated.getValue(1) || cowlHeated.getValue(2)) "HOT AIR FLOWING"
     else if (anyEngineAi || anyWingAi) "SELECTED" else "OFF"
     ICard("Wing slats / engine cowl anti-ice (ATA 30-11)", wingState, if (wingInhibited) "caution" else "ok") {
+        WingAntiIcePlan(anim, s.lePos, hotAir, lights, cowlOpen, cowlHeated, wingInhibited)
+        FrontOverviewDiagram(anim, valveOpen, cowlHeated, ovht)
         FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             P5RockerSwitch("ENG 1 FUEL HEAT", s.fuelHeat, onChange = { v -> cockpit.applySim { IceRainRules.setFuelHeat(it, 1, v) } }, lit = d.fuelHeatValveOpen)
             P5RockerSwitch("ENG 2 FUEL HEAT", s.fuelHeat2, onChange = { v -> cockpit.applySim { IceRainRules.setFuelHeat(it, 2, v) } }, lit = d.fuelHeatValve2Open)
@@ -426,7 +432,6 @@ internal fun IceRainTrainerSection(s: SimState, d: Derived, cockpit: CockpitMode
             }
         }
     }
-    Text("Animated diagrams (cockpit windows, front view, wing plan, probe locations): not ported yet.", color = SubtleC, fontSize = 9.sp, modifier = Modifier.padding(top = 4.dp))
 }
 
 /** Mutable animation state held outside composition (web stRef + wiper phase refs). */
