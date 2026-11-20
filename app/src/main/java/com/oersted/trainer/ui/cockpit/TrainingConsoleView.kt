@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -90,7 +91,7 @@ fun TrainingConsoleView(
         Spacer(Modifier.height(8.dp))
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
             when (section) {
-                "Flight Controls" -> FlightControlsSection(s, change, cockpit)
+                "Flight Controls" -> FlightControlsSection(s, d, change, cockpit)
                 "Landing Gear" -> LandingGearTrainerSection(s, d, change, note)
                 "Brakes / Antiskid" -> BrakesSection(s, d, change, cockpit)
                 "Hydraulics" -> HydraulicsSection(s, d, change, cockpit)
@@ -147,7 +148,7 @@ private fun HydraulicsSection(s: SimState, d: Derived, change: ((SimState) -> Si
 }
 
 @Composable
-private fun FlightControlsSection(s: SimState, change: ((SimState) -> SimState) -> Unit, cockpit: CockpitModel) {
+private fun FlightControlsSection(s: SimState, d: Derived, change: ((SimState) -> SimState) -> Unit, cockpit: CockpitModel) {
     Text("Flight Controls", style = MaterialTheme.typography.titleMedium)
     // the real P5 FLIGHT CONTROL panel (FLT CONTROL A / B, spoilers, alternate flaps)
     P5Cutout(cockpit, 0) { p -> FltCtrlPanel(p) }
@@ -159,6 +160,13 @@ private fun FlightControlsSection(s: SimState, change: ((SimState) -> SimState) 
     SwitchButton("Airborne test override", s.airborneTest) { change(TrainingConsoleRules::toggleAirborneTest) }
     SwitchButton("Ground hydraulic servicing", s.hydServicingConnected) { change(TrainingConsoleRules::toggleHydServicingConnected) }
     SwitchButton("Ground power cart (GPU)", s.externalPowerConnected) { change(TrainingConsoleRules::toggleExternalPowerConnected) }
+    Spacer(Modifier.height(6.dp))
+    Text("Yoke / rudder inputs → flight-control surfaces", style = MaterialTheme.typography.labelLarge)
+    FlightModeControlView(s, d, cockpit)
+    // web FlightControlsModule + B737200ControlStand (surface diagram / spoiler stand) are not ported here; the P8 pedestal tab has the stand.
+    val six by cockpit.sixPack.collectAsState()
+    SixPackView(six)
+    FlightControlInputsView(cockpit)
 }
 
 @Composable
@@ -167,7 +175,15 @@ private fun BrakesSection(s: SimState, d: Derived, change: ((SimState) -> SimSta
     // the real main instrument panel anti-skid toggles, AUTO BRAKE knob and brake lights
     BoxWithConstraints(Modifier.fillMaxWidth()) { MipBrakePanel(cockpit, maxWidth) }
     Spacer(Modifier.height(8.dp))
+    Spacer(Modifier.height(6.dp))
+    Text("Servicing / Test", style = MaterialTheme.typography.labelLarge)
+    Chip("ANTISKID ${if (d.antiskidOperational) "OPERABLE" else "INOP"} · AUTOBRAKE ${if (d.autobrakeArmed) "ARMED" else "NOT ARMED"}", d.antiskidOperational && d.autobrakeArmed, Modifier.fillMaxWidth())
+    Spacer(Modifier.height(6.dp))
+    Text("Landing / rollout trainer", style = MaterialTheme.typography.labelLarge)
     BrakeRunwayTrainer(s, d, cockpit)
+    Spacer(Modifier.height(6.dp))
+    Text("Main gear wheels", style = MaterialTheme.typography.labelLarge)
+    BrakeWheelPanelView(s, d)
 }
 
 @Composable

@@ -207,3 +207,5 @@
 | buildAirCondWires / AcPackSection / AirConditioningTrainerPanel (cockpit.tsx) | sim/AirCondFlowWires.kt, ui/cockpit/AirCondFlowView.kt | ported (drawing + buttons), sliders/fault select pending |
 | buildCabinWires / CabinPressurizationTrainerPanel (cockpit.tsx) | sim/AirCondFlowWires.kt (CabinFlowWires), ui/cockpit/AirCondFlowView.kt | ported |
 | components/panel/ElectricalPowerTrainer.tsx (full) | sim/ElectricalFlowWires.kt, sim/ElectricalTrainerRules.kt, ui/cockpit/ElectricalFlowView.kt, ElectricalIcons.kt | ported, unverified by CI |
+| components/panel/FlightModeControl.tsx (goGround / sliders), FlightControlInputs.tsx, SteeringControls.tsx | sim/FlightInputRules.kt, ui/cockpit/FlightControlInputsView.kt | FlightInputRulesTest.kt | Compose unverified; FlightControlsModule + spoiler stand not ported here. |
+| components/panel/Overhead.tsx WheelDynamics / BrakeWheelPanel | ui/cockpit/BrakeWheelDynamicsView.kt, ui/panel/BrakeFireModules.kt (BrakeWheelReadout) | — | Dial animation in Compose; unverified. |

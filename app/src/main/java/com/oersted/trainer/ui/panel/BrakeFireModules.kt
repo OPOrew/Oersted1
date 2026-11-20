@@ -74,7 +74,7 @@ fun BrakeModule(cockpit: CockpitModel, s: SimState, d: Derived) {
     }
 }
 
-/** Web BrakeWheelPanel: wheel and modulation readouts, as the text rows (the wheel dynamics graphic is not ported). */
+/** Web BrakeWheelPanel readout rows; the wheel dial cards are in ui/cockpit/BrakeWheelDynamicsView.kt. */
 @Composable
 fun BrakeWheelReadout(d: Derived) {
     ReadoutBox(
