@@ -211,3 +211,4 @@
 | components/panel/Overhead.tsx WheelDynamics / BrakeWheelPanel | ui/cockpit/BrakeWheelDynamicsView.kt, ui/panel/BrakeFireModules.kt (BrakeWheelReadout) | — | Dial animation in Compose; unverified. |
 | components/panel/PitotStaticDiagram.tsx | sim/PitotSchematicRules.kt, sim/SvgLines.kt, ui/cockpit/PitotSchematicView.kt | PitotSchematicRulesTest.kt, SvgLinesTest.kt | Compose unverified. |
 | components/panel/IceRainDiagrams.tsx (diagrams; model was ported earlier) | sim/IceRainGeometry.kt, ui/cockpit/IceRainDiagramsView.kt | IceRainGeometryTest.kt | Compose unverified; photos in res/drawable-nodpi. |
+| components/panel/ExteriorLightsDiagram.tsx | sim/ExteriorLightsData.kt, ui/cockpit/ExteriorLightsDiagramView.kt | ExteriorLightsDataTest.kt | Compose unverified; art in res/drawable-nodpi. |

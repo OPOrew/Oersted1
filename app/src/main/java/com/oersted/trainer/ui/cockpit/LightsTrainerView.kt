@@ -56,8 +56,8 @@ import com.oersted.trainer.ui.panel.PanelControlSlider
 
 /**
  * Port of LightsTrainer.tsx (ATA 33 lighting trainer): bus lamps, phase presets, four tabs (Controls, Aircraft, Deck + cabin,
- * Components). Logic lives in [LightsTrainerRules] / [LightsDerive]. NOT ported yet: ExteriorLightsDiagram (the AMM 33-40
- * exterior drawing). Compose only; verify on CI.
+ * Components). Logic lives in [LightsTrainerRules] / [LightsDerive]. The AMM 33-40 exterior drawing is
+ * ExteriorLightsDiagramView.kt. Compose only; verify on CI.
  */
 
 private val LineC = Color(0xFF39414B)
@@ -265,7 +265,7 @@ internal fun LightsTrainerSection(s: SimState, d: Derived, cockpit: CockpitModel
         "controls" -> { ExteriorSwitches(); DeckSwitches(); CabinSwitches() }
         "aircraft" -> {
             ExteriorSwitches()
-            LBox("Exterior lights · AMM 33-40-0 diagrams") { Text("Exterior lights diagram (ExteriorLightsDiagram): not ported yet.", color = SubtleC, fontSize = 9.sp) }
+            LBox("Exterior lights · AMM 33-40-0 diagrams") { ExteriorLightsDiagram(lights) }
             lights.filter { it.group == "Exterior" }.forEach { LampRow(it) }
         }
         "deck" -> {
