@@ -101,7 +101,6 @@ internal fun ApuTrainerSection(s: SimState, d: Derived, cockpit: CockpitModel) {
     }
 
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text("APU", color = AFg, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
         if (s.apuFirePulled) {
             Text("APU FIRE HANDLE PULLED — APU SHUT DOWN, FUEL AND GENERATOR ISOLATED", color = AWarn, fontSize = 9.sp,
                 modifier = Modifier.fillMaxWidth().background(Color(0x1AE24B4B), RoundedCornerShape(4.dp)).border(1.dp, AWarn, RoundedCornerShape(4.dp)).padding(8.dp))

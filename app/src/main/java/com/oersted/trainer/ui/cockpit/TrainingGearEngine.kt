@@ -67,7 +67,7 @@ import kotlin.math.cos
  * LandingGearComponentView / LandingGearMechanismSvg in components/panel/Overhead.tsx, EngineStartTrainerPanel).
  * Rules are in [TrainerGearRules] and [EngineStartTrainerRules]. Not compiled in the sandbox; verify on CI.
  *
- * Deferred (documented in docs/HANDOFF.md): EngineCutaway and CompactEngineParams.
+ * CompactEngineParams is CompactEngineParamsView.kt; the web Tape is WebTape in TrainingChrome.kt.
  */
 
 private val CardBg = Color(0xFF090B0E)
@@ -82,9 +82,7 @@ private typealias Note = (String, SimState.() -> Unit) -> Unit
 
 @Composable
 internal fun ActionButton(text: String, enabled: Boolean = true, onClick: () -> Unit, modifier: Modifier = Modifier.fillMaxWidth()) {
-    OutlinedButton(onClick = onClick, enabled = enabled, modifier = modifier) {
-        Text(text, style = MaterialTheme.typography.labelSmall)
-    }
+    WebButton(text, modifier, enabled, false, onClick)
 }
 
 @Composable
@@ -118,22 +116,27 @@ private fun Readout(label: String, value: String, modifier: Modifier = Modifier)
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun LandingGearTrainerSection(s: SimState, d: Derived, change: Change, note: Note) {
-    Text("Landing Gear", style = MaterialTheme.typography.titleMedium)
     val steering = TrainerGearRules.steering(d.noseWheelSteeringAngle)
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Chip(TrainerGearRules.angleChip(d.noseWheelSteeringAngle), true)
-        Chip(TrainerGearRules.sourceChip(d.noseWheelSteeringAvailable), d.noseWheelSteeringAvailable)
+    // web order: PARKING BRAKE, Servicing / Test, Gear · wheel & brake dynamics, Nose wheel steering
+    ActionButton("PARKING BRAKE · ${if (s.parkingBrake) "SET" else "RELEASE"}", onClick = { change(TrainingConsoleRules::toggleParkingBrake) }, modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
+    TrainingSub("Servicing / Test") {
+        ButtonGrid(listOf(
+            GridBtn("Ground hydraulic servicing · ${if (s.hydServicingConnected) "CONNECTED" else "DISCONNECTED"}") { change(TrainingConsoleRules::toggleHydServicingConnected) },
+            GridBtn("Ground-sensing test override · ${if (s.groundSenseTest) "ACTIVE" else "OFF"}") { change(TrainingConsoleRules::toggleGroundSenseTest) },
+            GridBtn("Airborne test override · ${if (s.airborneTest) "ACTIVE" else "OFF"}") { change(TrainingConsoleRules::toggleAirborneTest) },
+            GridBtn("Ground power cart (GPU) · ${if (s.externalPowerConnected) "CONNECTED" else "DISCONNECTED"}") { change(TrainingConsoleRules::toggleExternalPowerConnected) },
+        ))
     }
-    Spacer(Modifier.height(8.dp))
-    GearComponentView(s, d, steering, change, note)
-    Spacer(Modifier.height(8.dp))
-    ActionButton("PARKING BRAKE · ${TrainingConsoleRules.onOff(s.parkingBrake)}", onClick = { change(TrainingConsoleRules::toggleParkingBrake) })
-    Text("Servicing / Test", style = MaterialTheme.typography.labelLarge)
-    ActionButton("Ground hydraulic servicing · ${TrainingConsoleRules.onOff(s.hydServicingConnected)}", onClick = { change(TrainingConsoleRules::toggleHydServicingConnected) })
-    ActionButton("Ground-sensing test override · ${TrainingConsoleRules.onOff(s.groundSenseTest)}", onClick = { change(TrainingConsoleRules::toggleGroundSenseTest) })
-    ActionButton("Airborne test override · ${TrainingConsoleRules.onOff(s.airborneTest)}", onClick = { change(TrainingConsoleRules::toggleAirborneTest) })
-    ActionButton("Ground power cart (GPU) · ${TrainingConsoleRules.onOff(s.externalPowerConnected)}", onClick = { change(TrainingConsoleRules::toggleExternalPowerConnected) })
-    ActionButton("Center tiller & pedals", onClick = { change(TrainingConsoleRules::centerTillerAndPedals) })
+    TrainingSub("Gear · wheel & brake dynamics") {
+        GearComponentView(s, d, steering, change, note)
+    }
+    TrainingSub("Nose wheel steering") {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Chip(TrainerGearRules.angleChip(d.noseWheelSteeringAngle), true, Modifier.weight(1f))
+            Chip(TrainerGearRules.sourceChip(d.noseWheelSteeringAvailable), d.noseWheelSteeringAvailable, Modifier.weight(1f))
+        }
+        ActionButton("Center tiller & pedals", onClick = { change(TrainingConsoleRules::centerTillerAndPedals) }, modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
+    }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -460,55 +463,38 @@ private fun GearMechanism(
 // ───────────────────────────── Engine Start ─────────────────────────────
 
 @Composable
-internal fun SubTitle(title: String, content: @Composable () -> Unit) {
-    Column(Modifier.fillMaxWidth().padding(vertical = 4.dp).border(1.dp, CardLine, RoundedCornerShape(6.dp)).padding(8.dp)) {
-        Text(title, color = Color(0xFFB7AB87), fontSize = 10.sp, modifier = Modifier.padding(bottom = 6.dp))
-        content()
-    }
-}
+internal fun SubTitle(title: String, content: @Composable () -> Unit) = TrainingSub(title) { content() }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun EngineStartTrainerSection(s: SimState, d: Derived, change: Change, cockpit: CockpitModel) {
-    Text("Engine Start", style = MaterialTheme.typography.titleMedium)
     val nowMs = System.currentTimeMillis().toDouble()
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+    // grid-cols-3 gap-2 chips: DC, L DUCT, R DUCT
+    Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Chip(EngineStartTrainerRules.dcChip(d.dcPower), d.dcPower, Modifier.weight(1f))
         Chip(EngineStartTrainerRules.ductChip("L", d.leftDuctPsi), EngineStartTrainerRules.ductOk(d.leftDuctPsi), Modifier.weight(1f))
         Chip(EngineStartTrainerRules.ductChip("R", d.rightDuctPsi), EngineStartTrainerRules.ductOk(d.rightDuctPsi), Modifier.weight(1f))
     }
-    // the real P5 ENGINE START knobs
-    SubTitle("Engine start switches · P5") {
+    // the real P5 ENGINE START knobs replace the web StartModule
+    TrainingSub("Engine start switches · P5") {
         P5EngineStartKnobs(rememberP5(cockpit))
-        Spacer(Modifier.height(6.dp))
-        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            PanelCaptionLight("START VLV 1", d.startValveOpen1)
-            PanelCaptionLight("IGN 1", d.ignition1On)
-            PanelCaptionLight("START VLV 2", d.startValveOpen2)
-            PanelCaptionLight("IGN 2", d.ignition2On)
-        }
     }
-    // the real main instrument panel engine gauges (EPR, N1, N2, fuel flow, oil, EGT, hydraulics)
-    SubTitle("Engine gauges · main instrument panel") {
-        BoxWithConstraints(Modifier.fillMaxWidth()) { MipEngineGauges(cockpit, maxWidth) }
-    }
-    // the real thrust levers cut out of the centre pedestal
-    SubTitle("Thrust levers · center pedestal") {
+    var showCutaway by remember { mutableStateOf(true) }
+    EngineBlock(1, s, d, change, nowMs, showCutaway)
+    // the real thrust levers cut out of the centre pedestal replace the web B737200ControlStand
+    TrainingSub("Center pedestal") {
         BoxWithConstraints(Modifier.fillMaxWidth()) { PedestalThrustLevers(cockpit, maxWidth) }
         Spacer(Modifier.height(6.dp))
         ThrustLinkButton(cockpit)
     }
-    var showCutaway by remember { mutableStateOf(true) }
-    EngineBlock(1, s, d, change, nowMs, showCutaway)
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        ActionButton(EngineStartTrainerRules.batteryLabel(s.battery), onClick = { change(com.oersted.trainer.sim.ElectricalTrainerRules::toggleBattery) }, modifier = Modifier.weight(1f))
-        ActionButton(EngineStartTrainerRules.groundAirLabel(s.groundPneumaticConnected), s.wow, { change(FuelAndGroundRules::toggleGroundAirCart) }, Modifier.weight(1f))
-    }
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        ActionButton(EngineStartTrainerRules.groundPowerLabel(s.externalPowerConnected), onClick = { change(FuelAndGroundRules::toggleGroundPowerCart) }, modifier = Modifier.weight(1f))
-        ActionButton(EngineStartTrainerRules.apuLabel(s.apuMaster == "OFF", d.apuAvailable), onClick = { change(FuelAndGroundRules::toggleApuAndBleed) }, modifier = Modifier.weight(1f))
-    }
-    ActionButton(EngineStartTrainerRules.cutawayLabel(showCutaway), onClick = { showCutaway = !showCutaway })
+    Spacer(Modifier.height(8.dp))
+    ButtonGrid(listOf(
+        GridBtn(EngineStartTrainerRules.batteryLabel(s.battery)) { change(com.oersted.trainer.sim.ElectricalTrainerRules::toggleBattery) },
+        GridBtn(EngineStartTrainerRules.groundAirLabel(s.groundPneumaticConnected), s.wow) { change(FuelAndGroundRules::toggleGroundAirCart) },
+        GridBtn(EngineStartTrainerRules.groundPowerLabel(s.externalPowerConnected)) { change(FuelAndGroundRules::toggleGroundPowerCart) },
+        GridBtn(EngineStartTrainerRules.apuLabel(s.apuMaster == "OFF", d.apuAvailable)) { change(FuelAndGroundRules::toggleApuAndBleed) },
+    ))
+    ActionButton(EngineStartTrainerRules.cutawayLabel(showCutaway), onClick = { showCutaway = !showCutaway }, modifier = Modifier.fillMaxWidth().padding(top = 8.dp))
     EngineBlock(2, s, d, change, nowMs, showCutaway)
 }
 
@@ -527,18 +513,13 @@ private fun EngineBlock(side: Int, s: SimState, d: Derived, change: Change, nowM
     val psi = if (one) d.leftDuctPsi else d.rightDuctPsi
     val fire = if (one) s.engine1FirePulled else s.engine2FirePulled
     val status = EngineStartTrainerRules.status(running, fire, auto, n2)
-    SubTitle(EngineStartTrainerRules.subTitle(side, status)) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            ActionButton("START ENG $side", FuelAndGroundRules.startEnabled(running, auto, fire), { change { SimActions.startEngine(it, side, nowMs) } }, Modifier.weight(1f))
-            ActionButton(
-                "${FuelAndGroundRules.shutdownLabel(running, auto)} ENG $side",
-                FuelAndGroundRules.shutdownEnabled(running, auto, n2),
-                { change { SimActions.shutdownEngine(it, side, nowMs) } },
-                Modifier.weight(1f),
-            )
-        }
+    TrainingSub(EngineStartTrainerRules.subTitle(side, status)) {
+        ButtonGrid(listOf(
+            GridBtn("START ENG $side", FuelAndGroundRules.startEnabled(running, auto, fire), tint = OkGreen) { change { SimActions.startEngine(it, side, nowMs) } },
+            GridBtn("${FuelAndGroundRules.shutdownLabel(running, auto)} ENG $side", FuelAndGroundRules.shutdownEnabled(running, auto, n2), tint = Color(0xFFE0A84A)) { change { SimActions.shutdownEngine(it, side, nowMs) } },
+        ))
         if (showCutaway) {
-            Spacer(Modifier.height(6.dp))
+            Spacer(Modifier.height(8.dp))
             EngineCutaway(
                 side = side,
                 n1 = if (one) s.n1_1 else s.n1_2,
@@ -549,14 +530,22 @@ private fun EngineBlock(side: Int, s: SimState, d: Derived, change: Change, nowM
                 running = running,
             )
         }
-        Spacer(Modifier.height(6.dp))
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Spacer(Modifier.height(8.dp))
+        val caution = Color(0xFFE0A84A)
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            WebTape("N2-$side", n2, "%", 100.0, caution, Modifier.weight(1f))
+            WebTape("N1-$side", if (one) s.n1_1 else s.n1_2, "%", 100.0, caution, Modifier.weight(1f))
+            WebTape("EGT $side", if (one) s.egt1 else s.egt2, "°C", 600.0, caution, Modifier.weight(1f))
+        }
+        Spacer(Modifier.height(8.dp))
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             PanelCaptionLight("START VLV $side", valve)
             PanelCaptionLight("START SW GRD", sw == "GRD")
             PanelCaptionLight("IDLE", lever)
             PanelCaptionLight("RUNNING", running, LightTone.ELEC)
         }
-        Text(EngineStartTrainerRules.readoutLine(ff, oil, psi), color = Subtle, fontFamily = FontFamily.Monospace, fontSize = 8.sp, modifier = Modifier.padding(top = 6.dp))
-        if (side == 2) Text(EngineStartTrainerRules.START_HINT, color = Subtle, fontSize = 10.sp, modifier = Modifier.padding(top = 6.dp))
+        Text(EngineStartTrainerRules.readoutLine(ff, oil, psi), color = Subtle, fontFamily = FontFamily.Monospace, fontSize = 8.sp, modifier = Modifier.padding(top = 8.dp))
+        if (side == 2) Text(EngineStartTrainerRules.START_HINT, color = Subtle, fontSize = 10.sp, lineHeight = 16.sp, modifier = Modifier.padding(top = 8.dp))
     }
+    TrainingSub("Engine parameters") { CompactEngineParams(s, d, side) }
 }

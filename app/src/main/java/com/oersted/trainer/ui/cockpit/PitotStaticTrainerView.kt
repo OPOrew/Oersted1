@@ -161,7 +161,6 @@ internal fun PitotStaticTrainerSection(s: SimState, d: Derived, cockpit: Cockpit
     }
     fun act(text: String, mode: Int, note: String, f: (SimState) -> SimState) = TBtn(text, mode) { cockpit.applySimNote(note, f) }
 
-    Text("Pitot / Static", style = MaterialTheme.typography.titleMedium)
     Column(Modifier.fillMaxWidth().padding(vertical = 4.dp).background(Color(0xFF14171B), RoundedCornerShape(10.dp)).border(1.dp, LineColor, RoundedCornerShape(10.dp)).padding(10.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text("ATA 34 · PITOT / STATIC / AIR DATA", color = SubtleColor, fontSize = 10.sp, modifier = Modifier.weight(1f))

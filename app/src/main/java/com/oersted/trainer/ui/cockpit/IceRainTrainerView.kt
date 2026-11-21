@@ -259,7 +259,6 @@ internal fun IceRainTrainerSection(s: SimState, d: Derived, cockpit: CockpitMode
         IChip(label, IceRainModel.winChipValue(a, g), pw > 0.004, m, warn = ovht.getValue(id) || a.trip)
     }
 
-    Text("Ice & Rain Protection", style = MaterialTheme.typography.titleMedium)
     Column(Modifier.fillMaxWidth().padding(vertical = 4.dp).background(Color(0xFF111418), RoundedCornerShape(10.dp)).border(1.dp, LineC, RoundedCornerShape(10.dp)).padding(10.dp)) {
         Sub("ATA 30 · Ice & rain protection")
         Text(

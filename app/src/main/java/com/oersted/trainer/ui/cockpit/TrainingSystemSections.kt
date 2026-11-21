@@ -57,7 +57,6 @@ private fun Todo(text: String) = Text(text, style = MaterialTheme.typography.bod
 
 @Composable
 internal fun ElectricalTrainerSection(s: SimState, d: Derived, change: Change, cockpit: CockpitModel) {
-    Title("Electrical Power")
     // real P5 meter, standby power and generator panels
     P5Cutout(cockpit, 1) { p -> MeterPanel(p); StandbyPanel(p); GenPanel(p, true) }
     Spacer(Modifier.height(6.dp))
@@ -67,7 +66,6 @@ internal fun ElectricalTrainerSection(s: SimState, d: Derived, change: Change, c
 
 @Composable
 internal fun PneumaticTrainerSection(s: SimState, d: Derived, change: Change, cockpit: CockpitModel) {
-    Title("Pneumatic")
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         Chip(EngineStartTrainerRules.ductChip("L", d.leftDuctPsi), EngineStartTrainerRules.ductOk(d.leftDuctPsi), Modifier.weight(1f))
         Chip(EngineStartTrainerRules.ductChip("R", d.rightDuctPsi), EngineStartTrainerRules.ductOk(d.rightDuctPsi), Modifier.weight(1f))
@@ -84,7 +82,6 @@ internal fun PneumaticTrainerSection(s: SimState, d: Derived, change: Change, co
 
 @Composable
 internal fun AirConditioningTrainerSection(s: SimState, d: Derived, change: Change, cockpit: CockpitModel) {
-    Title("Air Conditioning")
     P5Cutout(cockpit, 4) { p -> AirCondPanel(p) }
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         ActionButton("L PACK · ${if (s.packL) "ON" else "OFF"}", onClick = { change { AirConditioningRules.togglePack(it, true) } }, modifier = Modifier.weight(1f))
@@ -101,7 +98,6 @@ internal fun AirConditioningTrainerSection(s: SimState, d: Derived, change: Chan
 
 @Composable
 internal fun CabinPressTrainerSection(s: SimState, d: Derived, change: Change, cockpit: CockpitModel) {
-    Title("Cabin Pressurization")
     P5Cutout(cockpit, 4) { p -> PressPanel(p, true) }
     val labels = mapOf("AUTO" to "AUTO", "STBY" to "STANDBY", "MAN_AC" to "MANUAL AC", "MAN_DC" to "MANUAL DC")
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -119,7 +115,6 @@ internal fun CabinPressTrainerSection(s: SimState, d: Derived, change: Change, c
 
 @Composable
 internal fun FireTrainerSection(s: SimState, d: Derived, cockpit: CockpitModel) {
-    Title("Fire Protection")
     Chip("FIRE WARN ${if (d.fireWarn) "ACTIVE" else "CLEAR"}", !d.fireWarn)
     Spacer(Modifier.height(6.dp))
     // real pedestal FIRE / OVERHEAT panel and the real P5 cargo fire panel
@@ -130,7 +125,6 @@ internal fun FireTrainerSection(s: SimState, d: Derived, cockpit: CockpitModel) 
 
 @Composable
 internal fun AutopilotTrainerSection(s: SimState, cockpit: CockpitModel) {
-    Title("Autopilot Simulator / Flight Director")
     // flight phases + live readout, then the real glareshield (MCP, flight mode annunciators) and the real instrument panel
     FlightPhasePanel(s, cockpit)
     Spacer(Modifier.height(6.dp))

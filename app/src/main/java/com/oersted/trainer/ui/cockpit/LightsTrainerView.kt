@@ -197,7 +197,6 @@ internal fun LightsTrainerSection(s: SimState, d: Derived, cockpit: CockpitModel
     fun p(edit: SimState.() -> Unit) = cockpit.patchSim(edit)
     val slide = { v: Double -> PitotStaticRules.stepSnap(v, 0.01) }
 
-    Text("Lights", style = MaterialTheme.typography.titleMedium)
 
     val buses = listOf(
         "AC XFR 1" to d.transferBus1Powered, "AC XFR 2" to d.transferBus2Powered, "DC BUS 1" to d.dcBus1Powered, "DC BUS 2" to d.dcBus2Powered,

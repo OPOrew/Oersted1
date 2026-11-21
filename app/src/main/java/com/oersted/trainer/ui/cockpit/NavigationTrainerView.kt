@@ -237,7 +237,6 @@ internal fun NavigationTrainerSection(s: SimState, d: Derived, cockpit: CockpitM
     val mip by cockpit.mipState.collectAsState()
     val ped by cockpit.pedestalState.collectAsState()
 
-    Text("Navigation", style = MaterialTheme.typography.titleMedium)
     FlightPhasePanel(s, cockpit)
     Spacer(Modifier.height(6.dp))
     // the real P8 NAV 1 / NAV 2 / ADF radios: the only place frequencies are set
