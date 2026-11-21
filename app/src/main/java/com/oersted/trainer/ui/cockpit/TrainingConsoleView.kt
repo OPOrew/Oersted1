@@ -151,12 +151,12 @@ fun TrainingConsoleView(
 
 @Composable
 private fun SwitchButton(label: String, on: Boolean, enabled: Boolean = true, onClick: () -> Unit) {
-    WebButton("$label · ${TrainingConsoleRules.onOff(on)}", Modifier.fillMaxWidth(), enabled, false, onClick)
+    WebButton("$label · ${TrainingConsoleRules.onOff(on)}", Modifier.fillMaxWidth(), enabled, false, onClick = onClick)
 }
 
 @Composable
 private fun StateButton(text: String, enabled: Boolean = true, onClick: () -> Unit) {
-    WebButton(text, Modifier.fillMaxWidth(), enabled, false, onClick)
+    WebButton(text, Modifier.fillMaxWidth(), enabled, false, onClick = onClick)
 }
 
 @Composable

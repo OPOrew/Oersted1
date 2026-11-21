@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.matchParentSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -440,7 +439,7 @@ private fun DrawScope.cargoScene(tm: TextMeasurer, clock: State<Float>, s: SimSt
     withTransform({ scale(size.width / 400f, size.width / 400f, Offset.Zero) }) {
         txt(tm, if (inst) "CARGO COMPARTMENTS (side cutaway, nose left)" else "CARGO FIRE SYSTEM NOT INSTALLED · SB 26A1081", 10.0, 16.0, 9.0, Sub, bold = false)
         if (inst) {
-            for ((x, ok, label, tx) in listOf(Quad(280.0, s.cargoLoopA, "LOOP A", 306.0), Quad(338.0, s.cargoLoopB, "LOOP B", 364.0))) {
+            for ((x, ok, label, tx) in listOf(LoopBadge(280.0, s.cargoLoopA, "LOOP A", 306.0), LoopBadge(338.0, s.cargoLoopB, "LOOP B", 364.0))) {
                 val c = if (ok) Ok else Warn
                 drawRoundRect(Color(0xFF0F1318), O(x, 6.0), Size(52f, 14f), CornerRadius(3f)); drawRoundRect(c, O(x, 6.0), Size(52f, 14f), CornerRadius(3f), style = Stroke(1.5f))
                 txt(tm, label, tx, 16.0, 7.0, c, middle = true, bold = false)
@@ -453,7 +452,7 @@ private fun DrawScope.cargoScene(tm: TextMeasurer, clock: State<Float>, s: SimSt
         drawPath(hull, Color(0xFF161B21), alpha = dim); drawPath(hull, Color(0xFF66727E), alpha = dim, style = Stroke(2f))
         drawLine(grey.copy(alpha = dim), O(20.0, 98.0), O(382.0, 98.0), strokeWidth = 1f, pathEffect = dashed(4f, 3f))
         txt(tm, "PASSENGER CABIN", 200.0, 82.0, 8.0, Sub.copy(alpha = dim), middle = true, bold = false)
-        for ((name, x, w, fire, lv) in listOf(Comp("FWD", 62.0, 116.0, s.cargoFwdFire, s.cargoFwdLevel), Comp("AFT", 250.0, 116.0, s.cargoAftFire, s.cargoAftLevel))) {
+        for ((name, x, w, fire, lv) in listOf(CargoComp("FWD", 62.0, 116.0, s.cargoFwdFire, s.cargoFwdLevel), CargoComp("AFT", 250.0, 116.0, s.cargoAftFire, s.cargoAftLevel))) {
             val armed = inst && s.cargoArmed == name
             val warned = if (name == "FWD") cfWarn else caWarn
             val col = if (!inst) grey else if (warned || fire) Warn else if (lv > 0.05) Caut else if (armed) Color(0xFF4DA3FF) else Color(0xFF66727E)
@@ -482,5 +481,5 @@ private fun DrawScope.cargoScene(tm: TextMeasurer, clock: State<Float>, s: SimSt
     }
 }
 
-private data class Quad(val x: Double, val ok: Boolean, val label: String, val tx: Double)
-private data class Comp(val name: String, val x: Double, val w: Double, val fire: Boolean, val lv: Double)
+private data class LoopBadge(val x: Double, val ok: Boolean, val label: String, val tx: Double)
+private data class CargoComp(val name: String, val x: Double, val w: Double, val fire: Boolean, val lv: Double)

@@ -82,7 +82,7 @@ private typealias Note = (String, SimState.() -> Unit) -> Unit
 
 @Composable
 internal fun ActionButton(text: String, enabled: Boolean = true, onClick: () -> Unit, modifier: Modifier = Modifier.fillMaxWidth()) {
-    WebButton(text, modifier, enabled, false, onClick)
+    WebButton(text, modifier, enabled, false, onClick = onClick)
 }
 
 @Composable
