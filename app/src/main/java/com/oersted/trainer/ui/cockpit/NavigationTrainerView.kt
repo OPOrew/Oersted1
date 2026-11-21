@@ -237,11 +237,12 @@ internal fun NavigationTrainerSection(s: SimState, d: Derived, cockpit: CockpitM
     val mip by cockpit.mipState.collectAsState()
     val ped by cockpit.pedestalState.collectAsState()
 
+    // web NavSharedDisplay: map (InteractiveNavMap) / pedestal NAV radios / situation display, then the flight-phase panel
+    NavSharedDisplay(cockpit, radios = true)
+    Spacer(Modifier.height(12.dp))
     FlightPhasePanel(s, cockpit)
-    Spacer(Modifier.height(6.dp))
-    // the real P8 NAV 1 / NAV 2 / ADF radios: the only place frequencies are set
-    BoxWithConstraints(Modifier.fillMaxWidth()) { PedestalRadiosCutout(cockpit, maxWidth) }
 
+    Fold("Component flow", hint = "ATA 34 · what feeds what") { NavAutopilotDiagram(cockpit, "nav") }
     Fold("Instrument panel", hint = "live captain / A/P / first officer") { ApTrainerView(cockpit, "nav") }
     Fold("ILS notes", hint = "how the approach sequence works") {
         Text(
@@ -314,5 +315,18 @@ internal fun NavigationTrainerSection(s: SimState, d: Derived, cockpit: CockpitM
             color = SubtleC, fontFamily = FontFamily.Monospace, fontSize = 8.sp, modifier = Modifier.padding(top = 6.dp),
         )
     }
-    Text("Map, situation display and the ATA 34 component-flow drawing: not ported yet.", color = SubtleC, fontSize = 9.sp, modifier = Modifier.padding(top = 6.dp))
+}
+
+/**
+ * Port of NavSharedDisplay.tsx: the one navigation display shared by the Navigation AND Autopilot tabs.
+ *   map = InteractiveNavMap, pedestal NAV radios = the real P8 NAV 1 / NAV 2 / ADF units, situation display.
+ * [radios] = false on the Autopilot tab, whose controls are the glareshield instead of the pedestal NAV radios.
+ */
+@Composable
+internal fun NavSharedDisplay(cockpit: CockpitModel, radios: Boolean = true) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        InteractiveNavMap(cockpit)
+        if (radios) BoxWithConstraints(Modifier.fillMaxWidth()) { PedestalRadiosCutout(cockpit, maxWidth) }
+        SituationDisplay(cockpit, "nav", Modifier.padding(top = 0.dp))
+    }
 }

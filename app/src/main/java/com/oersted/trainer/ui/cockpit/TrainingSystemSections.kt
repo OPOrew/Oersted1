@@ -1,5 +1,24 @@
 package com.oersted.trainer.ui.cockpit
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.Dp
+import com.oersted.trainer.sim.FlyThePlanRules
+import com.oersted.trainer.ui.common.Classic737Palette
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Row
@@ -120,15 +139,45 @@ internal fun FireTrainerSection(s: SimState, d: Derived, cockpit: CockpitModel) 
     TrainingSub("Servicing / Test") { InfoBox("FIRE WARN ${if (d.fireWarn) "ACTIVE" else "CLEAR"}", Modifier.fillMaxWidth()) }
 }
 
+/**
+ * Port of AutopilotSimulator.tsx, one screen with no second simulator: the Navigation tab's map and situation display (no pedestal radios), the
+ * FLY THE PLAN button, the flight-phase panel and the real glareshield (scaled to the console width, horizontal scroll below 0.55 so the knobs stay usable).
+ */
 @Composable
 internal fun AutopilotTrainerSection(s: SimState, cockpit: CockpitModel) {
-    // flight phases + live readout, then the real glareshield (MCP, flight mode annunciators) and the real instrument panel
-    FlightPhasePanel(s, cockpit)
-    Spacer(Modifier.height(6.dp))
-    ApTrainerView(cockpit, "ap")
-    Spacer(Modifier.height(6.dp))
-    BoxWithConstraints(Modifier.fillMaxWidth()) { GlareshieldPanel(cockpit, maxWidth) }
-    Todo("Interactive map, runway view and the FLY THE PLAN button: not ported yet.")
+    val plan by cockpit.activePlan.collectAsState()
+    val reason = FlyThePlanRules.disabledReason(plan != null)
+    Column(Modifier.padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        NavSharedDisplay(cockpit, radios = false)
+
+        Column(Modifier.fillMaxWidth().background(Classic737Palette.Panel, RoundedCornerShape(4.dp)).border(1.dp, Classic737Palette.Border, RoundedCornerShape(4.dp)).padding(8.dp)) {
+            val ok = reason.isEmpty()
+            Text(
+                "FLY THE PLAN", color = if (ok) Color(0xFFA7F3D0) else Classic737Palette.Subtle, fontFamily = FontFamily.Monospace, fontSize = 10.sp,
+                modifier = Modifier.alpha(if (ok) 1f else 0.5f).background(if (ok) Color(0x4D022C22) else Color.Transparent, RoundedCornerShape(4.dp))
+                    .border(1.dp, if (ok) Color(0x9910B981) else Classic737Palette.Border, RoundedCornerShape(4.dp)).clickable(enabled = ok) { cockpit.flyThePlan() }.padding(horizontal = 12.dp, vertical = 8.dp),
+            )
+            if (!ok) Text(reason.uppercase(), color = Classic737Palette.Subtle, fontFamily = FontFamily.Monospace, fontSize = 8.sp, modifier = Modifier.padding(top = 6.dp))
+        }
+
+        FlightPhasePanel(s, cockpit)
+
+        // ScaledGlareshield: design width 1360, fitted to the console width, Fit width / Full size toggle
+        var full by remember { mutableStateOf(false) }
+        Column {
+            Row(Modifier.fillMaxWidth().padding(bottom = 4.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Text("GLARESHIELD · THE REAL CONTROLS (SAME STATE AS THE MAIN PANEL)", color = Classic737Palette.Subtle, fontFamily = FontFamily.Monospace, fontSize = 8.sp, modifier = Modifier.weight(1f))
+                Text(
+                    (if (full) "Fit width" else "Full size").uppercase(), color = Classic737Palette.Subtle, fontFamily = FontFamily.Monospace, fontSize = 8.sp,
+                    modifier = Modifier.border(1.dp, Classic737Palette.Border, RoundedCornerShape(4.dp)).clickable { full = !full }.padding(horizontal = 6.dp, vertical = 2.dp),
+                )
+            }
+            BoxWithConstraints(Modifier.fillMaxWidth().background(Color(0xFF0B0D10), RoundedCornerShape(4.dp)).border(1.dp, Color(0xFF2A2F36), RoundedCornerShape(4.dp)).horizontalScroll(rememberScrollState())) {
+                val w = if (full) 1360.dp else maxOf(maxWidth, (1360 * 0.55f).dp).coerceAtMost(1360.dp)
+                GlareshieldPanel(cockpit, w)
+            }
+        }
+    }
 }
 
 @Composable

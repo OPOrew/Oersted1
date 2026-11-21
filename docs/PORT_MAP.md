@@ -214,3 +214,10 @@
 | components/panel/ExteriorLightsDiagram.tsx | sim/ExteriorLightsData.kt, ui/cockpit/ExteriorLightsDiagramView.kt | ExteriorLightsDataTest.kt | Compose unverified; art in res/drawable-nodpi. |
 | components/panel/ApuDiagram.tsx | sim/ApuDiagramRules.kt, ui/cockpit/ApuDiagramView.kt | ApuDiagramRulesTest.kt | Used by ApuTrainerView; Fire trainer overlay not ported. Compose unverified. |
 | components/panel/FireProtectionTrainer.tsx | sim/FireTrainerViewRules.kt, ui/cockpit/FireProtectionTrainerView.kt | FireTrainerViewRulesTest.kt | Whole screen; handlers in FireProtectionRules. Compose unverified. |
+| components/panel/RunwayScene.tsx | sim/RunwaySceneRules.kt (RunwaySceneModel) ; ui/cockpit/RunwaySceneView.kt | RunwaySceneRulesTest.kt | Done. Stepped by the Compose frame loop (50 ms throttle as the web). |
+| components/panel/SituationDisplay.tsx | ui/cockpit/SituationDisplayView.kt (uses sim/Situation.kt explain) | SituationTest.kt (existing) | Done. |
+| components/panel/NavAutopilotDiagram.tsx | sim/NavAutopilotDiagramRules.kt ; ui/cockpit/NavAutopilotDiagramView.kt | NavAutopilotDiagramRulesTest.kt | Done. |
+| components/panel/RadioCommsTrainer.tsx | sim/RadioCommsRules.kt ; ui/cockpit/RadioCommsView.kt | RadioCommsRulesTest.kt | Done; hiss via AudioTrack, voice via TextToSpeech. |
+| components/panel/InteractiveNavMap.tsx | sim/NavMapRules.kt ; ui/cockpit/InteractiveNavMapView.kt ; platform/MapTiles.kt, NavWeather.kt | NavMapRulesTest.kt | Done; Leaflet replaced by a native Compose tile map (same layers / controls). Radar sampling kept at 2 min. |
+| components/panel/NavSharedDisplay.tsx | NavSharedDisplay() in ui/cockpit/NavigationTrainerView.kt | (composition) | Done. |
+| components/panel/AutopilotSimulator.tsx | AutopilotTrainerSection in ui/cockpit/TrainingSystemSections.kt ; sim/FlyThePlanRules.kt | FlyThePlanRulesTest.kt | Done (map, FLY THE PLAN, phase panel, scaled glareshield). |

@@ -1,6 +1,7 @@
 package com.oersted.trainer.ui.cockpit
 
 import com.oersted.trainer.platform.PhaseTimer
+import com.oersted.trainer.sim.FlyThePlanRules
 import com.oersted.trainer.sim.ActiveFlightPlan
 import com.oersted.trainer.sim.AudioFeed
 import com.oersted.trainer.sim.AttitudeTicker
@@ -97,6 +98,17 @@ class CockpitModel(
     private val _activePlan = MutableStateFlow<ActiveFlightPlan?>(null)
     /** The active flight plan (web readActiveFlightPlan), for the pedestal GPS. */
     val activePlan: StateFlow<ActiveFlightPlan?> = _activePlan.asStateFlow()
+
+    /** Live precipitation from the map's radar sampling (web liveWeather store); its intensity feeds the sim step (cabin icing, visibility). */
+    val liveWx = com.oersted.trainer.sim.WxrWorld.LiveWxHolder()
+
+    fun applyLiveWeather(a: com.oersted.trainer.sim.LiveWeather.Analysis) = liveWx.setLiveWeather(a.cells, a.intensity, a.thunderstorm)
+
+    /** The attitude model's latest situation sample (web useSituation): published about 10 Hz, polled by the runway / situation views. */
+    fun situationSample(): Situation.SituationSample = situation.state.sample
+
+    /** Situation sample plus the flown-path trail (web useSituation, for the interactive map). */
+    fun situationState(): Situation.SituationState = situation.state
 
     private val _navState = MutableStateFlow<FlightNavigationState?>(null)
     /** The navigator's latest state (web readFlightNavigationState), for the pedestal GPS. */
@@ -272,7 +284,7 @@ class CockpitModel(
                 acc += min(0.25, now - last)
                 last = now
                 if (acc >= SIM_STEP_S) {
-                    sim.tick(min(0.25, acc))
+                    sim.tick(min(0.25, acc), liveWx.state.intensity)
                     acc = 0.0
                 }
                 attitude.maybeTick(now)
@@ -286,6 +298,15 @@ class CockpitModel(
         simJob = null
         phaseTimer.stop()
         attitude.stop()
+    }
+
+    /** Autopilot "Fly the plan" (web AutopilotSimulator.flyThePlan): load the plan if needed, AUTO PHASES on, start TAKEOFF. */
+    fun flyThePlan() {
+        if (_activePlan.value == null) return
+        if (FlyThePlanRules.needsLoad(true, sim.current().wow, controller.phase) && !controller.loadPlanIntoControls()) { publish(); return }
+        controller.setAutoPhases(true)
+        if (controller.canStart(Phase.TAKEOFF).ok) controller.startPhase(Phase.TAKEOFF)
+        publish()
     }
 
     fun startPhase(p: Phase) {

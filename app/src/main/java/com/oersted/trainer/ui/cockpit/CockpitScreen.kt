@@ -127,6 +127,7 @@ fun CockpitScreen(model: CockpitModel, audio: com.oersted.trainer.platform.Audio
             note = { text, edit -> model.patchSimNote(text, edit) },
             cockpit = model,
             onClose = { trainingOpen = false },
+            audioEnabled = audio.on.collectAsState().value,
         )
     } else {
         OutlinedButton(

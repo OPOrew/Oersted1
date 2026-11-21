@@ -64,6 +64,7 @@ fun TrainingConsoleView(
     note: (String, SimState.() -> Unit) -> Unit,
     cockpit: CockpitModel,
     onClose: () -> Unit,
+    audioEnabled: Boolean = true,
 ) {
     var section by remember { mutableStateOf(TrainingConsoleRules.DEFAULT_SECTION) }
     var sectionsCollapsed by remember { mutableStateOf(false) }
@@ -138,7 +139,10 @@ fun TrainingConsoleView(
                 "Fire Protection" -> TrainingGroup("Fire Protection") { FireTrainerSection(s, d, cockpit) }
                 "Ice & Rain" -> TrainingGroup("Ice & Rain Protection") { IceRainTrainerSection(s, d, cockpit) }
                 "Pitot / Static" -> TrainingGroup("Pitot / Static") { PitotStaticTrainerSection(s, d, cockpit) }
-                "Navigation" -> TrainingGroup("Navigation") { NavigationTrainerSection(s, d, cockpit) }
+                "Navigation" -> TrainingGroup("Navigation") {
+                    NavigationTrainerSection(s, d, cockpit)
+                    com.oersted.trainer.ui.common.Fold("VHF COM", hint = "receive + simulated PTT · ATA 23") { RadioCommsTrainer(cockpit, audioEnabled) }
+                }
                 "Autopilot" -> TrainingGroup("Autopilot simulator / Flight Director") { AutopilotTrainerSection(s, cockpit) }
                 "Lights" -> TrainingGroup("Lights") { LightsTrainerSection(s, d, cockpit) }
                 "Fault Injection" -> FaultInjectionSection(s, d, cockpit)
