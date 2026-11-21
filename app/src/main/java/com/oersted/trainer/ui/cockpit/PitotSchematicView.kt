@@ -231,9 +231,9 @@ fun PitotStaticSchematicView(air: PitotStatic.AirData, s: SimState, dc: Boolean,
             chip(274, 230, "ELEV PITOT R · ${if (air.elevPitotROk) "OK" else "FAULT"}", air.elevPitotROk)
             t("AUX / ELEV PITOT", 320, 262, 6.5f, DIM, 1); t("HEALTH ONLY", 320, 271, 6.5f, DIM, 1)
             if (air.disagree) {
-                ds.drawRoundRect(Color(0xFF3A0D0D).copy(alpha = pulse), o(244, 290), Size(152f * k, 18f * k), CornerRadius(3f * k))
-                ds.drawRoundRect(c(R.RED).copy(alpha = pulse), o(244, 290), Size(152f * k, 18f * k), CornerRadius(3f * k), style = Stroke(1f * k))
-                t("CAPT / F/O DISAGREE", 320, 302, 7.5f, PRED.copy(alpha = pulse), 1)
+                ds.drawRoundRect(Color(0xFF3A0D0D).copy(alpha = pulse.value), o(244, 290), Size(152f * k, 18f * k), CornerRadius(3f * k))
+                ds.drawRoundRect(c(R.RED).copy(alpha = pulse.value), o(244, 290), Size(152f * k, 18f * k), CornerRadius(3f * k), style = Stroke(1f * k))
+                t("CAPT / F/O DISAGREE", 320, 302, 7.5f, PRED.copy(alpha = pulse.value), 1)
             }
 
             // flags under each cluster

@@ -196,7 +196,7 @@ private fun DrawScope.windowLayer(tm: TextMeasurer, clock: IceClock, anim: IceRa
                     val ty = 5f - 14f * ph * ph
                     val x = (minX + ((i + 1.0) / (lines + 1)) * wd).toFloat()
                     val y = (botY - 4).toFloat() + ty
-                    val v = Path().apply { moveTo(x, y); quadTo(x + 2, y - 4, x, y - 8); quadTo(x - 2, y - 12, x, y - 16) }
+                    val v = Path().apply { moveTo(x, y); quadraticBezierTo(x + 2, y - 4, x, y - 8); quadraticBezierTo(x - 2, y - 12, x, y - 16) }
                     drawPath(v, Color(0xFFFFD9A0).copy(alpha = op.coerceIn(0f, 1f)), style = Stroke(0.9f))
                 }
             }
