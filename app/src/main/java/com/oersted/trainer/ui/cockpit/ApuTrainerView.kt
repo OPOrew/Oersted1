@@ -45,7 +45,7 @@ import com.oersted.trainer.ui.panel.PanelCaptionLight
 /**
  * Port of ApuTrainer.tsx: gauges, caption lights, the nine-step start sequence tracker and the P5 / APU controls. The rules
  * (steps, AUTO START demo, switch actions) are [ApuTrainerRules]. The P5 APU master switch and engine-start knobs are the real
- * overhead composables cut out of the P5. NOT ported: the animated ApuDiagram cutaway (photo art). Compose only.
+ * overhead composables cut out of the P5. The animated cutaway is ApuDiagramView.kt. Compose only.
  */
 
 private val ALine = Color(0xFF39414B)
@@ -106,7 +106,7 @@ internal fun ApuTrainerSection(s: SimState, d: Derived, cockpit: CockpitModel) {
             Text("APU FIRE HANDLE PULLED — APU SHUT DOWN, FUEL AND GENERATOR ISOLATED", color = AWarn, fontSize = 9.sp,
                 modifier = Modifier.fillMaxWidth().background(Color(0x1AE24B4B), RoundedCornerShape(4.dp)).border(1.dp, AWarn, RoundedCornerShape(4.dp)).padding(8.dp))
         }
-        Text("Animated APU cutaway: not ported yet — the gauges and lights below carry the same live values.", color = ASubtle, fontSize = 8.sp)
+        ApuDiagram(s.apuDoor, s.apuFuelValve, s.apuStarter, s.apuRpm, s.apuEgt, s.apuOilPsi, s.apuBleedValve, d.apuGenOnBus, s.apuMaster == "OFF", jam)
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             ATape("APU RPM", s.apuRpm, "%", 100.0, Modifier.weight(1f))
             ATape("APU EGT", s.apuEgt, "°C", 700.0, Modifier.weight(1f))
