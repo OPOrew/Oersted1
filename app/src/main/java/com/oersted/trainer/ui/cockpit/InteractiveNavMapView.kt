@@ -60,7 +60,10 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.withTransform
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Paint
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.layout.onSizeChanged
@@ -222,6 +225,16 @@ private fun nightFilter(): ColorFilter {
     return ColorFilter.colorMatrix(ColorMatrix(a))
 }
 
+/** Applies [nightFilter] to this node and its children (a composited layer with a colour-filter paint). */
+private fun Modifier.nightLayer(): Modifier = drawWithContent {
+    drawIntoCanvas { c ->
+        val paint = Paint().apply { colorFilter = nightFilter() }
+        c.saveLayer(Rect(0f, 0f, size.width, size.height), paint)
+        drawContent()
+        c.restore()
+    }
+}
+
 private val TIME_FMT get() = SimpleDateFormat("h:mm:ss a", Locale.US)
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -375,7 +388,7 @@ fun InteractiveNavMap(cockpit: CockpitModel, modifier: Modifier = Modifier) {
     val mapHeight = min(480, (LocalConfiguration.current.screenHeightDp * 0.52f).toInt()).dp
 
     Column(
-        modifier.fillMaxWidth().clipToBounds().border(1.dp, border, RoundedCornerShape(4.dp)).let { if (night) it.graphicsLayer { colorFilter = nightFilter() } else it },
+        modifier.fillMaxWidth().clipToBounds().border(1.dp, border, RoundedCornerShape(4.dp)).let { if (night) it.nightLayer() else it },
     ) {
         Column(Modifier.fillMaxWidth().background(Classic737Palette.Panel).padding(8.dp)) {
             Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.SpaceBetween) {

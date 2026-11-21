@@ -169,7 +169,7 @@ private fun DrawScope.airliner(gear: Double, pitch: Double, flaps: Double, spin:
         // tailplane (edge-on) and wing seen from slightly below, behind the fuselage
         drawPath(P_TAILPLANE, Color(0xFFB9C2CA)); drawPath(P_TAILPLANE, Color(0xFF7D8790), style = Stroke(0.3f))
         drawPath(P_WING, Color(0xFFC9D0D7)); drawPath(P_WING, Color(0xFF7D8790), style = Stroke(0.4f))
-        if (f > 0) drawPath(Path().apply { moveTo(-8f, 4.6f); lineTo(-25f, 9f); lineTo(-25f, (9 + f).toFloat()); lineTo(-8f, (4.6 + f * 0.5).toFloat(); close() }, Color(0xFF8D97A1))
+        if (f > 0) drawPath(Path().apply { moveTo(-8f, 4.6f); lineTo(-25f, 9f); lineTo(-25f, (9 + f).toFloat()); lineTo(-8f, (4.6 + f * 0.5).toFloat()); close() }, Color(0xFF8D97A1))
         // fuselage
         drawPath(P_FUSELAGE, body); drawPath(P_FUSELAGE, Color(0xFF8A949D), style = Stroke(0.5f))
         drawPath(P_STRIPE, Color(0xFF1F6FB5).copy(alpha = 0.95f))
