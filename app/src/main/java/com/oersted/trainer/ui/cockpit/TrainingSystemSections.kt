@@ -115,12 +115,9 @@ internal fun CabinPressTrainerSection(s: SimState, d: Derived, change: Change, c
 
 @Composable
 internal fun FireTrainerSection(s: SimState, d: Derived, cockpit: CockpitModel) {
-    Chip("FIRE WARN ${if (d.fireWarn) "ACTIVE" else "CLEAR"}", !d.fireWarn)
-    Spacer(Modifier.height(6.dp))
-    // real pedestal FIRE / OVERHEAT panel and the real P5 cargo fire panel
-    BoxWithConstraints(Modifier.fillMaxWidth()) { PedestalFireCutout(cockpit, maxWidth) }
-    P5Cutout(cockpit, 1) { p -> CargoFirePanel(p) }
-    FireModule(cockpit, s, d)
+    // web: FireProtectionTrainer, then TrainingSub "Servicing / Test" (FIRE WARN ACTIVE / CLEAR)
+    FireProtectionTrainerView(s, d, cockpit)
+    TrainingSub("Servicing / Test") { InfoBox("FIRE WARN ${if (d.fireWarn) "ACTIVE" else "CLEAR"}", Modifier.fillMaxWidth()) }
 }
 
 @Composable

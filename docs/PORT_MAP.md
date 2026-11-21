@@ -213,3 +213,4 @@
 | components/panel/IceRainDiagrams.tsx (diagrams; model was ported earlier) | sim/IceRainGeometry.kt, ui/cockpit/IceRainDiagramsView.kt | IceRainGeometryTest.kt | Compose unverified; photos in res/drawable-nodpi. |
 | components/panel/ExteriorLightsDiagram.tsx | sim/ExteriorLightsData.kt, ui/cockpit/ExteriorLightsDiagramView.kt | ExteriorLightsDataTest.kt | Compose unverified; art in res/drawable-nodpi. |
 | components/panel/ApuDiagram.tsx | sim/ApuDiagramRules.kt, ui/cockpit/ApuDiagramView.kt | ApuDiagramRulesTest.kt | Used by ApuTrainerView; Fire trainer overlay not ported. Compose unverified. |
+| components/panel/FireProtectionTrainer.tsx | sim/FireTrainerViewRules.kt, ui/cockpit/FireProtectionTrainerView.kt | FireTrainerViewRulesTest.kt | Whole screen; handlers in FireProtectionRules. Compose unverified. |
