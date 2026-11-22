@@ -207,7 +207,7 @@
 | buildAirCondWires / AcPackSection / AirConditioningTrainerPanel (cockpit.tsx) | sim/AirCondFlowWires.kt, ui/cockpit/AirCondFlowView.kt | ported (drawing, buttons, selector, sliders, fault select) |
 | buildCabinWires / CabinPressurizationTrainerPanel (cockpit.tsx) | sim/AirCondFlowWires.kt (CabinFlowWires), ui/cockpit/AirCondFlowView.kt | ported |
 | components/panel/ElectricalPowerTrainer.tsx (full) | sim/ElectricalFlowWires.kt, sim/ElectricalTrainerRules.kt, ui/cockpit/ElectricalFlowView.kt, ElectricalIcons.kt | ported, unverified by CI |
-| components/panel/FlightModeControl.tsx (goGround / sliders), FlightControlInputs.tsx, SteeringControls.tsx | sim/FlightInputRules.kt, ui/cockpit/FlightControlInputsView.kt | FlightInputRulesTest.kt | Compose unverified; FlightControlsModule + spoiler stand not ported here. |
+| components/panel/FlightModeControl.tsx (goGround / sliders), FlightControlInputs.tsx, SteeringControls.tsx | sim/FlightInputRules.kt, ui/cockpit/FlightControlInputsView.kt | FlightInputRulesTest.kt | Compose unverified; FlightControlsModule is in ui/panel/FlightControlsModuleView.kt. |
 | components/panel/Overhead.tsx WheelDynamics / BrakeWheelPanel | ui/cockpit/BrakeWheelDynamicsView.kt, ui/panel/BrakeFireModules.kt (BrakeWheelReadout) | — | Dial animation in Compose; unverified. |
 | components/panel/PitotStaticDiagram.tsx | sim/PitotSchematicRules.kt, sim/SvgLines.kt, ui/cockpit/PitotSchematicView.kt | PitotSchematicRulesTest.kt, SvgLinesTest.kt | Compose unverified. |
 | components/panel/IceRainDiagrams.tsx (diagrams; model was ported earlier) | sim/IceRainGeometry.kt, ui/cockpit/IceRainDiagramsView.kt | IceRainGeometryTest.kt | Compose unverified; photos in res/drawable-nodpi. |
@@ -222,3 +222,4 @@
 | components/panel/NavSharedDisplay.tsx | NavSharedDisplay() in ui/cockpit/NavigationTrainerView.kt | (composition) | Done. |
 | components/panel/AutopilotSimulator.tsx | AutopilotTrainerSection in ui/cockpit/TrainingSystemSections.kt ; sim/FlyThePlanRules.kt | FlyThePlanRulesTest.kt | Done (map, FLY THE PLAN, phase panel, scaled glareshield). |
 | HydraulicsTrainerPanel "P5 / Trainer controls" box + HydraulicTrainerSwitch (cockpit.tsx ~1291, ~1895) | ui/cockpit/HydraulicsControlsView.kt, sim/HydraulicTrainerRules.kt | HydraulicTrainerRulesTest.kt | Compose only (verify on CI) |
+| Overhead.tsx FlightControlsModule / FlightControlComponentView | sim/FlightControlsComponentRules.kt, ui/panel/FlightControlsModuleView.kt | FlightControlsComponentRulesTest.kt | Compose unverified; `aside` stand not drawn (P5 cutout + pedestal tab) |

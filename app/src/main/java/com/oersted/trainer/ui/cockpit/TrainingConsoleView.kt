@@ -180,7 +180,10 @@ private fun FlightControlsSection(s: SimState, d: Derived, change: ((SimState) -
     }
     TrainingSubHeader("Yoke / rudder inputs → flight-control surfaces")
     FlightModeControlView(s, d, cockpit)
-    // web FlightControlsModule + B737200ControlStand (surface diagram / spoiler stand) are not ported here; the P8 pedestal tab has the stand.
+    // web FlightControlsModule: surface diagram + readouts (the B737200ControlStand aside is the P5 cutout above / P8 pedestal tab)
+    Spacer(Modifier.height(8.dp))
+    com.oersted.trainer.ui.panel.FlightControlsModule(s, d)
+    Spacer(Modifier.height(12.dp))
     val six by cockpit.sixPack.collectAsState()
     SixPackView(six)
     FlightControlInputsView(cockpit)

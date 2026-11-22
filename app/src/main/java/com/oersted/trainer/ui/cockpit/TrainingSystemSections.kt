@@ -85,16 +85,8 @@ internal fun ElectricalTrainerSection(s: SimState, d: Derived, change: Change, c
 
 @Composable
 internal fun PneumaticTrainerSection(s: SimState, d: Derived, change: Change, cockpit: CockpitModel) {
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        Chip(EngineStartTrainerRules.ductChip("L", d.leftDuctPsi), EngineStartTrainerRules.ductOk(d.leftDuctPsi), Modifier.weight(1f))
-        Chip(EngineStartTrainerRules.ductChip("R", d.rightDuctPsi), EngineStartTrainerRules.ductOk(d.rightDuctPsi), Modifier.weight(1f))
-    }
-    // real P5 bleed air panel
+    // web PneumaticTrainerPanel is the drawing only (no chips / ground buttons); the real P5 bleed air panel stays as the modernised control
     P5Cutout(cockpit, 4) { p -> BleedPanel(p) }
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        ActionButton(EngineStartTrainerRules.groundAirLabel(s.groundPneumaticConnected), s.wow, { change(FuelAndGroundRules::toggleGroundAirCart) }, Modifier.weight(1f))
-        ActionButton(EngineStartTrainerRules.apuLabel(s.apuMaster == "OFF", d.apuAvailable), onClick = { change(FuelAndGroundRules::toggleApuAndBleed) }, modifier = Modifier.weight(1f))
-    }
     Spacer(Modifier.height(8.dp))
     PneumaticFlowDiagram(s, d)
 }
