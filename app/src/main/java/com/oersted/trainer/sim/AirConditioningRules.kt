@@ -108,4 +108,12 @@ object AirConditioningRules {
         if (!outflowEnabled(s)) return s
         return edited(s) { outflow = if (open) minOf(1.0, s.outflow + 0.1) else maxOf(0.0, s.outflow - 0.1) }
     }
+
+    /** Web L PACK / R PACK switch detail line. */
+    fun packDetail(flow: Boolean, trip: Boolean): String = if (flow) "FLOWING" else if (trip) "TRIPPED" else "NO FLOW"
+
+    /** Web cabin-pressurization modeLabel. */
+    fun pressModeLabel(mode: String): String = when (mode) {
+        "AUTO" -> "AUTO"; "STBY" -> "STANDBY"; "MAN_AC" -> "MANUAL AC"; "MAN_DC" -> "MANUAL DC"; else -> mode
+    }
 }

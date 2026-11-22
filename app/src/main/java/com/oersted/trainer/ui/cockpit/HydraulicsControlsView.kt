@@ -39,12 +39,12 @@ import com.oersted.trainer.sim.SimState
  * ENG / ELEC pump switches, STANDBY selector, ground interconnect / servicing / GPMU / air-cart switches and the A · B · S
  * pressure chips. The phone layout uses the web's two-column breakpoint (grid-cols-2). Compose only; rules in [R].
  */
-private enum class SwTone { A, B, S, ACCENT }
+internal enum class SwTone { A, B, S, ACCENT }
 
-private fun SwTone.color(): Color = when (this) { SwTone.A -> FlowHydA; SwTone.B -> FlowHydB; SwTone.S -> FlowHydS; SwTone.ACCENT -> FlowAccent }
+internal fun SwTone.color(): Color = when (this) { SwTone.A -> FlowHydA; SwTone.B -> FlowHydB; SwTone.S -> FlowHydS; SwTone.ACCENT -> FlowAccent }
 
 @Composable
-private fun HydTrainerSwitch(label: String, state: String, tone: SwTone, detail: String?, enabled: Boolean, modifier: Modifier, onClick: () -> Unit) {
+internal fun HydTrainerSwitch(label: String, state: String, tone: SwTone, detail: String?, enabled: Boolean, modifier: Modifier, onClick: () -> Unit) {
     val live = R.switchLive(state)
     val shape = RoundedCornerShape(4.dp)
     Column(

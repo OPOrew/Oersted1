@@ -85,4 +85,12 @@ class AirConditioningRulesTest {
         assertEquals("AIR MIX VALVE 0% HOT · MANUAL", rules.airMixCaption(d, "MANUAL", false))
         assertEquals("AIR MIX VALVE 46% HOT · AUTO", rules.airMixCaption(d, "AUTO", true))
     }
+
+    @Test fun packDetailAndPressLabels() {
+        org.junit.Assert.assertEquals("FLOWING", AirConditioningRules.packDetail(true, true))
+        org.junit.Assert.assertEquals("TRIPPED", AirConditioningRules.packDetail(false, true))
+        org.junit.Assert.assertEquals("NO FLOW", AirConditioningRules.packDetail(false, false))
+        org.junit.Assert.assertEquals("STANDBY", AirConditioningRules.pressModeLabel("STBY"))
+        org.junit.Assert.assertEquals("MANUAL DC", AirConditioningRules.pressModeLabel("MAN_DC"))
+    }
 }

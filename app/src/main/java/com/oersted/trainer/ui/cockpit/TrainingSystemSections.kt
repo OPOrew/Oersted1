@@ -102,13 +102,20 @@ internal fun PneumaticTrainerSection(s: SimState, d: Derived, change: Change, co
 @Composable
 internal fun AirConditioningTrainerSection(s: SimState, d: Derived, change: Change, cockpit: CockpitModel) {
     P5Cutout(cockpit, 4) { p -> AirCondPanel(p) }
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        ActionButton("L PACK · ${if (s.packL) "ON" else "OFF"}", onClick = { change { AirConditioningRules.togglePack(it, true) } }, modifier = Modifier.weight(1f))
-        ActionButton("R PACK · ${if (s.packR) "ON" else "OFF"}", onClick = { change { AirConditioningRules.togglePack(it, false) } }, modifier = Modifier.weight(1f))
+    // web: two HydraulicTrainerSwitch (L PACK / R PACK, detail FLOWING / TRIPPED / NO FLOW), then amber TRIP RESET buttons
+    Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        HydTrainerSwitch("L PACK", if (s.packL) "ON" else "OFF", SwTone.ACCENT, AirConditioningRules.packDetail(d.packLFlow, s.packTripL), true, Modifier.weight(1f)) { change { AirConditioningRules.togglePack(it, true) } }
+        HydTrainerSwitch("R PACK", if (s.packR) "ON" else "OFF", SwTone.ACCENT, AirConditioningRules.packDetail(d.packRFlow, s.packTripR), true, Modifier.weight(1f)) { change { AirConditioningRules.togglePack(it, false) } }
     }
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        ActionButton("L PACK TRIP RESET", onClick = { change { AirConditioningRules.resetPackTrip(it, true) } }, modifier = Modifier.weight(1f))
-        ActionButton("R PACK TRIP RESET", onClick = { change { AirConditioningRules.resetPackTrip(it, false) } }, modifier = Modifier.weight(1f))
+    Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        for ((label, left) in listOf("L PACK TRIP RESET" to true, "R PACK TRIP RESET" to false)) {
+            val amber = Color(0xFFFCD34D)
+            Text(
+                label, color = amber, fontFamily = FontFamily.Monospace, fontSize = 8.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                modifier = Modifier.weight(1f).background(amber.copy(alpha = 0.05f), RoundedCornerShape(4.dp)).border(1.dp, Color(0xFFF59E0B).copy(alpha = 0.4f), RoundedCornerShape(4.dp))
+                    .clickable { change { AirConditioningRules.resetPackTrip(it, left) } }.padding(horizontal = 8.dp, vertical = 4.dp),
+            )
+        }
     }
     AirCondTempControls(s, d, change)
     Spacer(Modifier.height(8.dp))
@@ -118,13 +125,13 @@ internal fun AirConditioningTrainerSection(s: SimState, d: Derived, change: Chan
 @Composable
 internal fun CabinPressTrainerSection(s: SimState, d: Derived, change: Change, cockpit: CockpitModel) {
     P5Cutout(cockpit, 4) { p -> PressPanel(p, true) }
-    val labels = mapOf("AUTO" to "AUTO", "STBY" to "STANDBY", "MAN_AC" to "MANUAL AC", "MAN_DC" to "MANUAL DC")
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+    // web: grid-cols-4 gap-1.5; the selected mode gets the accent border / tint
+    Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         for (m in AirConditioningRules.PRESS_MODES)
-            ActionButton(if (s.pressMode == m) "● ${labels[m]}" else labels[m]!!, onClick = { change { AirConditioningRules.setPressMode(it, m) } }, modifier = Modifier.weight(1f))
+            WebButton(AirConditioningRules.pressModeLabel(m), Modifier.weight(1f), true, s.pressMode == m) { change { AirConditioningRules.setPressMode(it, m) } }
     }
     val manual = AirConditioningRules.outflowEnabled(s)
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+    Row(Modifier.fillMaxWidth().padding(bottom = 12.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         ActionButton("OUTFLOW VALVE · OPEN", manual, { change { AirConditioningRules.stepOutflow(it, true) } }, Modifier.weight(1f))
         ActionButton("OUTFLOW VALVE · CLOSE", manual, { change { AirConditioningRules.stepOutflow(it, false) } }, Modifier.weight(1f))
     }
