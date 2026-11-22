@@ -179,7 +179,7 @@ internal fun PneumaticFlowDiagram(s: SimState, d: Derived) {
 
             // Manifolds with the isolation valve, ground connector and APU supply in the centre column
             Row(Modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                FlowNode(geo, "pn-lm", "manifold", "LEFT MANIFOLD", leftLive, Tone.A, "$psiL PSI · $srcL", modifier = Modifier.weight(1f).fillMaxHeight())
+                FlowNode(geo, "pn-lm", "manifold", "LEFT MANIFOLD", leftLive, Tone.A, "$psiL PSI · $srcL", offText = "NO PRESSURE", modifier = Modifier.weight(1f).fillMaxHeight())
                 Column(Modifier.width(CENTRE_W), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     FlowNode(geo, "pn-iso", "valve", "ISOLATION VALVE", isoOpen, Tone.GROUND, "${s.isolation} SWITCH", compact = true, liveText = "OPEN", offText = "CLOSED", modifier = Modifier.fillMaxWidth())
                     FlowNode(geo, "pn-dual", "gauge", "DUAL BLEED LIGHT", d.dualBleed, Tone.STANDBY, "APU + ENG + ISO OPEN", compact = true, liveText = "ON", offText = "OFF", modifier = Modifier.fillMaxWidth())
@@ -189,7 +189,7 @@ internal fun PneumaticFlowDiagram(s: SimState, d: Derived) {
                     FlowNode(geo, "pn-ad", "manifold", "APU SUPPLY DUCT", apuOn, Tone.STANDBY, "RELIEF VALVE ≈80 PSI", compact = true, liveText = "FLOW", offText = "OFF", modifier = Modifier.fillMaxWidth())
                     FlowNode(geo, "pn-ac", "shutoff", "APU CHECK VALVE", apuOn, Tone.STANDBY, "BLOCKS ENG → APU FLOW", compact = true, liveText = "FLOW", offText = "OFF", modifier = Modifier.fillMaxWidth())
                 }
-                FlowNode(geo, "pn-rm", "manifold", "RIGHT MANIFOLD", rightLive, Tone.B, "$psiR PSI · $srcR", modifier = Modifier.weight(1f).fillMaxHeight())
+                FlowNode(geo, "pn-rm", "manifold", "RIGHT MANIFOLD", rightLive, Tone.B, "$psiR PSI · $srcR", offText = "NO PRESSURE", modifier = Modifier.weight(1f).fillMaxHeight())
             }
 
             // Users

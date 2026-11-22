@@ -221,3 +221,4 @@
 | components/panel/InteractiveNavMap.tsx | sim/NavMapRules.kt ; ui/cockpit/InteractiveNavMapView.kt ; platform/MapTiles.kt, NavWeather.kt | NavMapRulesTest.kt | Done; Leaflet replaced by a native Compose tile map (same layers / controls). Radar sampling kept at 2 min. |
 | components/panel/NavSharedDisplay.tsx | NavSharedDisplay() in ui/cockpit/NavigationTrainerView.kt | (composition) | Done. |
 | components/panel/AutopilotSimulator.tsx | AutopilotTrainerSection in ui/cockpit/TrainingSystemSections.kt ; sim/FlyThePlanRules.kt | FlyThePlanRulesTest.kt | Done (map, FLY THE PLAN, phase panel, scaled glareshield). |
+| HydraulicsTrainerPanel "P5 / Trainer controls" box + HydraulicTrainerSwitch (cockpit.tsx ~1291, ~1895) | ui/cockpit/HydraulicsControlsView.kt, sim/HydraulicTrainerRules.kt | HydraulicTrainerRulesTest.kt | Compose only (verify on CI) |

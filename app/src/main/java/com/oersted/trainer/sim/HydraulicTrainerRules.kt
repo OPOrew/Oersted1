@@ -65,4 +65,25 @@ object HydraulicTrainerRules {
 
     /** Web GND INTERCONNECT label: OPEN when the switch is on. */
     fun interconnectState(on: Boolean): String = if (on) "OPEN" else "CLOSED"
+
+    // ── HydraulicTrainerSwitch strip (web "P5 / Trainer controls" box, below the flow drawing) ──
+
+    /** Web interconnectActual: valve is only really open with GPMU connected, on the ground, parking brake set. */
+    fun interconnectActual(s: SimState): Boolean = s.groundInterconnect && s.hydGroundPowerConnected && s.wow && s.parkingBrake
+
+    /** Web HydraulicTrainerSwitch: a state other than OFF / CLOSED / DISCONNECTED lights the switch. */
+    fun switchLive(state: String): Boolean = state != "OFF" && state != "CLOSED" && state != "DISCONNECTED"
+
+    /** Web ELEC n PUMP detail line. */
+    fun elecPumpDetail(busPowered: Boolean, pumpOn: Boolean, engine: Int): String =
+        if (busPowered) (if (pumpOn) "SYSTEM B · RUNNING" else "SYSTEM B · NOT RUNNING") else "NO AC BUS $engine"
+
+    fun interconnectDetail(actual: Boolean): String = if (actual) "B → A LIVE" else "GROUND"
+    fun servicingDetail(wow: Boolean): String = if (wow) "HAND PUMP · HYD FLUID" else "AIRBORNE"
+    fun gpmuDetail(wow: Boolean): String = if (wow) "GPMU · PRESSURE / RETURN" else "GROUND ONLY"
+    fun airCartDetail(wow: Boolean): String = if (wow) "RES PRESS · WHEN NO N₂ · ALSO R MANIFOLD" else "GROUND ONLY"
+    fun connectedState(on: Boolean): String = if (on) "CONNECTED" else "DISCONNECTED"
+
+    /** Web "A · 3000 PSI" pressure chip text (Math.round semantics). */
+    fun pressureText(label: String, psi: Double): String = "$label · ${Math.floor(psi + 0.5).toLong()} PSI"
 }

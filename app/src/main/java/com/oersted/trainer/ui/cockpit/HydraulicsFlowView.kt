@@ -36,8 +36,7 @@ import kotlin.math.floor
 /**
  * Port of HydraulicsTrainerPanel's drawing (routes/cockpit.tsx): air-pressurization box, system A / B / standby circuits, ground
  * servicing, ground-power interconnect and the A / B / S pressure strip. The wire router is [FlowWires.hydraulic]; node rectangles
- * are measured with [FlowGeo]. The web's P5 / trainer control grid is not repeated here: the section already carries the real P5
- * hydraulic panel and the ground buttons. Compose only.
+ * are measured with [FlowGeo]. The web's P5 / trainer control grid is [HydraulicsTrainerControls] (HydraulicsControlsView.kt), placed under this drawing. Compose only.
  */
 
 private val A_USERS = listOf("GROUND SPOILERS", "INBOARD FLIGHT SPOILERS", "AILERONS", "LE FLAPS / SLATS", "TE FLAPS", "LANDING GEAR / NOSE STEERING", "ELEVATORS", "RUDDER", "INBOARD BRAKES", "THRUST REVERSER")

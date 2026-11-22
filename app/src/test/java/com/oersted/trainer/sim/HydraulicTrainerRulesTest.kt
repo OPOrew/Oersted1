@@ -60,4 +60,28 @@ class HydraulicTrainerRulesTest {
         assertEquals("OPEN", rules.interconnectState(true))
         assertEquals("CLOSED", rules.interconnectState(false))
     }
+
+    @Test fun switchStripTexts() {
+        assertEquals("NO AC BUS 2", rules.elecPumpDetail(false, true, 2))
+        assertEquals("SYSTEM B · RUNNING", rules.elecPumpDetail(true, true, 1))
+        assertEquals("SYSTEM B · NOT RUNNING", rules.elecPumpDetail(true, false, 1))
+        assertEquals("B → A LIVE", rules.interconnectDetail(true))
+        assertEquals("GROUND", rules.interconnectDetail(false))
+        assertEquals("AIRBORNE", rules.servicingDetail(false))
+        assertEquals("GPMU · PRESSURE / RETURN", rules.gpmuDetail(true))
+        assertEquals("GROUND ONLY", rules.airCartDetail(false))
+        assertEquals("DISCONNECTED", rules.connectedState(false))
+        assertEquals("A · 3001 PSI", rules.pressureText("A", 3000.5))
+    }
+
+    @Test fun switchLiveAndInterconnectActual() {
+        assertFalse(rules.switchLive("CLOSED"))
+        assertFalse(rules.switchLive("DISCONNECTED"))
+        assertTrue(rules.switchLive("OPEN"))
+        val s = initialSimState()
+        s.groundInterconnect = true; s.hydGroundPowerConnected = true; s.wow = true; s.parkingBrake = false
+        assertFalse(rules.interconnectActual(s))
+        s.parkingBrake = true
+        assertTrue(rules.interconnectActual(s))
+    }
 }

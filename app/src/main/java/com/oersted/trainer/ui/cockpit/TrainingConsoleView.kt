@@ -154,29 +154,15 @@ fun TrainingConsoleView(
 }
 
 @Composable
-private fun SwitchButton(label: String, on: Boolean, enabled: Boolean = true, onClick: () -> Unit) {
-    WebButton("$label · ${TrainingConsoleRules.onOff(on)}", Modifier.fillMaxWidth(), enabled, false, onClick = onClick)
-}
-
-@Composable
-private fun StateButton(text: String, enabled: Boolean = true, onClick: () -> Unit) {
-    WebButton(text, Modifier.fillMaxWidth(), enabled, false, onClick = onClick)
-}
-
-@Composable
 private fun HydraulicsSection(s: SimState, d: Derived, change: ((SimState) -> SimState) -> Unit, cockpit: CockpitModel) {
     // the real P5 hydraulic panel (engine / electric pumps, standby) and the real MIP pressure dials
     P5Cutout(cockpit, 3) { p -> HydDoorsCvr(p, true) }
     BoxWithConstraints(Modifier.fillMaxWidth()) { MipHydDials(cockpit, maxWidth) }
-    StateButton("GND INTERCONNECT · ${HydraulicTrainerRules.interconnectState(s.groundInterconnect)}") {
-        change { HydraulicTrainerRules.toggle(it, "groundInterconnect") }
-    }
-    val onGround = HydraulicTrainerRules.groundServicingEnabled(s)
-    SwitchButton("GND SERVICING", s.hydServicingConnected, onGround) { change { HydraulicTrainerRules.toggle(it, "hydServicingConnected") } }
-    SwitchButton("GND HYD POWER", s.hydGroundPowerConnected, onGround) { change { HydraulicTrainerRules.toggle(it, "hydGroundPowerConnected") } }
-    SwitchButton("GND AIR CART", s.groundPneumaticConnected, onGround) { change { HydraulicTrainerRules.toggleGroundAirCart(it) } }
     Spacer(Modifier.height(8.dp))
     HydraulicsFlowDiagram(s, d)
+    Spacer(Modifier.height(8.dp))
+    // web order: drawing → "P5 / Trainer controls" switch strip + A · B · S pressure chips
+    HydraulicsTrainerControls(s, d, change)
 }
 
 @Composable
