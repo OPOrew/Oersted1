@@ -33,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import com.oersted.trainer.sim.Procedures
 import com.oersted.trainer.ui.cockpit.CockpitModel
 import com.oersted.trainer.ui.common.Classic737Palette
+import com.oersted.trainer.ui.panel.GroundModule
+import com.oersted.trainer.ui.panel.Overhead
 
 /** Port of routes/procedures.tsx: category switch, procedure chips, live step list and the reset / APU buttons. */
 @Composable
@@ -166,5 +168,8 @@ fun ProceduresScreen(cockpit: CockpitModel) {
                 OutlinedButton(onClick = { cockpit.readyApu() }) { Text("APU running preset") }
             }
         }
+        // web right column continues with the live overhead panel and the ground-service module
+        item { Overhead(cockpit) }
+        item { GroundModule(cockpit, s, d) }
     }
 }

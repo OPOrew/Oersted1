@@ -223,3 +223,7 @@
 | components/panel/AutopilotSimulator.tsx | AutopilotTrainerSection in ui/cockpit/TrainingSystemSections.kt ; sim/FlyThePlanRules.kt | FlyThePlanRulesTest.kt | Done (map, FLY THE PLAN, phase panel, scaled glareshield). |
 | HydraulicsTrainerPanel "P5 / Trainer controls" box + HydraulicTrainerSwitch (cockpit.tsx ~1291, ~1895) | ui/cockpit/HydraulicsControlsView.kt, sim/HydraulicTrainerRules.kt | HydraulicTrainerRulesTest.kt | Compose only (verify on CI) |
 | Overhead.tsx FlightControlsModule / FlightControlComponentView | sim/FlightControlsComponentRules.kt, ui/panel/FlightControlsModuleView.kt | FlightControlsComponentRulesTest.kt | Compose unverified; `aside` stand not drawn (P5 cutout + pedestal tab) |
+| routes/index.tsx (Hangar) | ui/hangar/HangarScreen.kt | none (Compose) | verify on CI |
+| routes/library.tsx, components/library/PartCard.tsx | ui/library/LibraryScreen.kt, ui/library/PartViews.kt | none (Compose) | verify on CI |
+| routes/systems.$id.tsx | ui/systems/SystemScreen.kt | none (Compose) | Overhead focus map + GroundModule added |
+| routes/procedures.tsx | ui/procedures/ProceduresScreen.kt | none (Compose) | Overhead + GroundModule added |

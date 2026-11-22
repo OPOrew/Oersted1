@@ -28,6 +28,8 @@ import com.oersted.trainer.platform.PlanStore
 import com.oersted.trainer.platform.AudioEngine
 import com.oersted.trainer.ui.cockpit.CockpitModel
 import com.oersted.trainer.ui.common.StatusStrip
+import com.oersted.trainer.ui.hangar.HangarScreen
+import com.oersted.trainer.ui.library.LibraryScreen
 import com.oersted.trainer.ui.procedures.ProceduresScreen
 import com.oersted.trainer.ui.systems.SystemScreen
 import androidx.compose.foundation.clickable
@@ -152,109 +154,14 @@ fun AppRoot(lightMode: Boolean, onToggleTheme: () -> Unit) {
                             onBack = { openSystemId = null },
                         )
                     } else {
-                        SystemsScreen(repo.systems) { openSystemId = it }
+                        HangarScreen(repo.systems, repo.parts, repo.amm.meta.source, cockpit) { openSystemId = it }
                     }
                 }
                 Tab.FLIGHT_DECK -> CockpitScreen(cockpit, audio)
                 Tab.FLIGHT_PLAN -> FlightPlanScreen(planStore, cockpitPlanLabel) { draft -> cockpit.activate(draft) }
                 Tab.PROCEDURES -> ProceduresScreen(cockpit)
-                Tab.LIBRARY -> LibraryScreen(repo.parts, repo.systems)
+                Tab.LIBRARY -> LibraryScreen(repo.parts, repo.systems, repo.amm.meta, repo.amm.chapters)
             }
         }
     }
 }
-
-@Composable
-private fun Header(eyebrow: String, title: String) {
-    Column(Modifier.padding(16.dp)) {
-        Text(eyebrow.uppercase(), style = MaterialTheme.typography.labelSmall)
-        Text(title, style = MaterialTheme.typography.headlineMedium)
-    }
-}
-
-@Composable
-private fun SystemsScreen(systems: List<SystemDef>, onOpen: (String) -> Unit) {
-    Header("Airframe layout · 737-200", "Systems")
-    LazyColumn(contentPadding = PaddingValues(16.dp)) {
-        items(systems, key = { it.id }) { s ->
-            Card(Modifier.fillMaxWidth().padding(bottom = 8.dp).clickable { onOpen(s.id) }) {
-                Column(Modifier.padding(12.dp)) {
-                    Text("ATA ${s.ata} · ${s.short}", style = MaterialTheme.typography.labelMedium)
-                    Text(s.title, style = MaterialTheme.typography.titleMedium)
-                    Text(s.blurb, style = MaterialTheme.typography.bodyMedium)
-                    Text("Power: ${s.power} · Panel: ${s.panel}", style = MaterialTheme.typography.bodySmall)
-                    // Web card links to /systems/{id}; this card opens the SystemScreen port.
-                    Text(
-                        "OPEN LAYOUT →",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(top = 8.dp),
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun LibraryScreen(parts: List<Part>, systems: List<SystemDef>) {
-    // Same filter as web routes/library.tsx: system chip + free-text match over name, function, ATA, group and controls.
-    var query by rememberSaveable { mutableStateOf("") }
-    var sysId by rememberSaveable { mutableStateOf("all") }
-    val needle = query.trim().lowercase()
-    val filtered = parts.filter { p ->
-        (sysId == "all" || p.system == sysId) &&
-            (needle.isEmpty() || "${p.name} ${p.function} ${p.ata} ${p.group} ${p.controls}".lowercase().contains(needle))
-    }
-    Header("Component library", "${filtered.size} parts")
-    OutlinedTextField(
-        value = query,
-        onValueChange = { query = it },
-        placeholder = { Text("Search valves, actuators, lights…") },
-        singleLine = true,
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-    )
-    LazyRow(
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        item {
-            FilterChip(selected = sysId == "all", onClick = { sysId = "all" }, label = { Text("All") })
-        }
-        items(systems, key = { it.id }) { s ->
-            FilterChip(selected = sysId == s.id, onClick = { sysId = s.id }, label = { Text(s.short) })
-        }
-    }
-    if (filtered.isEmpty()) {
-        Text("No components match.", modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.bodyMedium)
-    }
-    LazyColumn(contentPadding = PaddingValues(16.dp)) {
-        items(filtered, key = { it.id }) { p ->
-            Card(Modifier.fillMaxWidth().padding(bottom = 8.dp)) {
-                Column(Modifier.padding(12.dp)) {
-                    Text("ATA ${p.ata} · ${p.group}", style = MaterialTheme.typography.labelMedium)
-                    Text(p.name, style = MaterialTheme.typography.titleSmall)
-                    Text(p.function, style = MaterialTheme.typography.bodyMedium)
-                    Text("Flow: ${p.flow}", style = MaterialTheme.typography.bodySmall)
-                    Text("Controls: ${p.controls}", style = MaterialTheme.typography.bodySmall)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun AmmScreen(repo: Repository) {
-    val amm = repo.amm
-    Header(amm.meta.source, amm.meta.book + " Rev " + amm.meta.revision)
-    LazyColumn(contentPadding = PaddingValues(16.dp)) {
-        items(amm.chapters, key = { it.ata }) { c ->
-            Text(
-                "ATA ${c.ata}  ${c.title}" + if (c.trainer) "  ●" else "",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(vertical = 4.dp),
-            )
-        }
-    }
-}
-
