@@ -262,8 +262,8 @@ internal fun NavigationTrainerSection(s: SimState, d: Derived, cockpit: CockpitM
         val f = mip.srcFail
         val failOn = mapOf("gyro1" to f.gyro1, "gyro2" to f.gyro2, "gyroAux" to f.gyroAux, "comp1" to f.comp1, "comp2" to f.comp2, "nav1" to f.nav1, "nav2" to f.nav2)
         NLabel("Source failures (VHF NAV · COMPASS · VERTICAL GYRO selectors)")
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            for (k in NavigationTrainerRules.SRC_FAIL_KEYS) NBtn(failLabels.getValue(k), tone = if (failOn.getValue(k)) "red" else "plain", mono = true) { cockpit.updateMip { NavigationTrainerRules.toggleSrcFail(it, k) } }
+        NavGrid4(NavigationTrainerRules.SRC_FAIL_KEYS) { k, m ->
+            NBtn(failLabels.getValue(k), m, tone = if (failOn.getValue(k)) "red" else "plain", mono = true) { cockpit.updateMip { NavigationTrainerRules.toggleSrcFail(it, k) } }
         }
         val p = mip.srcPower
         val powerOn = mapOf(
@@ -279,11 +279,9 @@ internal fun NavigationTrainerSection(s: SimState, d: Derived, cockpit: CockpitM
             "comm1Cb" to "VHF1 CB", "comm2Cb" to "VHF2 CB", "hf1Cb" to "HF-1 CB", "hf2Cb" to "HF-2 CB*", "lrra1Cb" to "LRRA1 CB", "lrra2Cb" to "LRRA2 CB",
         )
         NLabel("Circuit breakers (closed = powered path)")
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            for (k in NavigationTrainerRules.SRC_POWER_KEYS) {
-                val closed = powerOn.getValue(k)
-                NBtn(cbLabels.getValue(k) + if (closed) "" else " OPEN", tone = if (!closed) "red" else "plain", mono = true) { cockpit.updateMip { NavigationTrainerRules.toggleSrcPower(it, k) } }
-            }
+        NavGrid4(NavigationTrainerRules.SRC_POWER_KEYS) { k, m ->
+            val closed = powerOn.getValue(k)
+            NBtn(cbLabels.getValue(k) + if (closed) "" else " OPEN", m, tone = if (!closed) "red" else "plain", mono = true) { cockpit.updateMip { NavigationTrainerRules.toggleSrcPower(it, k) } }
         }
         Text("* HF-2 CB separation is a trainer assumption pending tail-specific WDM/effectivity verification.", color = SubtleC, fontSize = 8.sp, modifier = Modifier.padding(top = 4.dp))
         Spacer(Modifier.height(6.dp))
@@ -314,6 +312,17 @@ internal fun NavigationTrainerSection(s: SimState, d: Derived, cockpit: CockpitM
             "LRRA DH: ${ped.lrraDh.first} / ${ped.lrraDh.second} ft · H: ${h(l.h1)} / ${h(l.h2)} ft${if (l.dh1) " · DH1" else ""}${if (l.dh2) " · DH2" else ""}",
             color = SubtleC, fontFamily = FontFamily.Monospace, fontSize = 8.sp, modifier = Modifier.padding(top = 6.dp),
         )
+    }
+}
+
+/** Web `grid grid-cols-4 gap-1.5`: equal-width cells, four per row. */
+@Composable
+private fun NavGrid4(keys: List<String>, cell: @Composable (String, Modifier) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        for (row in keys.chunked(4)) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            for (k in row) cell(k, Modifier.weight(1f))
+            repeat(4 - row.size) { Spacer(Modifier.weight(1f)) }
+        }
     }
 }
 
