@@ -72,6 +72,8 @@ class CockpitModel(
         { alt -> FlightPhaseControl.applyPhaseToGuidance(nav.liveGuidance(), controller.phase, alt, plan) },
         situation,
     )
+    /** Radar nav position / heading (web useWxrNav), published by the attitude ticker. */
+    val wxrNav get() = attitude.wxrNav
     private val phaseTimer = PhaseTimer(scope, controller, monoSec)
     private var simJob: Job? = null
 

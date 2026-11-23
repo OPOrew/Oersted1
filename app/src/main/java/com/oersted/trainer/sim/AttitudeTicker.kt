@@ -19,6 +19,8 @@ class AttitudeTicker(
     /** web applyPhaseToGuidance(getLiveFlightGuidance(), altFt) with the current phase */
     private val guidanceFor: (Double) -> GuidanceResult,
     val situation: Situation.SituationHolder,
+    /** web useWxrNav: the dead-reckoned position / heading the weather radar reads, published about every 400 ms. */
+    val wxrNav: WxrWorld.WxrNavHolder = WxrWorld.WxrNavHolder(),
 ) {
     private var attState = AttitudeHook.State(attitude = MipLocal.Attitude(0.0, 0.0, 0.0), gamma = 0.0)
     private var apState = AutopilotStage.State()
@@ -27,6 +29,7 @@ class AttitudeTicker(
     private var resetN = 0
     private var appliedHdgReqN = 0
     private var lastTickSec = Double.NaN
+    private var wxrAcc = 0.0
 
     /** web useAttitude enable: the panel model owns attitude and heading, so the six-pack shows the model's values. */
     fun start() {
@@ -104,6 +107,12 @@ class AttitudeTicker(
         )
         erect = radio.inst.erectTimers
         pos = radio.pos
+        // web: publish position for the weather radar at most every 400 ms
+        wxrAcc += dt
+        if (wxrAcc > 0.4) {
+            wxrAcc = 0.0
+            wxrNav.publish(WxrWorld.WxrNav(radio.pos.x, radio.pos.y, a.hdg))
+        }
         if (radio.clearHfTuneReq) pedestal.set { p -> p.copy(hfTuneReq = Pair(false, false)) }
 
         val ap = AutopilotStage.tick(

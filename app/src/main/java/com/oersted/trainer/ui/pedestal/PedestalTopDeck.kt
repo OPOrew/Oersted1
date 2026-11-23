@@ -3,6 +3,7 @@ package com.oersted.trainer.ui.pedestal
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -53,7 +54,7 @@ import kotlin.math.sin
  * Port of the TOP DECK of components/panel/CenterPedestal.tsx (lines 270-473): the FreeFlight GPS, VHF 3 COMM, cockpit
  * voice recorder, Primus 90 weather radar indicator and transponder, laid out at the photograph's coordinates.
  * The text and key rules are in sim/PedestalTopDeckRules.kt. Compose only; verified on CI.
- * Not ported yet: the radar scope picture itself (web WxrScope), drawn here as a dark placeholder.
+ * The radar picture is [WxrScope] (WxrScopeView.kt).
  */
 
 private val OrangeFill = Brush.verticalGradient(listOf(Color(0xFFE08A2E), Color(0xFFA85F14)))
@@ -268,16 +269,10 @@ fun PedestalRadarUnit(cockpit: CockpitModel) {
             Knob(value = m.radarGain, onChange = { v -> cockpit.updateMip { it.copy(radarGain = Rules.radarGain(v)) } }, min = 0.0, max = 1.0, size = 24.dp, ticks = listOf("PRESET", "MAX"), label = "GAIN", compact = true)
             Knob(value = m.radarInt, onChange = { v -> cockpit.updateMip { it.copy(radarInt = v) } }, min = 0.0, max = 1.0, size = 24.dp, label = "INT", compact = true)
         }
-        // placeholder for the web WxrScope picture
-        Box(
-            Modifier
-                .offset(22.dp, 62.dp)
-                .size(width = 196.dp, height = 150.dp)
-                .background(Color.Black, RoundedCornerShape(10.dp))
-                .border(5.dp, Color(0xFF2A323A), RoundedCornerShape(10.dp)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text("WX RADAR", color = Color(0xFF2F6B3F), fontSize = 9.sp, fontFamily = FontFamily.Monospace)
+        // web WxrScope: rounded-[10px] border-[5px] border-[#2a323a], the picture in the 186 x 140 inner area
+        Box(Modifier.offset(22.dp, 62.dp).size(width = 196.dp, height = 150.dp).clip(RoundedCornerShape(10.dp)).background(Color(0xFF050806))) {
+            WxrScope(cockpit, Modifier.fillMaxSize().padding(5.dp))
+            Box(Modifier.fillMaxSize().border(5.dp, Color(0xFF2A323A), RoundedCornerShape(10.dp)))
         }
         Row(Modifier.offset(14.dp, 218.dp).width(212.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
             Rules.RADAR_MODE_KEYS.forEach { (l, i) ->
