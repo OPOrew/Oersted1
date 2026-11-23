@@ -158,7 +158,7 @@ fun AppRoot(lightMode: Boolean, onToggleTheme: () -> Unit) {
                     }
                 }
                 Tab.FLIGHT_DECK -> CockpitScreen(cockpit, audio)
-                Tab.FLIGHT_PLAN -> FlightPlanScreen(planStore, cockpitPlanLabel) { draft -> cockpit.activate(draft) }
+                Tab.FLIGHT_PLAN -> FlightPlanScreen(planStore, cockpit)
                 Tab.PROCEDURES -> ProceduresScreen(cockpit)
                 Tab.LIBRARY -> LibraryScreen(repo.parts, repo.systems, repo.amm.meta, repo.amm.chapters)
             }

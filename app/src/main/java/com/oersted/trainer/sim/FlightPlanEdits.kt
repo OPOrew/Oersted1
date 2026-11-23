@@ -50,7 +50,7 @@ object FlightPlanEdits {
         val name = rawName.trim().uppercase()
         if (name.isEmpty()) return Result.Refused("Enter a waypoint identifier before adding it.")
         val (lat, lon) = parseCoordinates(latText, lonText)
-            ?: return Result.Refused("Enter valid waypoint latitude (-90 to 90) and longitude (-180 to 180).")
+            ?: return Result.Refused("Enter valid waypoint latitude (-90 to 90) and longitude (-180 to 180) so it can be plotted geographically.")
         if (draft.waypoints.any { it.name == name }) return Result.Refused("$name is already in the route.")
         val wp = ActiveFlightWaypoint(id, name, lat, lon, altitudeFromText(altText), speedFromText(speedText))
         return Result.Added(draft.copy(waypoints = draft.waypoints + wp), source = "user")

@@ -35,8 +35,8 @@ data class FlightPlanDraft(
     val timeCompression: Double = 15.0,
     /** Destination kind and the point the destination is plotted at (flight-plan.tsx destinationKind / destinationLat / destinationLon). Draft-only. */
     val destinationKind: String = "airport",
-    val destinationLat: Double? = null,
-    val destinationLon: Double? = null,
+    val destinationLat: Double? = NavData.WSSS_ILS_02L.thrLat,
+    val destinationLon: Double? = NavData.WSSS_ILS_02L.thrLon,
 ) {
     /**
      * TS vectorArrivalFor + the arrival setter: a vectored arrival to WSSS RWY 02L built from the point (fromLat, fromLon).

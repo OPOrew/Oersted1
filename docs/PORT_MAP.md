@@ -20,7 +20,7 @@
 | lib/sim/liveWeather.ts | 57 | sim/LiveWeather.kt (pure: tileUrl, analyze) + platform/LiveWeatherSampler.kt (HttpURLConnection, BitmapFactory, org.json) | done (LiveWeatherTest.kt); Android part compiled only by CI |
 | routes/cockpit.tsx | 2706 | ui/cockpit/ | not started |
 | routes/index.tsx | 177 | ui/HangarScreen.kt | basic placeholder |
-| routes/flight-plan.tsx | 539 | ui/FlightPlanScreen.kt | not started |
+| routes/flight-plan.tsx | 539 | ui/flightplan/FlightPlanScreen.kt (+ FlightPlanChrome, FlightPlanDrawings, NavaidStationPickerView) + sim/FlightPlanPageRules.kt | done (parity pass 7) |
 | routes/library.tsx, procedures.tsx, systems.$id.tsx | ~500 | ui/ | not started |
 | components/panel/*.tsx | ~30,000 | ui/panel/ | not started (see HANDOFF step 7 for order) |
 | components/aircraft/AircraftPlan.tsx | 298 | ui/AircraftPlan.kt (Canvas) | not started |
@@ -227,3 +227,5 @@
 | routes/library.tsx, components/library/PartCard.tsx | ui/library/LibraryScreen.kt, ui/library/PartViews.kt | none (Compose) | verify on CI |
 | routes/systems.$id.tsx | ui/systems/SystemScreen.kt | none (Compose) | Overhead focus map + GroundModule added |
 | routes/procedures.tsx | ui/procedures/ProceduresScreen.kt | none (Compose) | Overhead + GroundModule added |
+| routes/flight-plan.tsx full page: header/preset/load/save/reset, Aircraft navigation state, airports fields, route sequence, waypoint editor, GeographicRouteMap, cruise + landing profile SVGs, ILS select, procedures | ui/flightplan/FlightPlanScreen.kt, FlightPlanChrome.kt, FlightPlanDrawings.kt + sim/FlightPlanPageRules.kt + platform/PlanStore.kt (full draft) | FlightPlanPageRulesTest.kt | Compose not compiled locally. Web xl two-column layouts stacked. |
+| components/panel/NavaidStationPicker.tsx (Leaflet) | ui/flightplan/NavaidStationPickerView.kt (native OSM tile map, pan/pinch/double-tap, popups, chips) | FlightPlanPageRulesTest.kt (station filter/labels) | Tiles need network. |
