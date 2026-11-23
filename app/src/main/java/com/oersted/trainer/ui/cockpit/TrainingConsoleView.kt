@@ -180,9 +180,11 @@ private fun FlightControlsSection(s: SimState, d: Derived, change: ((SimState) -
     }
     TrainingSubHeader("Yoke / rudder inputs → flight-control surfaces")
     FlightModeControlView(s, d, cockpit)
-    // web FlightControlsModule: surface diagram + readouts (the B737200ControlStand aside is the P5 cutout above / P8 pedestal tab)
+    // web FlightControlsModule with aside={<B737200ControlStand scaleToFit spoilerSwitches />}
     Spacer(Modifier.height(8.dp))
-    com.oersted.trainer.ui.panel.FlightControlsModule(s, d)
+    com.oersted.trainer.ui.panel.FlightControlsModule(s, d) {
+        com.oersted.trainer.ui.panel.B737200ControlStand(cockpit, spoilerSwitches = true, scaleToFit = true)
+    }
     Spacer(Modifier.height(12.dp))
     val six by cockpit.sixPack.collectAsState()
     SixPackView(six)

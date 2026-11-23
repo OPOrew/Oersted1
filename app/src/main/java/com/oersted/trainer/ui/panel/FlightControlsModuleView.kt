@@ -56,8 +56,7 @@ import kotlin.math.min
  * Port of FlightControlsModule / FlightControlComponentView (components/panel/Overhead.tsx, mounted by routes/cockpit.tsx
  * in "Yoke / rudder inputs → flight-control surfaces"): the 640 x 425 surface diagram (ailerons, elevator, rudder bar,
  * eight spoiler panels, LE devices, flap gauge, PCU lamps, surface key) and the readout cards. Logic is in
- * [R] (FlightControlsComponentRules). The web `aside` slot (B737200ControlStand with spoiler switches) is not drawn here:
- * the real P5 FLIGHT CONTROL cutout and the P8 pedestal stand are already in this section / the pedestal tab.
+ * [R] (FlightControlsComponentRules). The web `aside` slot (B737200ControlStand with spoiler switches) is the optional [aside] lambda.
  */
 private val Inset = Color(0xFF0E1013)
 
@@ -177,14 +176,14 @@ private fun DrawScope.leStrip(points: DoubleArray, driveAvailable: Boolean, exte
 }
 
 @Composable
-fun FlightControlsModule(s: SimState, d: Derived) {
+fun FlightControlsModule(s: SimState, d: Derived, aside: (@Composable () -> Unit)? = null) {
     PanelModule("Flight controls · training") {
-        FlightControlComponentView(s, d)
+        FlightControlComponentView(s, d, aside)
     }
 }
 
 @Composable
-private fun FlightControlComponentView(s: SimState, d: Derived) {
+private fun FlightControlComponentView(s: SimState, d: Derived, aside: (@Composable () -> Unit)?) {
     val m = R.model(s, d)
     val surface = d.controlSurfaces
     val leDrive = d.leDriveAvailable; val leExt = d.leExtended; val leTransit = d.leTransit
@@ -318,14 +317,21 @@ private fun FlightControlComponentView(s: SimState, d: Derived) {
                 }
             }
         }
-        // web readout grid (grid-cols-2 gap-2)
-        FlowRow(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp), maxItemsInEachRow = 2) {
-            for ((label, value) in R.readouts(s, d)) {
-                Column(Modifier.weight(1f).background(Inset, RoundedCornerShape(4.dp)).border(1.dp, Classic737Palette.Border, RoundedCornerShape(4.dp)).padding(horizontal = 8.dp, vertical = 6.dp)) {
-                    Text(label, color = Classic737Palette.Subtle, fontFamily = FontFamily.Monospace, fontSize = 8.sp)
-                    Text(value, color = Classic737Palette.Fg, fontFamily = FontFamily.Monospace, fontSize = 8.sp, modifier = Modifier.padding(top = 2.dp))
+        // web readout grid: grid-cols-2 gap-2, or (with an aside) one column of readouts beside the aside at 1fr : 1.6fr
+        val readouts: @Composable (Modifier, Boolean) -> Unit = { mod, single ->
+            FlowRow(mod, horizontalArrangement = Arrangement.spacedBy(if (single) 6.dp else 8.dp), verticalArrangement = Arrangement.spacedBy(if (single) 6.dp else 8.dp), maxItemsInEachRow = if (single) 1 else 2) {
+                for ((label, value) in R.readouts(s, d)) {
+                    Column(Modifier.weight(1f).background(Inset, RoundedCornerShape(4.dp)).border(1.dp, Classic737Palette.Border, RoundedCornerShape(4.dp)).padding(horizontal = 8.dp, vertical = 6.dp)) {
+                        Text(label, color = Classic737Palette.Subtle, fontFamily = FontFamily.Monospace, fontSize = 8.sp)
+                        Text(value, color = Classic737Palette.Fg, fontFamily = FontFamily.Monospace, fontSize = 8.sp, modifier = Modifier.padding(top = 2.dp))
+                    }
                 }
             }
+        }
+        if (aside == null) readouts(Modifier.fillMaxWidth().padding(top = 8.dp), false)
+        else Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.Top) {
+            readouts(Modifier.weight(1f), true)
+            Box(Modifier.weight(1.6f)) { aside() }
         }
     }
 }
