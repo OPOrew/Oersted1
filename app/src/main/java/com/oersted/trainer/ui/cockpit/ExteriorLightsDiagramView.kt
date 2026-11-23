@@ -183,24 +183,27 @@ private fun ExteriorCanvas(v: D.ViewDef, lights: List<LightStatus>, sel: Int?, z
     val slow by tr.animateFloat(0f, 1f, infiniteRepeatable(tween(650, easing = LinearEasing), RepeatMode.Reverse), label = "slow")
     val scroll = rememberScrollState()
 
-    BoxWithConstraints(Modifier.fillMaxWidth().background(SkinBg, RoundedCornerShape(4.dp)).border(1.dp, LineC, RoundedCornerShape(4.dp)).horizontalScroll(scroll)) {
+    // The width is measured OUTSIDE the horizontal scroll: inside horizontalScroll maxWidth is infinite and the canvas never gets a size.
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
         val w = if (zoom) maxWidth * 2.2f else maxWidth
         val h = w * (v.h / v.w).toFloat()
-        Canvas(
-            Modifier.width(w).height(h).pointerInput(v.key) {
-                detectTapGestures { off ->
-                    val sc = size.width / v.w.toFloat()
-                    D.hitNumber(v, (off.x / sc).toDouble(), (off.y / sc).toDouble())?.let { onSelect(it) }
-                }
-            },
-        ) {
-            val sc = size.width / v.w.toFloat()
-            drawImage(art, dstSize = IntSize(size.width.toInt(), size.height.toInt()), alpha = 0.85f, colorFilter = ColorFilter.colorMatrix(INVERT), blendMode = BlendMode.Screen)
-            withTransform({ scale(sc, sc, Offset.Zero) }) {
-                for (mk in v.marks) {
-                    val l = lights.firstOrNull { it.id == mk.id } ?: continue
-                    val t = if (l.flash == "strobe") strobe else slow
-                    marker(tm, mk, l, sel == mk.n, t)
+        Box(Modifier.fillMaxWidth().background(SkinBg, RoundedCornerShape(4.dp)).border(1.dp, LineC, RoundedCornerShape(4.dp)).horizontalScroll(scroll)) {
+            Canvas(
+                Modifier.width(w).height(h).pointerInput(v.key) {
+                    detectTapGestures { off ->
+                        val sc = size.width / v.w.toFloat()
+                        D.hitNumber(v, (off.x / sc).toDouble(), (off.y / sc).toDouble())?.let { onSelect(it) }
+                    }
+                },
+            ) {
+                val sc = size.width / v.w.toFloat()
+                drawImage(art, dstSize = IntSize(size.width.toInt(), size.height.toInt()), alpha = 0.85f, colorFilter = ColorFilter.colorMatrix(INVERT), blendMode = BlendMode.Screen)
+                withTransform({ scale(sc, sc, Offset.Zero) }) {
+                    for (mk in v.marks) {
+                        val l = lights.firstOrNull { it.id == mk.id } ?: continue
+                        val t = if (l.flash == "strobe") strobe else slow
+                        marker(tm, mk, l, sel == mk.n, t)
+                    }
                 }
             }
         }

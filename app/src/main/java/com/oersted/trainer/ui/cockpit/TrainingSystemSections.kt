@@ -21,6 +21,7 @@ import com.oersted.trainer.sim.FlyThePlanRules
 import com.oersted.trainer.ui.common.Classic737Palette
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -171,9 +172,12 @@ internal fun AutopilotTrainerSection(s: SimState, cockpit: CockpitModel) {
                     modifier = Modifier.border(1.dp, Classic737Palette.Border, RoundedCornerShape(4.dp)).clickable { full = !full }.padding(horizontal = 6.dp, vertical = 2.dp),
                 )
             }
-            BoxWithConstraints(Modifier.fillMaxWidth().background(Color(0xFF0B0D10), RoundedCornerShape(4.dp)).border(1.dp, Color(0xFF2A2F36), RoundedCornerShape(4.dp)).horizontalScroll(rememberScrollState())) {
+            // Measure the available width outside the horizontal scroll (inside it maxWidth is infinite and "Fit width" never fits).
+            BoxWithConstraints(Modifier.fillMaxWidth()) {
                 val w = if (full) 1360.dp else maxOf(maxWidth, (1360 * 0.55f).dp).coerceAtMost(1360.dp)
-                GlareshieldPanel(cockpit, w)
+                Box(Modifier.fillMaxWidth().background(Color(0xFF0B0D10), RoundedCornerShape(4.dp)).border(1.dp, Color(0xFF2A2F36), RoundedCornerShape(4.dp)).horizontalScroll(rememberScrollState())) {
+                    GlareshieldPanel(cockpit, w)
+                }
             }
         }
     }
