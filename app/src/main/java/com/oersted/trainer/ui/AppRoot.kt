@@ -27,7 +27,13 @@ import com.oersted.trainer.data.SystemDef
 import com.oersted.trainer.platform.PlanStore
 import com.oersted.trainer.platform.AudioEngine
 import com.oersted.trainer.ui.cockpit.CockpitModel
+import com.oersted.trainer.ui.common.ShellBottomNav
+import com.oersted.trainer.ui.common.ShellHeader
+import com.oersted.trainer.ui.common.ShellIconKind
+import com.oersted.trainer.ui.common.ShellNavItem
 import com.oersted.trainer.ui.common.StatusStrip
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.ui.platform.LocalConfiguration
 import com.oersted.trainer.ui.hangar.HangarScreen
 import com.oersted.trainer.ui.library.LibraryScreen
 import com.oersted.trainer.ui.procedures.ProceduresScreen
@@ -99,25 +105,30 @@ fun AppRoot(lightMode: Boolean, onToggleTheme: () -> Unit) {
         }
     }
 
+    val navItems = remember {
+        listOf(
+            ShellNavItem("Hangar", ShellIconKind.PLANE),
+            ShellNavItem("Flight deck", ShellIconKind.PANEL_LEFT),
+            ShellNavItem("Flight plan", ShellIconKind.TAKEOFF),
+            ShellNavItem("Procedures", ShellIconKind.PLAY),
+            ShellNavItem("Library", ShellIconKind.BOOK_OPEN),
+        )
+    }
+    val wide = LocalConfiguration.current.screenWidthDp >= 768
     Scaffold(
+        // The header and bottom nav apply the status / navigation bar insets themselves (edge-to-edge on API 35).
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
-            // Web AppShell header: title, "model · book Rev revision", theme toggle; StatusStrip below it.
-            Column {
-                Row(
-                    Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Column(Modifier.weight(1f)) {
-                        Text("Classic 737 Line Lab", style = MaterialTheme.typography.titleLarge)
-                        Text(
-                            "${repo.amm.meta.model} · ${repo.amm.meta.book} Rev ${repo.amm.meta.revision}",
-                            style = MaterialTheme.typography.labelSmall,
-                        )
-                    }
-                    OutlinedButton(onClick = onToggleTheme) {
-                        Text(if (lightMode) "Dark" else "Light")
-                    }
-                }
+            // Web AppShell header (logo, title, "model · book Rev revision", theme button, md+ nav) with the StatusStrip inside it.
+            ShellHeader(
+                title = "Classic 737 Line Lab",
+                subtitle = "${repo.amm.meta.model} · ${repo.amm.meta.book} Rev ${repo.amm.meta.revision}",
+                lightMode = lightMode,
+                onToggleTheme = onToggleTheme,
+                items = navItems,
+                selected = tabIndex,
+                onSelect = { tabIndex = it },
+            ) {
                 StatusStrip(
                     s = sim,
                     d = derived,
@@ -128,16 +139,7 @@ fun AppRoot(lightMode: Boolean, onToggleTheme: () -> Unit) {
             }
         },
         bottomBar = {
-            NavigationBar {
-                Tab.entries.forEachIndexed { i, t ->
-                    NavigationBarItem(
-                        selected = i == tabIndex,
-                        onClick = { tabIndex = i },
-                        icon = { Text(t.label.take(1)) },
-                        label = { Text(t.label) },
-                    )
-                }
-            }
+            if (!wide) ShellBottomNav(navItems, tabIndex) { tabIndex = it }
         },
     ) { padding ->
         Column(Modifier.padding(padding).fillMaxSize()) {

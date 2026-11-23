@@ -107,7 +107,7 @@ enum class PlanBtn { DEFAULT, SECONDARY, OUTLINE }
 
 /** web Button: default (accent fill), secondary (raised) and outline. */
 @Composable
-internal fun PlanButton(text: String, modifier: Modifier = Modifier, variant: PlanBtn = PlanBtn.DEFAULT, enabled: Boolean = true, onClick: () -> Unit) {
+internal fun PlanButton(text: String, modifier: Modifier = Modifier, variant: PlanBtn = PlanBtn.DEFAULT, enabled: Boolean = true, small: Boolean = false, onClick: () -> Unit) {
     val scheme = MaterialTheme.colorScheme
     val shape = RoundedCornerShape(8.dp)
     val (bg, fg, bd) = when (variant) {
@@ -116,9 +116,9 @@ internal fun PlanButton(text: String, modifier: Modifier = Modifier, variant: Pl
         PlanBtn.OUTLINE -> Triple(Color.Transparent, scheme.onSurface, scheme.outline.copy(alpha = 0.6f))
     }
     Box(
-        modifier.alpha(if (enabled) 1f else 0.5f).background(bg, shape).border(1.dp, bd, shape).clickable(enabled = enabled, onClick = onClick).padding(horizontal = 16.dp, vertical = 10.dp),
+        modifier.alpha(if (enabled) 1f else 0.5f).background(bg, shape).border(1.dp, bd, shape).clickable(enabled = enabled, onClick = onClick).padding(horizontal = if (small) 12.dp else 16.dp, vertical = if (small) 6.dp else 10.dp),
         contentAlignment = Alignment.Center,
-    ) { Text(text, color = fg, fontSize = 14.sp, fontWeight = FontWeight.Medium) }
+    ) { Text(text, color = fg, fontSize = if (small) 13.sp else 14.sp, fontWeight = FontWeight.Medium) }
 }
 
 /** Small icon-style action (the waypoint row arrows and trash). */

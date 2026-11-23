@@ -226,6 +226,7 @@
 | routes/index.tsx (Hangar) | ui/hangar/HangarScreen.kt | none (Compose) | verify on CI |
 | routes/library.tsx, components/library/PartCard.tsx | ui/library/LibraryScreen.kt, ui/library/PartViews.kt | none (Compose) | verify on CI |
 | routes/systems.$id.tsx | ui/systems/SystemScreen.kt | none (Compose) | Overhead focus map + GroundModule added |
-| routes/procedures.tsx | ui/procedures/ProceduresScreen.kt | none (Compose) | Overhead + GroundModule added |
+| routes/procedures.tsx | ui/procedures/ProceduresScreen.kt | none (Compose) | Overhead + GroundModule; web classes (category buttons, chips, step cards, badge) |
+| components/layout/AppShell.tsx, panel/widgets.tsx CaptionLight/Tape | ui/common/ShellChrome.kt, ShellIcons.kt, ui/AppRoot.kt | none (Compose) | Header, md top nav, bottom nav with Canvas icons, StatusStrip with bars and responsive hiding, insets |
 | routes/flight-plan.tsx full page: header/preset/load/save/reset, Aircraft navigation state, airports fields, route sequence, waypoint editor, GeographicRouteMap, cruise + landing profile SVGs, ILS select, procedures | ui/flightplan/FlightPlanScreen.kt, FlightPlanChrome.kt, FlightPlanDrawings.kt + sim/FlightPlanPageRules.kt + platform/PlanStore.kt (full draft) | FlightPlanPageRulesTest.kt | Compose not compiled locally. Web xl two-column layouts stacked. |
 | components/panel/NavaidStationPicker.tsx (Leaflet) | ui/flightplan/NavaidStationPickerView.kt (native OSM tile map, pan/pinch/double-tap, popups, chips) | FlightPlanPageRulesTest.kt (station filter/labels) | Tiles need network. |
