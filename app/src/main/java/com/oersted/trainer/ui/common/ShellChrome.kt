@@ -236,7 +236,6 @@ fun StatusStrip(
                 Modifier.fillMaxWidth().padding(horizontal = if (sm) 16.dp else 8.dp, vertical = if (sm) 8.dp else 6.dp),
                 horizontalArrangement = Arrangement.spacedBy(if (sm) 16.dp else 8.dp),
                 verticalArrangement = Arrangement.spacedBy(if (sm) 8.dp else 6.dp),
-                itemVerticalAlignment = Alignment.CenterVertically,
             ) {
                 CaptionLight("MASTER CAUTION", d.masterCaution, tones.caution)
                 CaptionLight("FIRE", d.fireWarn, tones.warn)
