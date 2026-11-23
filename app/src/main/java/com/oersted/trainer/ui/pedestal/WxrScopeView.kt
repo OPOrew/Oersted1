@@ -185,10 +185,10 @@ private fun DrawScope.drawWxr(
                     }
                 } else {
                     val coast = Path()
-                    W.WX_COAST.forEachIndexed { i, (x, y) -> pathPt(coast, W.mapPoint(x, y, nav, rangeNm), i == 0) }
+                    WxrWorld.WX_COAST.forEachIndexed { i, (x, y) -> pathPt(coast, W.mapPoint(x, y, nav, rangeNm), i == 0) }
                     drawPath(coast, lvl[0], alpha = 0.9f, style = Stroke(2.2f, join = StrokeJoin.Miter))
                     drawPath(coast, lvl[1], alpha = 0.9f, style = Stroke(0.8f, join = StrokeJoin.Miter))
-                    for ((x, y) in W.WX_CITIES) {
+                    for ((x, y) in WxrWorld.WX_CITIES) {
                         val p = W.mapPoint(x, y, nav, rangeNm)
                         drawCircle(lvl[2], 3f, Offset(p.first.toFloat(), p.second.toFloat()))
                     }
