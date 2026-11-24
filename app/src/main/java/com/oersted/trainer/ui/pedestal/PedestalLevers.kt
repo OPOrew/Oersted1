@@ -1,5 +1,6 @@
 package com.oersted.trainer.ui.pedestal
 
+import com.oersted.trainer.ui.common.insetShadow
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -122,6 +123,7 @@ fun DetentGate(
                 .width(96.dp)
                 .fillMaxHeight()
                 .background(Color(0xFF16181C), RoundedCornerShape(topEnd = 2.dp, bottomEnd = 2.dp))
+                .insetShadow(RoundedCornerShape(topEnd = 2.dp, bottomEnd = 2.dp), 10.dp, Color.Black.copy(alpha = 0.85f))
                 .border(1.dp, Color(0xFF0A0B0D), RoundedCornerShape(topEnd = 2.dp, bottomEnd = 2.dp))
                 .pointerInput(index, n, height) {
                     fun pick(py: Float) {
@@ -143,7 +145,8 @@ fun DetentGate(
                     .fillMaxHeight()
                     .padding(vertical = 12.dp)
                     .width(8.dp)
-                    .background(Color(0xFF050608), RoundedCornerShape(50)),
+                    .background(Color(0xFF050608), RoundedCornerShape(50))
+                    .insetShadow(RoundedCornerShape(50), 4.dp, Color.Black),
             )
             Box(Modifier.align(Alignment.TopStart).centeredAtY(handleY)) { handle() }
         }

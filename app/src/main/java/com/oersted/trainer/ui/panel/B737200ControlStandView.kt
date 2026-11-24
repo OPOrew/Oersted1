@@ -2,6 +2,7 @@
 
 package com.oersted.trainer.ui.panel
 
+import com.oersted.trainer.ui.common.insetShadow
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -97,7 +98,7 @@ private fun StandInner(cockpit: CockpitModel, compact: Boolean, spoilerSwitches:
             }
             Text("THRUST ${R.pedestalLabel(s.throttle1, s.throttle2)}", color = Classic737Palette.Subtle, fontFamily = FontFamily.Monospace, fontSize = 8.sp)
         }
-        Column(Modifier.fillMaxWidth().background(Brush.verticalGradient(listOf(c(0x282C31), c(0x111419))), inner).border(1.dp, c(0x0A0C0F), inner).padding(12.dp)) {
+        Column(Modifier.fillMaxWidth().background(Brush.verticalGradient(listOf(c(0x282C31), c(0x111419))), inner).insetShadow(inner, 30.dp, Color.Black.copy(alpha = 0.6f)).border(1.dp, c(0x0A0C0F), inner).padding(12.dp)) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(if (compact) 8.dp else 12.dp), verticalAlignment = Alignment.CenterVertically) {
                 SpeedBrakeLever(s.speedBrake, { v -> cockpit.patchSimNote(PedestalLeversRules.speedBrakeNote(v)) { speedBrake = v } })
                 val box = RoundedCornerShape(4.dp)
@@ -183,7 +184,7 @@ private fun Tag(text: String, border: Color, ink: Color) {
 @Composable
 private fun LeverSlot(height: Int, value: Double, label: String, rev: Boolean, onValue: (Double) -> Unit, onReverse: () -> Unit) {
     val shape = RoundedCornerShape(4.dp)
-    Box(Modifier.size(width = 48.dp, height = height.dp).background(Slot, shape).border(1.dp, c(0x090B0E), shape).padding(4.dp), contentAlignment = Alignment.BottomCenter) {
+    Box(Modifier.size(width = 48.dp, height = height.dp).background(Slot, shape).insetShadow(shape, 12.dp, Color.Black.copy(alpha = 0.9f)).border(1.dp, c(0x090B0E), shape).padding(4.dp), contentAlignment = Alignment.BottomCenter) {
         Box(
             Modifier.align(Alignment.BottomCenter).size(width = 32.dp, height = R.TRACK_H.dp)
                 .pointerInput(label) {
@@ -213,7 +214,7 @@ private fun Modifier.fillMaxHeightDp(): Modifier = this.height(R.TRACK_H.dp)
 private fun FuelCutoff(label: String, idle: Boolean, onChange: (Boolean) -> Unit) {
     Column(Modifier.clickable { onChange(!idle) }, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
         val shape = RoundedCornerShape(4.dp)
-        Box(Modifier.size(width = 32.dp, height = 64.dp).background(c(0x090B0D), shape).border(1.dp, c(0x090B0D), shape)) {
+        Box(Modifier.size(width = 32.dp, height = 64.dp).background(c(0x090B0D), shape).insetShadow(shape, 8.dp, Color.Black.copy(alpha = 0.8f)).border(1.dp, c(0x090B0D), shape)) {
             Box(
                 Modifier.align(if (idle) Alignment.TopCenter else Alignment.BottomCenter).padding(vertical = 4.dp).size(width = 20.dp, height = 40.dp)
                     .background(Brush.horizontalGradient(listOf(c(0x777777), c(0x34383C), c(0x777777))), RoundedCornerShape(2.dp)).border(1.dp, c(0x111111), RoundedCornerShape(2.dp)),

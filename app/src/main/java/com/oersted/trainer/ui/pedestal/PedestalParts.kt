@@ -1,5 +1,8 @@
 package com.oersted.trainer.ui.pedestal
 
+import com.oersted.trainer.ui.common.InsetLayer
+import com.oersted.trainer.ui.common.insetShadows
+import com.oersted.trainer.ui.common.insetShadow
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -95,7 +98,11 @@ fun BoxScope.Screws(n: Int = 4) {
 @Composable
 fun Plate(title: String? = null, modifier: Modifier = Modifier, color: Color = PlateColor, content: @Composable ColumnScope.() -> Unit) {
     val shape = RoundedCornerShape(3.dp)
-    Box(modifier.background(color, shape).border(1.dp, PlateBorder, shape).padding(8.dp)) {
+    Box(
+        modifier.background(color, shape)
+            .insetShadows(shape, InsetLayer(Color.White.copy(alpha = 0.18f), 0.dp, dy = 1.dp), InsetLayer(Color.Black.copy(alpha = 0.35f), 6.dp, dy = (-2).dp))
+            .border(1.dp, PlateBorder, shape).padding(8.dp),
+    ) {
         Screws()
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             if (title != null) PedestalLegend(title, Modifier.padding(bottom = 4.dp), textAlign = TextAlign.Center)
@@ -223,6 +230,7 @@ fun Toggle(
             Modifier
                 .size(width = 28.dp, height = 48.dp)
                 .background(Color(0xFF14161A), shape)
+                .insetShadow(shape, 6.dp, Color.Black)
                 .border(1.dp, if (guarded) Color(0xFFC03A2A) else Color(0xFF15171A), shape)
                 .clickable(enabled = !disabled) { onChange(!on) },
         ) {
@@ -252,7 +260,7 @@ fun SpringSwitch(up: String, down: String, value: String, onChange: (String) -> 
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(2.dp)) {
         PedestalLegend(up, size = 6, color = if (value == "UP") LegendLit else LegendColor, modifier = Modifier.hold("UP").padding(horizontal = 4.dp))
         val shape = RoundedCornerShape(3.dp)
-        Box(Modifier.size(width = 24.dp, height = 44.dp).background(Color(0xFF14161A), shape).border(1.dp, Color(0xFF15171A), shape)) {
+        Box(Modifier.size(width = 24.dp, height = 44.dp).background(Color(0xFF14161A), shape).insetShadow(shape, 6.dp, Color.Black).border(1.dp, Color(0xFF15171A), shape)) {
             // web: top 3px (UP), 13px (MID), bottom 3px (DOWN); the handle is 18px tall
             val y = when (value) { "UP" -> 3.dp; "DOWN" -> 44.dp - 3.dp - 18.dp - 2.dp; else -> 13.dp }
             Box(
@@ -315,6 +323,7 @@ fun Selector3(options: List<String>, value: String, onChange: (String) -> Unit, 
                     .offset(y = 3.dp)
                     .size(dial)
                     .background(Brush.radialGradient(listOf(Color(0xFF33373B), Color(0xFF0F1114))), CircleShape)
+                    .insetShadow(CircleShape, 3.dp, Color.White.copy(alpha = 0.15f), dy = 1.dp)
                     .border(1.dp, Color(0xFF15171A), CircleShape)
                     .clickable { if (n > 0) onChange(options[(idx + 1) % n]) },
             ) {

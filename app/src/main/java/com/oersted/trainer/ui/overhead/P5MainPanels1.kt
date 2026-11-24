@@ -1,5 +1,6 @@
 package com.oersted.trainer.ui.overhead
 
+import com.oersted.trainer.ui.common.insetShadow
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -298,6 +299,7 @@ private fun DriveDisc(p: P5, n: Int) {
     Box(
         Modifier.size(width = 26.dp, height = 44.dp)
             .background(if (on) Color(0xFFE83A2A) else Color(0xFFB51F1F), shape)
+            .insetShadow(shape, 8.dp, Color.Black.copy(alpha = 0.5f))
             .border(2.dp, if (on) Color(0xFFFFB0A0) else Color(0xFF7B1515), shape)
             .tap {
                 val n2 = if (n == 1) s.n2_1 else s.n2_2

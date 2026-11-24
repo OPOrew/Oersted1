@@ -1,5 +1,6 @@
 package com.oersted.trainer.ui.pedestal
 
+import com.oersted.trainer.ui.common.insetShadow
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -155,7 +156,7 @@ fun Bat(on: Boolean, onChange: (Boolean) -> Unit, modifier: Modifier = Modifier,
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(1.dp)) {
         if (up != null) Tiny(up, dim = !on)
         val shape = RoundedCornerShape(2.dp)
-        Box(Modifier.size(width = 17.dp, height = 30.dp).background(Color(0xFF14161A), shape).border(1.dp, Color(0xFF101316), shape).clickable { onChange(!on) }) {
+        Box(Modifier.size(width = 17.dp, height = 30.dp).background(Color(0xFF14161A), shape).insetShadow(shape, 4.dp, Color.Black).border(1.dp, Color(0xFF101316), shape).clickable { onChange(!on) }) {
             Canvas(Modifier.size(width = 17.dp, height = 30.dp)) {
                 val c = Offset(size.width / 2f, size.height / 2f)
                 val len = 13.dp.toPx() * (if (on) -1f else 1f)
@@ -179,7 +180,7 @@ fun Bat3(options: List<String>, value: String, onChange: (String) -> Unit, modif
             }
         }
         val shape = RoundedCornerShape(2.dp)
-        Box(Modifier.size(width = 34.dp, height = 24.dp).background(Color(0xFF14161A), shape).border(1.dp, Color(0xFF101316), shape).clickable { onChange(options[(i + 1) % options.size]) }) {
+        Box(Modifier.size(width = 34.dp, height = 24.dp).background(Color(0xFF14161A), shape).insetShadow(shape, 4.dp, Color.Black).border(1.dp, Color(0xFF101316), shape).clickable { onChange(options[(i + 1) % options.size]) }) {
             Canvas(Modifier.size(width = 34.dp, height = 24.dp)) {
                 val pivot = Offset(size.width / 2f, 3.dp.toPx() + 3.5.dp.toPx())
                 val a = rot * PI / 180.0

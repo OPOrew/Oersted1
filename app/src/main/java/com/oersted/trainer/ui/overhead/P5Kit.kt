@@ -1,5 +1,6 @@
 package com.oersted.trainer.ui.overhead
 
+import com.oersted.trainer.ui.common.insetShadow
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -253,6 +254,7 @@ fun VSwitch(
             Box(
                 Modifier.width(22.dp).height(h.dp)
                     .background(TrackColor, shape)
+                    .insetShadow(shape, 6.dp, Color.Black)
                     .border(1.dp, if (guarded) Color(0xFFC03A2A) else TrackBorder, shape)
                     .pointerInput(n) {
                         detectTapGestures(onPress = { pos ->
@@ -300,6 +302,7 @@ fun HSwitch(
         Box(
             Modifier.width(w.dp).height(20.dp)
                 .background(TrackColor, shape)
+                .insetShadow(shape, 6.dp, Color.Black)
                 .border(1.dp, if (guarded) Color(0xFFC03A2A) else TrackBorder, shape)
                 .pointerInput(n) {
                     detectTapGestures(onPress = { pos ->
@@ -337,7 +340,7 @@ fun RedGuarded(value: String, options: List<String>, onChange: (String) -> Unit,
     val shape = RoundedCornerShape(3.dp)
     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(2.dp)) {
         if (label != null) P5Cap(label)
-        Box(Modifier.background(Color(0xFFB51F1F), shape).border(2.dp, Color(0xFF7B1515), shape).padding(4.dp)) {
+        Box(Modifier.background(Color(0xFFB51F1F), shape).insetShadow(shape, 8.dp, Color.Black.copy(alpha = 0.55f)).border(2.dp, Color(0xFF7B1515), shape).padding(4.dp)) {
             VSwitch(options, value, onChange, null, false, null, true, legends ?: options)
         }
     }

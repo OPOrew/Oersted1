@@ -1,5 +1,8 @@
 package com.oersted.trainer.ui.instruments
 
+import com.oersted.trainer.ui.common.InsetLayer
+import com.oersted.trainer.ui.common.insetShadows
+import com.oersted.trainer.ui.common.insetShadow
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -43,6 +46,7 @@ fun GearLever(
     Box(
         modifier = modifier
             .background(Color(0xFF6A6D71), RoundedCornerShape(2.dp))
+            .insetShadows(RoundedCornerShape(2.dp), InsetLayer(Color.White.copy(alpha = 0.18f), 0.dp, dy = 1.dp), InsetLayer(Color.Black.copy(alpha = 0.35f), 6.dp, dy = (-2).dp))
             .border(1.dp, Color(0xFF2C2F33), RoundedCornerShape(2.dp)),
     ) {
         // the slot: a light-grey channel with a black guide inside
@@ -57,7 +61,8 @@ fun GearLever(
                 modifier = Modifier
                     .padding(start = 19.dp, top = 26.dp, bottom = 30.dp)
                     .size(width = 8.dp, height = 214.dp)
-                    .background(Color(0xFF0B0D0F), CircleShape),
+                    .background(Color(0xFF0B0D0F), CircleShape)
+                    .insetShadow(CircleShape, 4.dp, Color.Black),
             )
         }
         // detent legends down the left edge
