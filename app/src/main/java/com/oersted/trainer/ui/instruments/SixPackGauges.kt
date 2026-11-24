@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -140,8 +141,8 @@ fun SixPackAttitude(roll: Double, pitch: Double, modifier: Modifier = Modifier) 
     }
 }
 
-private inline fun DrawScope.withTransformDeg(rotDeg: Float, dy: Float, block: DrawScope.() -> Unit) {
-    androidx.compose.ui.graphics.drawscope.withTransform({ rotate(rotDeg, Offset(100f, 100f)); translate(0f, dy) }) { block() }
+private fun DrawScope.withTransformDeg(rotDeg: Float, dy: Float, block: DrawScope.() -> Unit) {
+    withTransform({ rotate(rotDeg, Offset(100f, 100f)); translate(0f, dy) }) { block() }
 }
 
 @Composable
