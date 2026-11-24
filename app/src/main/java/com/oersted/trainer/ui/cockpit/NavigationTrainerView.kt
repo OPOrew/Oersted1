@@ -145,15 +145,10 @@ internal fun FlightPhasePanel(s: SimState, cockpit: CockpitModel) {
             modifier = Modifier.fillMaxWidth().background(Color(0x33451A03), RoundedCornerShape(4.dp)).border(1.dp, Color(0x66F59E0B), RoundedCornerShape(4.dp)).padding(horizontal = 6.dp, vertical = 4.dp),
         )
         Spacer(Modifier.height(6.dp))
-        // live instruments (web InstrumentStrip): the controller's readout
-        CellGrid(3, listOf(
-            "Altitude" to "${NavigationPhaseText.fmtFt(ro.altFt)} ft",
-            "CAS" to "${NavigationPhaseText.jsNumber(Math.floor(ro.casKt + 0.5))} kt",
-            "V/S" to "${NavigationPhaseText.jsNumber(Math.floor(ro.vsFpm + 0.5))} fpm",
-            "Heading" to "${NavigationPhaseText.pad3(ro.headingDeg)}°",
-            "Thrust L" to "${NavigationPhaseText.jsNumber(Math.floor(ro.throttle1 * 100 + 0.5))}%",
-            "Ground speed" to "${NavigationPhaseText.jsNumber(Math.floor(s.groundSpeedKt + 0.5))} kt",
-        ))
+        // web: <div className="mt-2"><InstrumentStrip /></div><SystemsCluster />
+        InstrumentStrip(cockpit)
+        SystemsCluster(cockpit)
+        Spacer(Modifier.height(4.dp))
 
         Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
             Text("FLIGHT PLAN SECTION", color = SubtleC, fontSize = 8.sp)
