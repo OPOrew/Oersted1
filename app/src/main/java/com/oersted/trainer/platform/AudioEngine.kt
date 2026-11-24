@@ -15,6 +15,7 @@ import com.oersted.trainer.sim.AudioTicker
 import com.oersted.trainer.sim.EngineVoice
 import com.oersted.trainer.sim.EngineSpoolAudio
 import com.oersted.trainer.sim.FxBank
+import com.oersted.trainer.sim.WarningVoices
 import com.oersted.trainer.sim.FxTargets
 import com.oersted.trainer.sim.MarkerBeacons
 import kotlinx.coroutines.CoroutineScope
@@ -74,6 +75,8 @@ class AudioEngine(context: Context) {
     private val apuStream = mixer.Stream({ out, t -> apu.render(out, t) })
     private val tone = mixer.Tone(MarkerBeacons.markerSpec(MarkerBeacons.MarkerId.OM).hz)
     private val fx = FxBank(sr)
+    /** synth horn / wailer / shaker: only used for a warning whose recorded loop did not decode (web: fx.horn(false) while a sample exists) */
+    private val warn = WarningVoices(sr)
     private val engines = listOf(EngineVoice(sr, 0, 11L), EngineVoice(sr, 1, 23L))
     private val clacker = mixer.SampleLoop(
         AudioMixer.toFloat(AudioSounds.clackLoop(sr.toDouble(), AudioTicker.Tunables.CLACK_HZ.toInt())), sr,
@@ -92,6 +95,7 @@ class AudioEngine(context: Context) {
         mixer.add(tone)
         mixer.add(clacker)
         mixer.add(fx)
+        mixer.add(warn)
         for (e in engines) mixer.add(e)
         apuStream.on = false
     }
@@ -243,6 +247,7 @@ class AudioEngine(context: Context) {
             // engines wind down to nothing; the voices fall silent and their buses close
             for (e in engines) e.update(EngineSpoolAudio.newAcousticSpool(), false, mixer.time)
             clacker.targetGain = 0f
+            warn.horn(false, mixer.time); warn.wailer(false, mixer.time); warn.shaker(false, mixer.time)
             tone.targetGain = 0f
             apuStream.on = false
             applyLevels(AudioEvents.Levels())
@@ -338,6 +343,10 @@ class AudioEngine(context: Context) {
             setLoop(SampleBank.Loop.GLIDESLOPE, l.glideslope)
             setLoop(SampleBank.Loop.GPWS_VOCAB, l.gpwsVocab)
             setLoop(SampleBank.Loop.CONFIG_HORN, l.configCabinHorn)
+            // synth fallbacks: audio.ts plays the recorded loop when it exists and fx.horn / wailer / shaker(false), otherwise the synth
+            warn.horn(l.configCabinHorn && !loops.containsKey(SampleBank.Loop.CONFIG_HORN), mixer.time)
+            warn.wailer(l.apDisconnectWailer && !loops.containsKey(SampleBank.Loop.AP_DISCONNECT), mixer.time)
+            warn.shaker(l.stickShaker && !loops.containsKey(SampleBank.Loop.STICK_SHAKER), mixer.time)
             val (_, ramp) = FxTargets.clacker(l.machClacker)
             clacker.gainTau = ramp.timeConstant
             clacker.targetGain = ramp.target.toFloat()

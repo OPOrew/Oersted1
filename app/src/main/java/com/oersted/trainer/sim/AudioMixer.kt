@@ -51,6 +51,23 @@ class AudioMixer(val sampleRate: Int = 44100) {
     private var lBuf = FloatArray(0)
     private var rBuf = FloatArray(0)
 
+    /** web engFx: the engines send into this big-hall reverb + echo, which is added to the mix after every voice has rendered. */
+    val space = EngineSpace(sampleRate)
+
+    /** Send bus of the engine space (cleared every block). Voices add into it; use [ensureSend] before indexing. */
+    var sendL = FloatArray(0)
+        private set
+    var sendR = FloatArray(0)
+        private set
+
+    /** Makes the send buffers at least [n] frames long (new entries are zero). */
+    fun ensureSend(n: Int) {
+        if (sendL.size < n) {
+            sendL = FloatArray(n)
+            sendR = FloatArray(n)
+        }
+    }
+
     /** Renders [n] stereo frames into [out] (interleaved 16-bit). Applies the master gain and hard-limits to +-1. */
     fun render(out: ShortArray, n: Int) {
         while (true) (commands.poll() ?: break).invoke()
@@ -60,8 +77,12 @@ class AudioMixer(val sampleRate: Int = 44100) {
         }
         java.util.Arrays.fill(lBuf, 0, n, 0f)
         java.util.Arrays.fill(rBuf, 0, n, 0f)
+        ensureSend(n)
+        java.util.Arrays.fill(sendL, 0, n, 0f)
+        java.util.Arrays.fill(sendR, 0, n, 0f)
         val it = voices.iterator()
         while (it.hasNext()) if (!it.next().render(lBuf, rBuf, n, this)) it.remove()
+        space.process(sendL, sendR, lBuf, rBuf, n)
         val g = master
         for (i in 0 until n) {
             out[2 * i] = toPcm(lBuf[i] * g)

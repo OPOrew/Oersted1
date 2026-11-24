@@ -484,7 +484,7 @@ and the packages zustand@4.5.5, react@18.3.1, clsx, tailwind-merge installed wit
 - Layers: recorded loops decoded once by `platform/SampleBank.kt` (fire bell, stick shaker, A/P disconnect, glideslope, GPWS, config horn; the replacement for the unused MediaPlayer `SamplePlayer`); engine voices (`sim/EngineVoice.kt`: synth + recorded idle/power loops through shelves); effect bank (`sim/FxBank.kt`); APU voice (`sim/ApuVoice.kt`); Mach clacker; marker tone (400 / 1300 / 3000 Hz keyed, gain 0.12); switch clicks (8 pre-rendered variants, 35 ms throttle) from `CockpitModel.applySim` (so `patchSim`, the training console, engine start/stop, fault buttons and presets all click) and `patchSimNote`.
 - UI: the SOUND ON/OFF button and volume slider (`ui/cockpit/SoundControls.kt`) sit under the cockpit title. On at launch and while the app is in front (paused in the background, resumed on return, unless the person turned it off); volume default 0.6.
 - Tests (pure): AudioMixerTest, AudioFeedTest, AudioEventRenderTest, AudioSwitchSoundsTest, FxBankTest, EngineVoiceTest, plus the earlier AudioEvents/Ticker/Sounds/Dsp tests.
-- Known gaps: the engine-space reverb and echo; synth fallbacks for horn, wailer and shaker (only matter if a sample fails to decode); MP3 decoder padding may leave a tiny gap at a loop seam; only the cockpit tab's audio feed exists (it runs for the whole app once SOUND is on).
+- Known gaps (the reverb/echo and the synth fallbacks were ported in PARITY PASS 16): MP3 decoder padding may leave a tiny gap at a loop seam; only the cockpit tab's audio feed exists (it runs for the whole app once SOUND is on).
 - Status: sound port feature-complete apart from the gaps above; unverified by ear.
 
 ## Main instrument panel on the cockpit tab
@@ -646,3 +646,8 @@ Component / System Flow: live rows (`TrainingConsoleRules.componentFlowRows`, `C
 - Verified against the web: ADF kHz units, tuneNav1 powerOn, IRS/Transfer panels are never placed on the web (nothing to port).
 - Ported the MIP write tolerances: `RadioNav.navWriteNeeded` (flag flips, radial 0.2, loc/gs 0.02, thrDist 0.05) in AutopilotStage for nav and navFo; `FlightDirector.cmdWriteNeeded` in AttitudeTicker for fdCmd. 5 tests in MipToleranceTest (pass under kotlinc), AttitudeStagesTest and AttitudeTickerTest still pass.
 - `ui/common/InsetShadow.kt` + glareshield housing / warning cluster shadows.
+
+### PARITY PASS 16 — inset shadows, engine space, warning synth fallbacks (uncompiled until CI)
+- Inset shadows: `ui/common/InsetShadow.kt` now takes offsets and stacked layers (`insetShadows(shape, InsetLayer...)`), drawn behind content. Applied to P5 switch tracks and red guards, the generator-drive disc, pedestal plates / switch tracks / lever tracks / bats, the gear lever plate and slot, and the 737-200 control stand (card 30, lever slots 12, trim box 8).
+- `sim/EngineSpace.kt` (+ `EngineSpaceTest`, 6 tests): `engFx`. FFT partitioned convolution of the same generated 1.3 s stereo IR with Chromium's ConvolverNode normalisation, 30 ms pre-delay (minus the 1024-sample block latency), wet 0.2, plus the 190 / 270 ms ping-pong echo (feedback 0.32, 1500 Hz LP, out 0.08). The mixer owns it (`AudioMixer.space`, `sendL/sendR`) and EngineVoice sends its panned output at 0.9. Sleeps after 4 s of silence. About 25 ms of CPU per second of audio on the dev machine.
+- `sim/WarningVoices.kt` (+ `WarningVoicesTest`, 6 tests): synth horn, A/P wailer siren and stick-shaker motors, used by AudioEngine only for a warning whose recorded loop did not decode (as audio.ts).

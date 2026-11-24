@@ -129,6 +129,9 @@ class EngineVoice(private val sr: Int, val index: Int, seed: Long = 1L) : AudioM
             i!!.render(tmpL, tmpR, n, mixer)
             rr!!.render(tmpL, tmpR, n, mixer)
         }
+        mixer.ensureSend(n)
+        val sendL = mixer.sendL
+        val sendR = mixer.sendR
         var off = 0
         while (off < n) {
             val m = minOf(CHUNK, n - off)
@@ -157,6 +160,9 @@ class EngineVoice(private val sr: Int, val index: Int, seed: Long = 1L) : AudioM
                 if (haveSmp) v += highShelf.process(lowShelf.process(tmpL[off + k] * SQRT2))
                 l[off + k] += (v * gl).toFloat()
                 r[off + k] += (v * gr).toFloat()
+                // web: the panner also feeds the engine space through sendG = 0.9
+                sendL[off + k] += (v * gl * EngineSpace.SEND).toFloat()
+                sendR[off + k] += (v * gr * EngineSpace.SEND).toFloat()
             }
             off += m
         }
