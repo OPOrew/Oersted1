@@ -457,7 +457,7 @@ and the packages zustand@4.5.5, react@18.3.1, clsx, tailwind-merge installed wit
 - Uses `sim/Procedures.kt` (already ported and tested). Not yet ported from the web page: the Overhead and GroundModule panels under the steps.
 
 ## System layout screens (Hangar → system) ported (not compiled locally)
-- `ui/aircraft/AircraftPlan.kt`: `components/aircraft/AircraftPlan.tsx` as a Compose Canvas in the web's 1200 x 520 space (wings, flaps, spoilers, fuselage, windows, APU cone and inlet door, JT8D nacelles, gear, pack bays, part hotspots). Tap selects the nearest part. Not ported: the flow and spool CSS animations and the hover card.
+- `ui/aircraft/AircraftPlan.kt`: `components/aircraft/AircraftPlan.tsx` as a Compose Canvas in the web's 1200 x 520 space (wings, flaps, spoilers, fuselage, windows, APU cone and inlet door, JT8D nacelles, gear, pack bays, part hotspots). Tap selects the nearest part. (The flow / spool / glow animations and the hover card were ported in PARITY PASS 17.)
 - `ui/systems/SystemScreen.kt`: `routes/systems.$id.tsx` (header, system chips, fault buttons, plan, selected part detail, part list). Not ported: the Overhead and GroundModule panels under the plan.
 - AppRoot: the Hangar opens a system through `openSystemId` (back button returns to the list). The Hangar cards are now clickable.
 
@@ -651,3 +651,8 @@ Component / System Flow: live rows (`TrainingConsoleRules.componentFlowRows`, `C
 - Inset shadows: `ui/common/InsetShadow.kt` now takes offsets and stacked layers (`insetShadows(shape, InsetLayer...)`), drawn behind content. Applied to P5 switch tracks and red guards, the generator-drive disc, pedestal plates / switch tracks / lever tracks / bats, the gear lever plate and slot, and the 737-200 control stand (card 30, lever slots 12, trim box 8).
 - `sim/EngineSpace.kt` (+ `EngineSpaceTest`, 6 tests): `engFx`. FFT partitioned convolution of the same generated 1.3 s stereo IR with Chromium's ConvolverNode normalisation, 30 ms pre-delay (minus the 1024-sample block latency), wet 0.2, plus the 190 / 270 ms ping-pong echo (feedback 0.32, 1500 Hz LP, out 0.08). The mixer owns it (`AudioMixer.space`, `sendL/sendR`) and EngineVoice sends its panned output at 0.9. Sleeps after 4 s of silence. About 25 ms of CPU per second of audio on the dev machine.
 - `sim/WarningVoices.kt` (+ `WarningVoicesTest`, 6 tests): synth horn, A/P wailer siren and stick-shaker motors, used by AudioEngine only for a warning whose recorded loop did not decode (as audio.ts).
+
+### PARITY PASS 17 — hangar plan animations and hover card (uncompiled until CI)
+- `AircraftPlan.kt`: `.flow-active` dashes (6 10, offset to -28 per 0.75 s) on the bleed manifold (ductPsi > 20) and hydraulic A / B lines (> 1500 psi); `.glow-ok` pulse (0.55..1, 1.8 s) on the start-valve lamp; `.spool` (n2 > 40, 0.8 s) / `.spool-slow` (n2 > 8, 2.4 s) on the compressor spokes.
+- DEVIATION from the deployment, on purpose: in the web, `transform-origin: center` on the SVG `<g>` resolves against the whole 1200 x 520 view box, so the spokes swing round a far point and never show turning at the hub (checked with a Playwright test page). Android turns them about the hub as the author intended. To match the browser exactly, draw the spokes unrotated.
+- Hover card (bottom-left, `max-w-sm`): shown while a finger is held on a hotspot (the hotspot grows to r 9); lifting inside the touch slop selects the part; a scroll cancels. `AircraftPlan` takes `systems` for the card's ATA / short name.

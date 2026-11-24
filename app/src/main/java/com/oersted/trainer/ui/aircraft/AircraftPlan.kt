@@ -1,7 +1,35 @@
 package com.oersted.trainer.ui.aircraft
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.em
+import com.oersted.trainer.data.SystemDef
+import com.oersted.trainer.ui.common.Classic737Palette
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,7 +53,10 @@ import com.oersted.trainer.sim.Derived
 import com.oersted.trainer.sim.SimState
 
 // Port of components/aircraft/AircraftPlan.tsx. Drawn in the web's 1200 x 520 viewBox, scaled to the available width.
-// Not ported: the flow and spool CSS animations, and the hover card (tapping a hotspot selects its part instead).
+// Animations of styles.css: .flow-active (dash 6 10, offset to -28 over 0.75 s), .glow-ok (opacity 0.55..1, 1.8 s ease-in-out) and
+// .spool / .spool-slow (0.8 s / 2.4 s per turn). The web's `transform-origin: center` on the SVG <g> resolves against the whole view box, so
+// there the spokes swing round a far point and are never seen turning at the hub; here they turn about the hub, as intended.
+// Hover card: a finger held on a hotspot (no mouse hover on a phone); lifting it inside the touch slop selects the part.
 
 private val Line = Color(0xFF3A4150)
 private val FuseTop = Color(0xFF3A414C)
@@ -80,6 +111,7 @@ fun AircraftPlan(
     selectedId: String?,
     onSelect: (String) -> Unit,
     compact: Boolean = false,
+    systems: List<SystemDef> = emptyList(),
 ) {
     val parts = if (activeSystem != null) allParts.filter { it.system == activeSystem } else allParts
     val gearY = 18.0 * (1.0 - sim.gearPos)
@@ -88,6 +120,12 @@ fun AircraftPlan(
     val spoil = sim.spoilerPos
     val spoilL = derived.controlSurfaces.spoilerL
     val spoilR = derived.controlSurfaces.spoilerR
+    val clock = rememberInfiniteTransition(label = "plan")
+    val dashT by clock.animateFloat(0f, 1f, infiniteRepeatable(tween(750, easing = LinearEasing), RepeatMode.Restart), label = "dash")
+    val fastT by clock.animateFloat(0f, 1f, infiniteRepeatable(tween(800, easing = LinearEasing), RepeatMode.Restart), label = "spool")
+    val slowT by clock.animateFloat(0f, 1f, infiniteRepeatable(tween(2400, easing = LinearEasing), RepeatMode.Restart), label = "spoolSlow")
+    val glowT by clock.animateFloat(0f, 1f, infiniteRepeatable(tween(900, easing = FastOutSlowInEasing), RepeatMode.Reverse), label = "glow")
+    var hoverId by remember { mutableStateOf<String?>(null) }
 
     BoxWithConstraints(
         Modifier
@@ -99,19 +137,37 @@ fun AircraftPlan(
             Modifier
                 .matchParentSize()
                 .pointerInput(parts) {
-                    detectTapGestures { tap ->
+                    val slop = viewConfiguration.touchSlop
+                    // hotspot under a touch: nearest part within 14 units, as before
+                    fun hitAt(pos: Offset): Part? {
                         val k = size.width / 1200f
-                        val hit = parts
-                            .minByOrNull { p ->
-                                val dx = tap.x / k - p.x.toFloat()
-                                val dy = tap.y / k - p.y.toFloat()
-                                dx * dx + dy * dy
+                        val hit = parts.minByOrNull { p ->
+                            val dx = pos.x / k - p.x.toFloat()
+                            val dy = pos.y / k - p.y.toFloat()
+                            dx * dx + dy * dy
+                        } ?: return null
+                        val dx = pos.x / k - hit.x.toFloat()
+                        val dy = pos.y / k - hit.y.toFloat()
+                        return if (dx * dx + dy * dy <= 14f * 14f) hit else null
+                    }
+                    awaitEachGesture {
+                        val down = awaitFirstDown(requireUnconsumed = false)
+                        var hit = hitAt(down.position)
+                        hoverId = hit?.id                       // web onMouseEnter
+                        var tap = true
+                        while (true) {
+                            val ev = awaitPointerEvent()
+                            val ch = ev.changes.firstOrNull { it.id == down.id } ?: break
+                            if (ch.isConsumed) { tap = false; break }     // the page started scrolling
+                            if ((ch.position - down.position).getDistance() > slop) tap = false
+                            if (!ch.pressed) {
+                                if (tap && hit != null) onSelect(hit.id)  // web onClick
+                                break
                             }
-                        if (hit != null) {
-                            val dx = tap.x / k - hit.x.toFloat()
-                            val dy = tap.y / k - hit.y.toFloat()
-                            if (dx * dx + dy * dy <= 14f * 14f) onSelect(hit.id)
+                            hit = hitAt(ch.position)
+                            hoverId = hit?.id
                         }
+                        hoverId = null                          // web onMouseLeave
                     }
                 },
         ) {
@@ -128,20 +184,24 @@ fun AircraftPlan(
             }
 
             // Bleed manifold and hydraulic lines
+            val flowDash = { on: Boolean -> if (on) PathEffect.dashPathEffect(floatArrayOf(w(6.0), w(10.0)), -w(28.0) * dashT) else null }
             drawLine(
                 Pneumatic.copy(alpha = if (derived.ductPsi > 8) 0.9f else 0.25f),
                 p(430.0, 248.0), p(980.0, 248.0),
                 strokeWidth = w(if (derived.ductPsi > 20) 4.0 else 2.0),
+                pathEffect = flowDash(derived.ductPsi > 20),
             )
             drawLine(
                 HydA.copy(alpha = if (sim.hydAPress > 400) 0.95f else 0.22f),
                 p(500.0, 210.0), p(760.0, 210.0),
                 strokeWidth = w(if (sim.hydAPress > 1500) 3.5 else 2.0),
+                pathEffect = flowDash(sim.hydAPress > 1500),
             )
             drawLine(
                 HydB.copy(alpha = if (sim.hydBPress > 400) 0.95f else 0.22f),
                 p(500.0, 268.0), p(760.0, 268.0),
                 strokeWidth = w(if (sim.hydBPress > 1500) 3.5 else 2.0),
+                pathEffect = flowDash(sim.hydBPress > 1500),
             )
 
             // Wings
@@ -268,8 +328,10 @@ fun AircraftPlan(
             )
 
             // JT8D nacelles
-            drawNacelle(k, 500.0, 92.0, derived.eng1Running, derived.startValveOpen1, sim.bleed1 && derived.eng1Running)
-            drawNacelle(k, 500.0, 404.0, derived.eng2Running, derived.startValveOpen2, sim.bleed2 && derived.eng2Running)
+            drawNacelle(k, 500.0, 92.0, derived.eng1Running, derived.startValveOpen1, sim.bleed1 && derived.eng1Running,
+                if (sim.n2_1 > 40) fastT * 360f else if (sim.n2_1 > 8) slowT * 360f else 0f, if (derived.startValveOpen1) 0.55f + 0.45f * glowT else 1f)
+            drawNacelle(k, 500.0, 404.0, derived.eng2Running, derived.startValveOpen2, sim.bleed2 && derived.eng2Running,
+                if (sim.n2_2 > 40) fastT * 360f else if (sim.n2_2 > 8) slowT * 360f else 0f, if (derived.startValveOpen2) 0.55f + 0.45f * glowT else 1f)
 
             // Landing gear
             val gearAlpha = (0.35 + sim.gearPos * 0.65).toFloat()
@@ -290,9 +352,10 @@ fun AircraftPlan(
             // Hotspots for the parts of the active system
             for (part in parts) {
                 val selected = selectedId == part.id
-                val radius = if (selected) 9.0 else 5.5
+                val hovered = hoverId == part.id
+                val radius = if (selected || hovered) 9.0 else 5.5
                 drawCircle(
-                    aircraftSystemColor(part.system).copy(alpha = if (selected) 1f else 0.7f),
+                    aircraftSystemColor(part.system).copy(alpha = if (selected) 1f else if (hovered) 0.9f else 0.7f),
                     radius = w(radius),
                     center = p(part.x, part.y),
                 )
@@ -307,6 +370,9 @@ fun AircraftPlan(
         Text("APU", color = labelColor, fontSize = 10.sp, modifier = Modifier.offset(x = unit * 1088f, y = unit * 177f))
         Text("ENG 1 · JT8D", color = labelColor, fontSize = 10.sp, modifier = Modifier.offset(x = unit * 488f, y = unit * 25f))
         Text("ENG 2 · JT8D", color = labelColor, fontSize = 10.sp, modifier = Modifier.offset(x = unit * 488f, y = unit * 489f))
+
+        val hp = hoverId?.let { id -> allParts.firstOrNull { it.id == id } }
+        if (hp != null) HoverCard(hp, systems.firstOrNull { it.id == hp.system }, Modifier.align(Alignment.BottomStart).padding(12.dp))
     }
 }
 
@@ -318,7 +384,8 @@ private fun DrawScope.drawOvalAt(k: Float, cx: Double, cy: Double, rx: Double, r
 }
 
 /** EngineNacelle from the web component, drawn at its centre (cx, cy) in the 1200-unit space. */
-private fun DrawScope.drawNacelle(k: Float, cx: Double, cy: Double, running: Boolean, start: Boolean, bleed: Boolean) {
+/** EngineNacelle: [spokeDeg] is the .spool / .spool-slow turn of the compressor spokes (N2 > 40: 0.8 s a turn, N2 > 8: 2.4 s), [glow] the .glow-ok pulse of the start-valve lamp. */
+private fun DrawScope.drawNacelle(k: Float, cx: Double, cy: Double, running: Boolean, start: Boolean, bleed: Boolean, spokeDeg: Float = 0f, glow: Float = 1f) {
     fun q(dx: Double, dy: Double) = Offset(((cx + dx) * k).toFloat(), ((cy + dy) * k).toFloat())
     fun w(v: Double) = (v * k).toFloat()
 
@@ -328,8 +395,26 @@ private fun DrawScope.drawNacelle(k: Float, cx: Double, cy: Double, running: Boo
     drawCircle(Black, radius = w(12.0), center = q(-58.0, 0.0))
     drawCircle(if (running) Ok else Grey, radius = w(12.0), center = q(-58.0, 0.0), style = Stroke(width = w(1.0)))
     val spoke = if (running) Ok else Color(0xFF666666)
-    drawLine(spoke, q(-58.0, -8.0), q(-58.0, 8.0), strokeWidth = w(1.2))
-    drawLine(spoke, q(-66.0, 0.0), q(-50.0, 0.0), strokeWidth = w(1.2))
-    if (start) drawCircle(Caution, radius = w(6.0), center = q(70.0, 0.0))
+    rotate(spokeDeg, pivot = q(-58.0, 0.0)) {
+        drawLine(spoke, q(-58.0, -8.0), q(-58.0, 8.0), strokeWidth = w(1.2))
+        drawLine(spoke, q(-66.0, 0.0), q(-50.0, 0.0), strokeWidth = w(1.2))
+    }
+    if (start) drawCircle(Caution.copy(alpha = glow), radius = w(6.0), center = q(70.0, 0.0))
     if (bleed) drawCircle(Pneumatic, radius = w(4.0), center = q(40.0, -18.0))
+}
+
+/** web HoverCard: `absolute bottom-3 left-3 max-w-sm rounded-lg border border-border bg-raised/95 px-3 py-2`. */
+@Composable
+private fun HoverCard(part: Part, sys: SystemDef?, modifier: Modifier = Modifier) {
+    Column(
+        modifier
+            .widthIn(max = 384.dp)
+            .background(Classic737Palette.Raised.copy(alpha = 0.95f), RoundedCornerShape(8.dp))
+            .border(BorderStroke(1.dp, Classic737Palette.Border), RoundedCornerShape(8.dp))
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+    ) {
+        Text("ATA ${part.ata} · ${sys?.short ?: ""}".uppercase(), color = Classic737Palette.Subtle, fontSize = 11.sp, letterSpacing = 0.16.em)
+        Text(part.name, color = Classic737Palette.Fg, fontSize = 14.sp, fontWeight = FontWeight.Medium, modifier = Modifier.padding(top = 2.dp))
+        Text(part.function, color = Classic737Palette.Muted, fontSize = 12.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 4.dp))
+    }
 }

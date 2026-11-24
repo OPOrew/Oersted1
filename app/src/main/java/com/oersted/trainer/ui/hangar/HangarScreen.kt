@@ -92,7 +92,7 @@ fun HangarScreen(
                         WebBadge("GEAR ${if (sim.gearPos > 0.9) "DN" else if (sim.gearPos < 0.1) "UP" else "TR"}", if (sim.gearPos > 0.9) BadgeTone.OK else BadgeTone.ACCENT)
                     }
                     Box(Modifier.padding(top = 12.dp)) {
-                        AircraftPlan(sim = sim, derived = derived, allParts = parts, activeSystem = null, selectedId = selected, onSelect = { selected = it })
+                        AircraftPlan(sim = sim, derived = derived, allParts = parts, activeSystem = null, selectedId = selected, onSelect = { selected = it }, systems = systems)
                     }
                     FlowRow(Modifier.padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Legend(aircraftSystemColor("pneumatic"), "Bleed manifold")

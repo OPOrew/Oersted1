@@ -115,6 +115,7 @@ fun SystemScreen(
                         activeSystem = system.id,
                         selectedId = part?.id,
                         onSelect = { selectedId = it },
+                        systems = systems,
                     )
                 }
             }
