@@ -3,6 +3,8 @@ package com.oersted.trainer.ui.cockpit
 import com.oersted.trainer.platform.PhaseTimer
 import com.oersted.trainer.sim.FlyThePlanRules
 import com.oersted.trainer.sim.ActiveFlightPlan
+import com.oersted.trainer.sim.ActiveFlightPlanLogic
+import com.oersted.trainer.sim.FlightLevelCap
 import com.oersted.trainer.sim.AudioFeed
 import com.oersted.trainer.sim.AttitudeTicker
 import com.oersted.trainer.sim.FlightPhaseControl
@@ -47,11 +49,16 @@ import kotlin.math.min
 class CockpitModel(
     private val scope: CoroutineScope,
     private val monoSec: () -> Double = { System.nanoTime() / 1e9 },
+    initialFlightLevelCap: Int? = null,
+    private val onFlightLevelCapChanged: (Int?) -> Unit = {},
 ) {
     private var plan: ActiveFlightPlan? = null
+    private var flCap: Int? = FlightLevelCap.validFl(initialFlightLevelCap?.toDouble())
+    /** The plan the sim and the views read: the stored plan with the max-flight-level cap applied (web applyFlightLevelCap where the plan is read). */
+    private fun cappedPlan(): ActiveFlightPlan? = plan?.let { ActiveFlightPlanLogic.applyFlightLevelCap(it, FlightLevelCap.capFt(flCap)) }
     private val clockMs: () -> Long = { System.currentTimeMillis() }
     private val nav = FlightNavigator()
-    private val sim = SimStore(initialSimState(), nav, { plan }, { clockMs().toDouble() })
+    private val sim = SimStore(initialSimState(), nav, { cappedPlan() }, { clockMs().toDouble() })
     private val _mip = MutableStateFlow(MipLocal.MipState())
     private val _pedestal = MutableStateFlow(Pedestal.PedestalState())
     private val mip = MipLocal.Holder(onChange = { _mip.value = it })
@@ -60,7 +67,7 @@ class CockpitModel(
     private val _overhead = MutableStateFlow(OverheadLocal.OverheadLocalState())
     /** P5 overhead-local state (web useOverheadLocal) as a flow, so the overhead panel recomposes. */
     val overheadState: StateFlow<OverheadLocal.OverheadLocalState> = _overhead.asStateFlow()
-    private val world = SimPhaseWorld(sim, mip, pedestal, nav, { clockMs() }, monoSec, { plan })
+    private val world = SimPhaseWorld(sim, mip, pedestal, nav, { clockMs() }, monoSec, { cappedPlan() })
     private val controller = PhaseController(world)
     private val situation = Situation.SituationHolder()
     private val attitude = AttitudeTicker(
@@ -68,8 +75,8 @@ class CockpitModel(
         mip,
         pedestal,
         nav,
-        { plan },
-        { alt -> FlightPhaseControl.applyPhaseToGuidance(nav.liveGuidance(), controller.phase, alt, plan) },
+        { cappedPlan() },
+        { alt -> FlightPhaseControl.applyPhaseToGuidance(nav.liveGuidance(), controller.phase, alt, cappedPlan()) },
         situation,
     )
     /** Radar nav position / heading (web useWxrNav), published by the attitude ticker. */
@@ -96,6 +103,18 @@ class CockpitModel(
     private val _derived = MutableStateFlow(sim.derived(sim.current()))
     /** Derived values for the current sim state (transfer-bus power, engine running, ...). */
     val derived: StateFlow<Derived> = _derived.asStateFlow()
+
+    private val _flightLevelCap = MutableStateFlow(flCap)
+    /** Max flight level (sim) as an FL number, or null when no cap is set (web useFlightLevelCap). */
+    val flightLevelCap: StateFlow<Int?> = _flightLevelCap.asStateFlow()
+
+    /** web setFlightLevelCap: a valid FL sets the cap, null clears it; the plan readers see the change on the next publish. */
+    fun setFlightLevelCap(fl: Int?) {
+        flCap = FlightLevelCap.validFl(fl?.toDouble())
+        _flightLevelCap.value = flCap
+        onFlightLevelCapChanged(flCap)
+        publish()
+    }
 
     private val _activePlan = MutableStateFlow<ActiveFlightPlan?>(null)
     /** The active flight plan (web readActiveFlightPlan), for the pedestal GPS. */
@@ -344,7 +363,7 @@ class CockpitModel(
         _air.value = air
         _sixPack.value = sixPackSnapshot(air)
         _log.value = sim.current().log.toList()
-        _activePlan.value = plan
+        _activePlan.value = cappedPlan()
         _navState.value = nav.readState()
         _simState.value = sim.current()
         _derived.value = sim.derived(sim.current())

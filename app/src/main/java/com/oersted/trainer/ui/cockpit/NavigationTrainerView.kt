@@ -5,7 +5,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.unit.em
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -35,6 +39,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.oersted.trainer.sim.Derived
+import com.oersted.trainer.sim.FlightLevelCap
 import com.oersted.trainer.sim.FlightPhases
 import com.oersted.trainer.sim.NavigationPhaseText
 import com.oersted.trainer.sim.NavigationTrainerRules
@@ -122,6 +127,7 @@ internal fun FlightPhasePanel(s: SimState, cockpit: CockpitModel) {
             NBtn(if (phase == FlightPhases.Phase.NO_PLAN) "Load plan into controls" else "Reload plan / reset", enabled = plan != null, tone = if (plan != null) "accent" else "plain") { cockpit.reloadPlan() }
             NBtn("Auto phases ${if (pv.auto) "ON" else "OFF"}", tone = if (pv.auto) "on" else "plain") { cockpit.setAutoPhases(!pv.auto) }
             NBtn("Ready for departure", tone = "on") { cockpit.readyForDeparture() }
+            FlightLevelInput(cockpit)
         }
         if (plan == null) {
             Text(
@@ -181,6 +187,39 @@ internal fun FlightPhasePanel(s: SimState, cockpit: CockpitModel) {
                 }
             }
         }
+    }
+}
+
+/** web FlightLevelInput: simulation-only maximum flight level; empty = the plan's own altitudes. Commits on Done or when focus leaves. */
+@Composable
+private fun FlightLevelInput(cockpit: CockpitModel) {
+    val cap by cockpit.flightLevelCap.collectAsState()
+    var draft by remember { mutableStateOf<String?>(null) }   // text being typed; null = show the stored cap
+    val shown = draft ?: (cap?.toString() ?: "")
+    var focused by remember { mutableStateOf(false) }
+    fun commit() {
+        val text = shown
+        draft = null
+        when (val c = FlightLevelCap.commit(text)) {
+            is FlightLevelCap.Commit.Clear -> cockpit.setFlightLevelCap(null)
+            is FlightLevelCap.Commit.Set -> cockpit.setFlightLevelCap(c.fl)
+            is FlightLevelCap.Commit.Ignore -> Unit
+        }
+    }
+    val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text("MAX FL (SIM)", color = SubtleC, fontSize = 9.sp, letterSpacing = 0.05.em)
+        androidx.compose.foundation.text.BasicTextField(
+            value = shown, onValueChange = { draft = it }, singleLine = true,
+            textStyle = androidx.compose.ui.text.TextStyle(color = FgC, fontFamily = FontFamily.Monospace, fontSize = 10.sp, textAlign = androidx.compose.ui.text.style.TextAlign.Center),
+            cursorBrush = androidx.compose.ui.graphics.SolidColor(FgC),
+            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number, imeAction = androidx.compose.ui.text.input.ImeAction.Done),
+            keyboardActions = androidx.compose.foundation.text.KeyboardActions(onDone = { focusManager.clearFocus() }),
+            modifier = Modifier.width(56.dp).background(Color(0xFF0E1116), RoundedCornerShape(4.dp)).border(1.dp, LineC, RoundedCornerShape(4.dp))
+                .padding(horizontal = 6.dp, vertical = 5.dp)
+                .onFocusChanged { if (focused && !it.isFocused) commit(); focused = it.isFocused },
+            decorationBox = { inner -> Box(contentAlignment = Alignment.Center) { if (shown.isEmpty()) Text("none", color = SubtleC.copy(alpha = 0.6f), fontFamily = FontFamily.Monospace, fontSize = 10.sp); inner() } },
+        )
     }
 }
 

@@ -95,3 +95,39 @@ object ActiveFlightPlanLogic {
         )
     }
 }
+
+/**
+ * Port of the constants and the commit rule of src/lib/sim/flightLevelCap.ts and FlightLevelInput (FlightPhasePanel.tsx).
+ * Simulation-only maximum flight level: a CEILING on the plan's cruise and waypoint altitudes. The storage and the event
+ * bus stay on the Android side (CockpitModel); the cap is applied with [ActiveFlightPlanLogic.applyFlightLevelCap].
+ */
+object FlightLevelCap {
+    const val FL_CAP_MIN = 10
+    const val FL_CAP_MAX = 410
+
+    /** TS readFlightLevelCapFt / setFlightLevelCap validation: a finite flight level in range, rounded; anything else clears the cap. */
+    fun validFl(fl: Double?): Int? =
+        if (fl != null && fl.isFinite() && fl >= FL_CAP_MIN && fl <= FL_CAP_MAX) Math.round(fl).toInt() else null
+
+    /** Cap in feet for a stored flight level, or null (TS readFlightLevelCapFt). */
+    fun capFt(fl: Int?): Double? = fl?.let { validFl(it.toDouble()) }?.let { it * 100.0 }
+
+    /** The result of leaving the field (TS FlightLevelInput commit). */
+    sealed class Commit {
+        /** Empty text: the cap is cleared. */
+        object Clear : Commit()
+        /** A valid FL (e.g. 350). */
+        data class Set(val fl: Int) : Commit()
+        /** Not a number or out of range: the stored cap is left as it was. */
+        object Ignore : Commit()
+    }
+
+    /** TS commit: trim, drop a leading "FL", empty clears, a number in FL_CAP_MIN..FL_CAP_MAX sets, anything else is ignored. */
+    fun commit(text: String): Commit {
+        val t = text.trim().replace(Regex("^fl", RegexOption.IGNORE_CASE), "")
+        if (t == "") return Commit.Clear
+        val n = t.toDoubleOrNull()   // JS Number("1e2") parses as well; Number("") was handled above
+        val fl = validFl(n) ?: return Commit.Ignore
+        return Commit.Set(fl)
+    }
+}

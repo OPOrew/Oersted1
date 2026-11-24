@@ -234,3 +234,4 @@
 | components/panel/PrimusWxr.tsx (WxrScope, useWxrWarm) | ui/pedestal/WxrScopeView.kt + sim/WxrScopeModel.kt (+ AttitudeTicker wxrNav publish) | WxrScopeModelTest.kt | Replaces the WX RADAR placeholder in PedestalRadarUnit |
 | components/panel/SixPack.tsx | ui/cockpit/SixPackView.kt + ui/instruments/SixPackGauges.kt + sim/SixPackGaugeRules.kt (feed: sim/SixPackData.kt) | SixPackGaugeRulesTest.kt, SixPackDataTest.kt | Six steam gauges per side, replaces the old attitude-ball placeholder |
 | components/panel/LiveInstruments.tsx (InstrumentStrip, SystemsCluster) | ui/cockpit/LiveInstrumentsView.kt | none (Compose) | Replaces the text CellGrid in the flight-phase panel |
+| flightLevelCap.ts + FlightLevelInput (FlightPhasePanel.tsx) | sim/ActiveFlightPlan.kt (FlightLevelCap), ui/cockpit/NavigationTrainerView.kt (FlightLevelInput), CockpitModel.cappedPlan | ported |

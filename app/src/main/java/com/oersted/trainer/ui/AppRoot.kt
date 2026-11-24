@@ -74,7 +74,15 @@ fun AppRoot(lightMode: Boolean, onToggleTheme: () -> Unit) {
     var openSystemId by rememberSaveable { mutableStateOf<String?>(null) }
     val tab = Tab.entries[tabIndex]
     // The sim and the phase controller run for the whole app, like the web's SimTicker, on the main thread.
-    val cockpit = remember { CockpitModel(CoroutineScope(SupervisorJob() + Dispatchers.Main)) }
+    val cockpit = remember {
+        // web localStorage "oersted-flight-level-cap-v1" (the max flight level, sim only)
+        val capPrefs = context.getSharedPreferences("oersted-flight-level-cap", Context.MODE_PRIVATE)
+        CockpitModel(
+            CoroutineScope(SupervisorJob() + Dispatchers.Main),
+            initialFlightLevelCap = capPrefs.getString("oersted-flight-level-cap-v1", null)?.toDoubleOrNull()?.let { FlightLevelCap.validFl(it) },
+            onFlightLevelCapChanged = { fl -> capPrefs.edit().apply { if (fl == null) remove("oersted-flight-level-cap-v1") else putString("oersted-flight-level-cap-v1", fl.toString()) }.apply() },
+        )
+    }
     val planStore = remember { PlanStore(context) }
     val cockpitPlanLabel by cockpit.activePlanLabel.collectAsState()
     val sim by cockpit.simState.collectAsState()
