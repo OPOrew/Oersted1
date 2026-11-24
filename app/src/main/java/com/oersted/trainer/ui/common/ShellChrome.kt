@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -282,7 +284,8 @@ fun CaptionLight(label: String, on: Boolean, tone: Color) {
 fun Tape(label: String, value: Double, unit: String, max: Double, tone: Color) {
     val scheme = MaterialTheme.colorScheme
     val pct = (value / max).coerceIn(0.0, 1.0).toFloat()
-    Column(Modifier.widthIn(min = 77.dp)) {
+    // IntrinsicSize.Max: the tape is as wide as its label + value (CSS min-w 4.8rem), not the whole FlowRow line.
+    Column(Modifier.widthIn(min = 77.dp).width(IntrinsicSize.Max)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom) {
             Text(label.uppercase(), color = scheme.onSurfaceVariant, fontSize = 10.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 0.14.em)
             Row(Modifier.padding(start = 8.dp)) {
@@ -290,7 +293,7 @@ fun Tape(label: String, value: Double, unit: String, max: Double, tone: Color) {
                 Text(unit, color = Classic737Palette.Subtle, fontFamily = FontFamily.Monospace, fontSize = 11.sp, modifier = Modifier.padding(start = 2.dp))
             }
         }
-        Box(Modifier.padding(top = 4.dp).fillMaxWidth().height(6.dp).background(shellTonesInset(), CircleShape)) {
+        Box(Modifier.padding(top = 4.dp).fillMaxWidth().height(6.dp).background(shellTones().line.copy(alpha = 0.45f), CircleShape)) {
             Box(Modifier.fillMaxWidth(pct).height(6.dp).background(tone, CircleShape))
         }
     }

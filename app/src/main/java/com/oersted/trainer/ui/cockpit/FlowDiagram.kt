@@ -11,6 +11,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -92,11 +96,20 @@ internal fun Modifier.flowId(geo: FlowGeo, id: String?): Modifier =
 internal fun FlowRoot(modifier: Modifier = Modifier, wires: (Map<String, FlowWires.Rect>) -> List<FlowWires.Wire>, content: @Composable (FlowGeo) -> Unit) {
     val density = LocalDensity.current.density
     val geo = remember(density) { FlowGeo(density) }
-    Box(modifier.onGloballyPositioned { geo.root = it; geo.refresh() }) {
-        content(geo)
-        FlowWireLayer(wires(geo.rects), Modifier.matchParentSize())
+    // The web grid keeps its desktop proportions on a phone (the page scrolls sideways); squeezing it makes labels wrap per letter,
+    // so below FLOW_MIN_W the diagram keeps that width and scrolls horizontally.
+    BoxWithConstraints(modifier) {
+        val w = if (maxWidth < FLOW_MIN_W) FLOW_MIN_W else maxWidth
+        Box(Modifier.horizontalScroll(rememberScrollState())) {
+            Box(Modifier.width(w).onGloballyPositioned { geo.root = it; geo.refresh() }) {
+                content(geo)
+                FlowWireLayer(wires(geo.rects), Modifier.matchParentSize())
+            }
+        }
     }
 }
+
+private val FLOW_MIN_W: Dp = 680.dp
 
 @Composable
 internal fun FlowIcon(name: String?, color: Color, size: Dp) {

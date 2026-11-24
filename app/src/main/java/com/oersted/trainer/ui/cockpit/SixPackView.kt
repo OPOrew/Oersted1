@@ -83,7 +83,7 @@ private fun SixPackSet(
     val three = LocalConfiguration.current.screenWidthDp >= 640
     Column(modifier.fillMaxWidth().background(Color(0xFF1A1E23), shape).border(1.dp, Color(0xFF454C55), shape).padding(12.dp)) {
         Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
+            Column(Modifier.weight(1f, fill = false)) {
                 Text("$side FLIGHT INSTRUMENTS", color = Classic737Palette.Subtle, fontSize = 10.sp, letterSpacing = 0.18.em)
                 Text(title, color = Classic737Palette.Fg, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
             }
@@ -91,7 +91,7 @@ private fun SixPackSet(
             Text(
                 SixPackGaugeRules.status(flags).uppercase(), fontFamily = FontFamily.Monospace, fontSize = 8.sp,
                 color = if (warn) Color(0xFFFCD34D) else Color(0xFF6EE7B7),
-                modifier = Modifier.padding(start = 8.dp)
+                modifier = Modifier.weight(1f, fill = false).padding(start = 8.dp)
                     .background(if (warn) Color(0x33451A03) else Color(0x33022C22), RoundedCornerShape(4.dp))
                     .border(1.dp, if (warn) Color(0x80F59E0B) else Color(0x6610B981), RoundedCornerShape(4.dp))
                     .padding(horizontal = 8.dp, vertical = 4.dp),
