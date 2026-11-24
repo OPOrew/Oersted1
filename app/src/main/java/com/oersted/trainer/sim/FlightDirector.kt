@@ -42,6 +42,10 @@ object FlightDirector {
     /** show / flag as in the web; bank and pitch are already quantised to half degrees. */
     data class Command(val show: Boolean, val flag: Boolean, val bank: Double, val pitch: Double)
 
+    /** web: `if (oc.show !== show || oc.flag !== flag || |oc.bank - q(bank)| > 0.01 || |oc.pitch - q(pit)| > 0.01) upd.fdCmd = ...` (cmd is already quantised). */
+    fun cmdWriteNeeded(oldShow: Boolean, oldFlag: Boolean, oldBank: Double, oldPitch: Double, c: Command): Boolean =
+        oldShow != c.show || oldFlag != c.flag || Math.abs(oldBank - c.bank) > 0.01 || Math.abs(oldPitch - c.pitch) > 0.01
+
     /** JS Math.round(x * 2) / 2: half rounds up, unlike Kotlin's default. */
     fun quantizeHalf(x: Double): Double = floor(x * 2.0 + 0.5) / 2.0
 

@@ -235,3 +235,4 @@
 | components/panel/SixPack.tsx | ui/cockpit/SixPackView.kt + ui/instruments/SixPackGauges.kt + sim/SixPackGaugeRules.kt (feed: sim/SixPackData.kt) | SixPackGaugeRulesTest.kt, SixPackDataTest.kt | Six steam gauges per side, replaces the old attitude-ball placeholder |
 | components/panel/LiveInstruments.tsx (InstrumentStrip, SystemsCluster) | ui/cockpit/LiveInstrumentsView.kt | none (Compose) | Replaces the text CellGrid in the flight-phase panel |
 | flightLevelCap.ts + FlightLevelInput (FlightPhasePanel.tsx) | sim/ActiveFlightPlan.kt (FlightLevelCap), ui/cockpit/NavigationTrainerView.kt (FlightLevelInput), CockpitModel.cappedPlan | ported |
+| inset shadows (CSS inset box-shadow) | ui/common/InsetShadow.kt; used by ui/glareshield/GlareshieldPanel.kt | glareshield only |

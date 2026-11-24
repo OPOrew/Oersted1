@@ -4,7 +4,8 @@
 The log below is chronological and many early lines are stale. As of PARITY PASS 14 (CI green on 61fd7ec):
 - **Ported and matching the web layout:** app shell, Hangar, Systems, Library, Procedures, Flight Plan, the Flight deck tab (MIP with glareshield, P5, pedestal, Flight Controls with the 737-200 control stand and six-pack), and every Training Console section (Hydraulics, Electrical, Pneumatic, Air Conditioning, Cabin Pressurization, APU, Fire Protection incl. flame / mist / isolation-valve overlays and the stubborn-bottle toggle, Ice & Rain, Pitot/Static incl. the schematic, Navigation incl. map / situation / weather radar / live instruments, Autopilot, Lights incl. the exterior-lights diagram, Fault Injection, Component Flow). The flow drawings (Hydraulics, Pneumatic, Air Cond, Cabin) scroll sideways below 680dp.
 - **Dropped by decision:** the Realistic* panels, the 360 view. The cockpit tab shows MIP, P5 and P8 only.
-- **Still open:** IRS / transfer panels and the 3D instrument panel (need a user decision); inset shadows; unverified rules: ADF frequency units (RadioStage), `tuneNav1` powerOn semantics, tolerance checks (approximated by unconditional MIP writes), and the Fire view's stubborn-bottle toggle is a local UI flag as in the web.
+- **Closed in PARITY PASS 15:** the IRS and Transfer panels are dead code on the web (`IrsPanel` / `TransferPanel` in OverheadP5.tsx are defined but never rendered), so not showing them matches the deployment; the transfer *logic* (navXfr / irsXfr / efiXfr) is already ported in RadioStage and the instruments follow it. ADF units checked (pedestal values are kHz, defaults 353 / 316, clamp 190..1750, NDB match tolerance 0.6). `tuneNav1` powerOn checked (only sets navOn true, callers match). The MIP write tolerances (nav solutions, FD command, ADF bearing) are ported (`RadioNav.navWriteNeeded`, `FlightDirector.cmdWriteNeeded`, `MipToleranceTest`). Inset shadows: `ui/common/InsetShadow.kt` (`Modifier.insetShadow`, `drawInsetShadow`), applied to the glareshield housing (40) and both warning clusters (18).
+- **Still open:** the 3D instrument panel (the user said not to do it); inset shadows on the other panels (pedestal, P5 knobs, instruments); nothing verified on a device.
 - **Nothing here has been run on a device by an agent.** CI proves it compiles and that the pure-Kotlin tests pass; layout, audio and gestures need eyes on the phone.
 
 ## Status by phase
@@ -640,3 +641,8 @@ Component / System Flow: live rows (`TrainingConsoleRules.componentFlowRows`, `C
 - `sim/ActiveFlightPlan.kt`: `FlightLevelCap` (FL_CAP_MIN/MAX, validFl, capFt, commit rule of FlightLevelInput) + `FlightLevelCapTest` (4 tests, passing under kotlinc).
 - `CockpitModel`: `flightLevelCap` flow, `setFlightLevelCap(fl)`, `cappedPlan()` is what the sim, phase controller, attitude ticker and `activePlan` flow read (web applyFlightLevelCap where the plan is read). The stored plan is never changed. Persisted in SharedPreferences "oersted-flight-level-cap" (AppRoot).
 - `NavigationTrainerView.kt`: `FlightLevelInput` in the Flight phases header (commit on Done / focus loss, "FL350" accepted, empty clears, out-of-range ignored).
+
+### PARITY PASS 15 — remaining items (uncompiled until CI)
+- Verified against the web: ADF kHz units, tuneNav1 powerOn, IRS/Transfer panels are never placed on the web (nothing to port).
+- Ported the MIP write tolerances: `RadioNav.navWriteNeeded` (flag flips, radial 0.2, loc/gs 0.02, thrDist 0.05) in AutopilotStage for nav and navFo; `FlightDirector.cmdWriteNeeded` in AttitudeTicker for fdCmd. 5 tests in MipToleranceTest (pass under kotlinc), AttitudeStagesTest and AttitudeTickerTest still pass.
+- `ui/common/InsetShadow.kt` + glareshield housing / warning cluster shadows.

@@ -157,7 +157,10 @@ class AttitudeTicker(
         attState = res.state
 
         val fdc = res.fdCommand
-        mip.set { it.copy(fdCmd = MipLocal.FdCmd(show = fdc.show, bank = fdc.bank, pitch = fdc.pitch, flag = fdc.flag)) }
+        mip.set {
+            val o = it.fdCmd
+            if (FlightDirector.cmdWriteNeeded(o.show, o.flag, o.bank, o.pitch, fdc)) it.copy(fdCmd = MipLocal.FdCmd(show = fdc.show, bank = fdc.bank, pitch = fdc.pitch, flag = fdc.flag)) else it
+        }
         if (res.writeAttitude) mip.set { it.copy(att = res.attitude) }
 
         // Dynamic (trainer) vertical path: the altitude and vertical speed go back to the sim.

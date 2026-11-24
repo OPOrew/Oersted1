@@ -25,7 +25,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Path
+import com.oersted.trainer.ui.common.drawInsetShadow
+import com.oersted.trainer.ui.common.insetShadow
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.graphicsLayer
@@ -144,7 +147,8 @@ fun GlareshieldPanel(cockpit: CockpitModel, width: Dp) {
                     Modifier
                         .offset(14.dp, 248.dp)
                         .size(326.dp, 252.dp)
-                        .background(Brush.verticalGradient(listOf(Color(0xFF14161A), Color(0xFF0D0F12))), RoundedCornerShape(4.dp)),
+                        .background(Brush.verticalGradient(listOf(Color(0xFF14161A), Color(0xFF0D0F12))), RoundedCornerShape(4.dp))
+                        .insetShadow(RoundedCornerShape(4.dp), 18.dp, Color.Black),
                 )
                 Screw(35f, 298f, 30f)
                 Screw(27f, 430f, 75f)
@@ -245,7 +249,8 @@ fun GlareshieldPanel(cockpit: CockpitModel, width: Dp) {
                     Modifier
                         .offset(1782.dp, 248.dp)
                         .size(376.dp, 252.dp)
-                        .background(Brush.verticalGradient(listOf(Color(0xFF14161A), Color(0xFF0D0F12))), RoundedCornerShape(4.dp)),
+                        .background(Brush.verticalGradient(listOf(Color(0xFF14161A), Color(0xFF0D0F12))), RoundedCornerShape(4.dp))
+                        .insetShadow(RoundedCornerShape(4.dp), 18.dp, Color.Black),
                 )
                 Screw(1793f, 276f, 50f)
                 Screw(2130f, 298f, 15f)
@@ -373,6 +378,11 @@ private fun DrawScope.drawHousing(u: Float) {
     drawPath(
         poly(0f, 242f, 660f, 174f, 672f, 165f, 1410f, 165f, 1422f, 174f, 2172f, 242f, 2172f, 508f, 0f, 508f),
         Brush.verticalGradient(listOf(Color(0xFF0A0B0D), Color(0xFF0E1013), Color(0xFF0C0D10)), startY = OY * u, endY = 508f * u),
+    )
+    // web boxShadow "inset 0 0 40px #000" on the element's own box (0 0 NW x OY+NH+10), cut by the same clip-path polygon
+    drawInsetShadow(
+        poly(0f, 242f, 660f, 174f, 672f, 165f, 1410f, 165f, 1422f, 174f, 2172f, 242f, 2172f, 508f, 0f, 508f),
+        Rect(0f, 0f, NW * u, (OY + NH + 10f) * u), 40f * u, Color.Black,
     )
     drawPath(
         poly(

@@ -406,8 +406,8 @@ object AutopilotStage {
 
         // Radio-side MIP values from the first stage, applied the way the web merged them.
         mip = mip.copy(
-            nav = nv,
-            navFo = nvFo,
+            nav = if (RadioNav.navWriteNeeded(m.nav, nv)) nv else m.nav,
+            navFo = if (RadioNav.navWriteNeeded(m.navFo, nvFo)) nvFo else m.navFo,
             dmeCh = MipLocal.DmeChannels(ch1 = r.dme1, ch2 = r.dme2),
             lrra = MipLocal.LrraStatus(
                 h1 = r.lrra.ch1.heightFt,

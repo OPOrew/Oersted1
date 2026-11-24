@@ -61,6 +61,15 @@ object RadioNav {
         val thrDist: Double,
     )
 
+    /**
+     * web MainInstrumentPanel "if (on.vorValid !== nv.vorValid || ... ) upd.nav = nv": the radio solution is written to the MIP store only when a
+     * flag flips or a value moves past its tolerance (radial 0.2 deg, loc and glide-slope 0.02 deg, distance 0.05 nm). Used for both sides.
+     */
+    fun navWriteNeeded(old: RadioNavData, nv: RadioNavData): Boolean =
+        old.vorValid != nv.vorValid || old.locValid != nv.locValid || old.gsValid != nv.gsValid ||
+            Math.abs(old.radial - nv.radial) > 0.2 || Math.abs(old.locDev - nv.locDev) > 0.02 ||
+            Math.abs(old.gsErr - nv.gsErr) > 0.02 || Math.abs(old.thrDist - nv.thrDist) > 0.05
+
     val NO_NAV = RadioNavData(vorValid = false, locValid = false, gsValid = false, radial = 0.0, locDev = 0.0, gsErr = 0.0, vorDist = 0.0, thrDist = 0.0)
 
     private const val NM_FT = 6076.12
