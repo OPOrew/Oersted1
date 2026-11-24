@@ -186,8 +186,7 @@ private fun FlightControlsSection(s: SimState, d: Derived, change: ((SimState) -
         com.oersted.trainer.ui.panel.B737200ControlStand(cockpit, spoilerSwitches = true, scaleToFit = true)
     }
     Spacer(Modifier.height(12.dp))
-    val six by cockpit.sixPack.collectAsState()
-    SixPackView(six)
+    SixPackView(cockpit, sideBySide = true, foFirst = true, hideNote = true)
     FlightControlInputsView(cockpit)
 }
 

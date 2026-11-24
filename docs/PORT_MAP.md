@@ -232,3 +232,4 @@
 | components/panel/NavaidStationPicker.tsx (Leaflet) | ui/flightplan/NavaidStationPickerView.kt (native OSM tile map, pan/pinch/double-tap, popups, chips) | FlightPlanPageRulesTest.kt (station filter/labels) | Tiles need network. |
 | components/panel/B737200ControlStand.tsx | ui/panel/B737200ControlStandView.kt + sim/B737200ControlStandRules.kt | B737200ControlStandRulesTest.kt | Aside of FlightControlsModule; scaleToFit via a custom Layout with placeWithLayer scale |
 | components/panel/PrimusWxr.tsx (WxrScope, useWxrWarm) | ui/pedestal/WxrScopeView.kt + sim/WxrScopeModel.kt (+ AttitudeTicker wxrNav publish) | WxrScopeModelTest.kt | Replaces the WX RADAR placeholder in PedestalRadarUnit |
+| components/panel/SixPack.tsx | ui/cockpit/SixPackView.kt + ui/instruments/SixPackGauges.kt + sim/SixPackGaugeRules.kt (feed: sim/SixPackData.kt) | SixPackGaugeRulesTest.kt, SixPackDataTest.kt | Six steam gauges per side, replaces the old attitude-ball placeholder |

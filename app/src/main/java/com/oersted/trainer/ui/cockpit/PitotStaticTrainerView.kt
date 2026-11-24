@@ -130,7 +130,6 @@ internal fun PitotStaticTrainerSection(s: SimState, d: Derived, cockpit: Cockpit
         onDispose { cockpit.patchSimNote("PITOT/STATIC TRAINER DISABLED") { psTrainerEnabled = false } }
     }
     val air by cockpit.air.collectAsState()
-    val six by cockpit.sixPack.collectAsState()
     val dc = d.dcPower
     val anyFault = PitotStaticRules.anyFault(air)
 
@@ -234,7 +233,7 @@ internal fun PitotStaticTrainerSection(s: SimState, d: Derived, cockpit: Cockpit
     }
 
     TCard("Primary flight instruments · six-pack", PitotStaticRules.sixPackCardState(dc), if (dc) 0 else 2) {
-        SixPackView(six)
+        SixPackView(cockpit, hideNote = true)
         Note(
             "Airspeed, altimeter and vertical speed on each side read the same air-data line: fail the CAPT pitot and only the CAPT airspeed " +
                 "indicator goes to a FLAG; trap the F/O static line and the F/O altimeter freezes and its VSI goes to zero.",
