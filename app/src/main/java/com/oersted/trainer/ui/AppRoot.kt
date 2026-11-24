@@ -1,6 +1,8 @@
 package com.oersted.trainer.ui
 
+import android.content.Context
 import androidx.compose.foundation.layout.Column
+import com.oersted.trainer.sim.FlightLevelCap
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
