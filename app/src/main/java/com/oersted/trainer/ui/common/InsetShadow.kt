@@ -14,12 +14,13 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
 /**
  * CSS `box-shadow: inset 0 0 <blur> <color>`: a soft dark rim just inside the edge of [shape]. Drawn behind the content (children sit above it, as in CSS), so put it after `background`.
  * The glow is a blurred frame (everything outside the shape) clipped back to the shape, so it never leaks out.
  */
-fun Modifier.insetShadow(shape: Shape, blur: Dp, color: Color, dx: Dp = Dp.Zero, dy: Dp = Dp.Zero): Modifier = drawBehind {
+fun Modifier.insetShadow(shape: Shape, blur: Dp, color: Color, dx: Dp = 0.dp, dy: Dp = 0.dp): Modifier = drawBehind {
     val outline = shape.createOutline(size, layoutDirection, this)
     val path = Path().apply {
         when (outline) {
@@ -46,7 +47,7 @@ fun Modifier.insetShadows(shape: Shape, vararg layers: InsetLayer): Modifier = d
 }
 
 /** One `inset <dx> <dy> <blur> <color>` layer. */
-class InsetLayer(val color: Color, val blur: Dp, val dx: Dp = Dp.Zero, val dy: Dp = Dp.Zero)
+class InsetLayer(val color: Color, val blur: Dp, val dx: Dp = 0.dp, val dy: Dp = 0.dp)
 
 /**
  * Draws the inset shadow of [shapePath] clipped to it. [bounds] is the box the frame is built around (the element's box, which
