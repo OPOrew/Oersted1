@@ -1,5 +1,12 @@
 # HANDOFF — Oersted 737 Line Lab → Android
 
+## CURRENT STATUS (read this first; it supersedes older "not ported" / "placeholder" lines further down)
+The log below is chronological and many early lines are stale. As of PARITY PASS 14 (CI green on 61fd7ec):
+- **Ported and matching the web layout:** app shell, Hangar, Systems, Library, Procedures, Flight Plan, the Flight deck tab (MIP with glareshield, P5, pedestal, Flight Controls with the 737-200 control stand and six-pack), and every Training Console section (Hydraulics, Electrical, Pneumatic, Air Conditioning, Cabin Pressurization, APU, Fire Protection incl. flame / mist / isolation-valve overlays and the stubborn-bottle toggle, Ice & Rain, Pitot/Static incl. the schematic, Navigation incl. map / situation / weather radar / live instruments, Autopilot, Lights incl. the exterior-lights diagram, Fault Injection, Component Flow). The flow drawings (Hydraulics, Pneumatic, Air Cond, Cabin) scroll sideways below 680dp.
+- **Dropped by decision:** the Realistic* panels, the 360 view. The cockpit tab shows MIP, P5 and P8 only.
+- **Still open:** IRS / transfer panels and the 3D instrument panel (need a user decision); inset shadows; unverified rules: ADF frequency units (RadioStage), `tuneNav1` powerOn semantics, tolerance checks (approximated by unconditional MIP writes), and the Fire view's stubborn-bottle toggle is a local UI flag as in the web.
+- **Nothing here has been run on a device by an agent.** CI proves it compiles and that the pure-Kotlin tests pass; layout, audio and gestures need eyes on the phone.
+
 ## Status by phase
 | Phase | Scope | Status |
 |---|---|---|
