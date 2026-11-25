@@ -97,14 +97,11 @@ internal fun FlowRoot(modifier: Modifier = Modifier, wires: (Map<String, FlowWir
     val density = LocalDensity.current.density
     val geo = remember(density) { FlowGeo(density) }
     // The web grid keeps its desktop proportions on a phone (the page scrolls sideways); squeezing it makes labels wrap per letter,
-    // so below FLOW_MIN_W the diagram keeps that width and scrolls horizontally.
-    BoxWithConstraints(modifier) {
-        val w = if (maxWidth < FLOW_MIN_W) FLOW_MIN_W else maxWidth
-        Box(Modifier.horizontalScroll(rememberScrollState())) {
-            Box(Modifier.width(w).onGloballyPositioned { geo.root = it; geo.refresh() }) {
-                content(geo)
-                FlowWireLayer(wires(geo.rects), Modifier.matchParentSize())
-            }
+    // so below FLOW_MIN_W the diagram keeps that width and scrolls horizontally. ZoomableFlow adds the − / FIT / + zoom and pinch.
+    ZoomableFlow(modifier, minNaturalWidth = FLOW_MIN_W) {
+        Box(Modifier.fillMaxWidth().onGloballyPositioned { geo.root = it; geo.refresh() }) {
+            content(geo)
+            FlowWireLayer(wires(geo.rects), Modifier.matchParentSize())
         }
     }
 }

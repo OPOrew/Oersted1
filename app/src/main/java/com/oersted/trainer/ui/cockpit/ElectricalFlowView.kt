@@ -216,6 +216,7 @@ internal fun ElectricalPowerFlowPanel(s: SimState, d: Derived, cockpit: CockpitM
     val density = LocalDensity.current.density
     val geo = remember(density) { FlowGeo(density) }
     Column(Modifier.fillMaxWidth().padding(bottom = 8.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        ZoomableFlow(Modifier.fillMaxWidth()) {
         Box(Modifier.fillMaxWidth().onGloballyPositioned { geo.root = it; geo.refresh() }) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 // header
@@ -453,6 +454,7 @@ internal fun ElectricalPowerFlowPanel(s: SimState, d: Derived, cockpit: CockpitM
                 }
             }
             ElWireLayer(ElectricalFlowWires.wires(geo.rects, f), Modifier.matchParentSize())
+        }
         }
     }
 }

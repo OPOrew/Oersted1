@@ -129,6 +129,7 @@ fun NavAutopilotDiagram(cockpit: CockpitModel, focus: String?, modifier: Modifie
                 }
             }
         }
+        ZoomableFlow(Modifier.fillMaxWidth()) {
         Canvas(Modifier.fillMaxWidth().aspectRatio(D.VBW.toFloat() / D.VBH)) {
             val sc = size.width / D.VBW
             withTransform({ scale(sc, sc, Offset.Zero) }) {
@@ -137,6 +138,7 @@ fun NavAutopilotDiagram(cockpit: CockpitModel, focus: String?, modifier: Modifie
                 model.edges.forEach { edge(it, flow) }
                 model.nodes.forEach { node(tm, it) }
             }
+        }
         }
         Text(
             "The FD-108 and SP-77 run from the captain's selected sources. The SP-77 AIL / ELEV engage switches hold only while DC power, hydraulic B, valid ATT and valid HDG are all present; " +

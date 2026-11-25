@@ -6,6 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,12 +30,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.oersted.trainer.ui.overhead.OverheadP5
-import com.oersted.trainer.ui.overhead.OverheadZoom
 import com.oersted.trainer.ui.panel.MainInstrumentPanel
 import com.oersted.trainer.ui.pedestal.CenterPedestal
 import com.oersted.trainer.ui.pedestal.PedestalOtherFunctions
 import com.oersted.trainer.ui.pedestal.ThrustLinkButton
-import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.horizontalScroll
+import com.oersted.trainer.ui.pedestal.PEDESTAL_STAGE_W
 
 /** Cockpit tab (web routes/cockpit.tsx): heading, sound controls, then only the main instrument panel, P5 overhead and P8 pedestal. */
 @Composable
@@ -56,50 +57,44 @@ fun CockpitScreen(model: CockpitModel, audio: com.oersted.trainer.platform.Audio
             style = MaterialTheme.typography.bodySmall,
         )
         Spacer(Modifier.height(12.dp))
-        // The main panel is a 3060 x 988 design canvas: it scrolls sideways at a readable zoom. Zoom steps of 10 % from 30 % to 100 %.
-        var panelScale by remember { mutableStateOf(0.3f) }
+        // Every panel has the same VIEW selector: 30 %, 50 % or FULL (100 %, scrolls sideways).
+        var panelView by remember { mutableStateOf(PanelView.V30) }
         PanelSection(
             eyebrow = "MAIN INSTRUMENT PANEL · 737-200 (RP-C8009 / N267AU)",
             title = "Interactive instrument panel — every control is live",
-            trailing = {
-                OutlinedButton(onClick = { panelScale = (panelScale - 0.1f).coerceAtLeast(0.3f) }, enabled = panelScale > 0.31f) { Text("-") }
-                Text("${Math.round(panelScale * 100)}%", style = MaterialTheme.typography.labelSmall)
-                OutlinedButton(onClick = { panelScale = (panelScale + 0.1f).coerceAtMost(1.0f) }, enabled = panelScale < 0.99f) { Text("+") }
-            },
+            trailing = { PanelViewSelector(panelView) { panelView = it } },
             caption = "Turn the battery on for displays and lights (unpowered, the instrument flags show as on the aircraft). Gear lever, flaps, " +
                 "autobrake, antiskid, hydraulic / brake pressure, engine dials and air-data instruments follow the live simulation; clocks, " +
                 "selectors, radios, test keys and brightness knobs are local. Tap left / right of a selector knob to step it.",
         ) {
-            MainInstrumentPanel(cockpit = model, scale = panelScale, modifier = Modifier.fillMaxWidth())
+            MainInstrumentPanel(cockpit = model, scale = panelView.factor, modifier = Modifier.fillMaxWidth())
         }
         Spacer(Modifier.height(16.dp))
-        var overheadZoom by remember { mutableStateOf(OverheadZoom.FIT) }
+        var overheadView by remember { mutableStateOf(PanelView.V30) }
         PanelSection(
             eyebrow = "P5 · FORWARD OVERHEAD · 737-200",
             title = "Interactive overhead — every control is live",
-            trailing = {
-                Text("SIZE", style = MaterialTheme.typography.labelSmall)
-                OverheadZoom.values().forEach { z ->
-                    if (z == overheadZoom) Button(onClick = { overheadZoom = z }) { Text(z.label) }
-                    else OutlinedButton(onClick = { overheadZoom = z }) { Text(z.label) }
-                }
-            },
+            trailing = { PanelViewSelector(overheadView) { overheadView = it } },
             caption = "Lights and displays need DC power — flip BAT first. Tap a switch to move it; knobs turn by dragging around them.",
         ) {
-            OverheadP5(cockpit = model, zoom = overheadZoom)
+            OverheadP5(cockpit = model, scale = overheadView.factor)
         }
         Spacer(Modifier.height(16.dp))
+        var pedestalView by remember { mutableStateOf(PanelView.V50) }
         PanelSection(
             eyebrow = "P8 · CENTER PEDESTAL · 737-200",
             title = "Interactive pedestal — every control is live",
-            trailing = { ThrustLinkButton(cockpit = model) },
+            trailing = { ThrustLinkButton(cockpit = model); PanelViewSelector(pedestalView) { pedestalView = it } },
             caption = "Drag the thrust handles, flap grip, speed-brake arm, start / parking-brake levers, trim wheels and the STAB drum; turn the " +
                 "knobs by dragging round them (double-tap the rudder knob to centre). Tap a thrust handle to press its A/T DISENGAGE switch; " +
                 "tap a reverse claw to deploy / stow. Needs DC power for displays and lights (turn BATTERY on). Fire handles are locked until " +
                 "a fire warning exists — press LOCK OVRD to test.",
         ) {
-            BoxWithConstraints(Modifier.fillMaxWidth()) {
-                CenterPedestal(cockpit = model, width = maxWidth)
+            // 700 dp design width: 30 % / 50 % sit centred, FULL scrolls sideways
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
+                Box(Modifier.horizontalScroll(rememberScrollState())) {
+                    CenterPedestal(cockpit = model, width = (PEDESTAL_STAGE_W * pedestalView.factor).dp)
+                }
             }
             Spacer(Modifier.height(8.dp))
             var otherOpen by remember { mutableStateOf(false) }
@@ -156,13 +151,30 @@ private fun PanelSection(
             .padding(12.dp),
     ) {
         Text(eyebrow, style = MaterialTheme.typography.labelSmall, color = Color(0xFF9AA0A8))
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(title, style = MaterialTheme.typography.titleSmall, modifier = Modifier.weight(1f))
+        Text(title, style = MaterialTheme.typography.titleSmall, modifier = Modifier.fillMaxWidth())
+        // controls on their own scrollable line, so three VIEW buttons never squeeze the title on a phone
+        Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             trailing()
         }
         Spacer(Modifier.height(8.dp))
         content()
         Spacer(Modifier.height(8.dp))
         Text(caption, style = MaterialTheme.typography.labelSmall, color = Color(0xFF9AA0A8))
+    }
+}
+
+/** The cockpit panels' VIEW sizes: 30 %, 50 % or FULL (design size, scrolls sideways). */
+internal enum class PanelView(val label: String, val factor: Float) {
+    V30("30%", 0.3f),
+    V50("50%", 0.5f),
+    FULL("FULL", 1.0f),
+}
+
+@Composable
+private fun PanelViewSelector(selected: PanelView, onSelect: (PanelView) -> Unit) {
+    Text("VIEW", style = MaterialTheme.typography.labelSmall)
+    PanelView.values().forEach { v ->
+        if (v == selected) Button(onClick = { onSelect(v) }, contentPadding = PaddingValues(horizontal = 10.dp)) { Text(v.label) }
+        else OutlinedButton(onClick = { onSelect(v) }, contentPadding = PaddingValues(horizontal = 10.dp)) { Text(v.label) }
     }
 }

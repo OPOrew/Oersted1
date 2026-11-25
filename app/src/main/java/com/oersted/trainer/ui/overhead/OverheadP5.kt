@@ -39,12 +39,6 @@ import kotlin.math.roundToInt
  */
 
 /** web zoom choices: FIT (to the width), 100 %, 150 % */
-enum class OverheadZoom(val label: String, val factor: Float?) {
-    FIT("FIT", null),
-    X1("100%", 1f),
-    X150("150%", 1.5f),
-}
-
 @Composable
 private fun RowScope.GCol(w: Int, content: @Composable ColumnScope.() -> Unit) {
     Column(Modifier.width(w.dp).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(4.dp), content = content)
@@ -104,14 +98,12 @@ private fun Modifier.scaledDesign(designW: Dp, scale: Float): Modifier = this.la
     }
 }
 
-/** web `OverheadP5` body: the face in a dark scroll well, scaled to FIT, 100 % or 150 %. The title and size buttons are in the cockpit tab's section. */
+/** web `OverheadP5` body: the face in a dark scroll well, scaled to the cockpit tab's 30 % / 50 % / FULL view. The title and size buttons are in the cockpit tab's section. */
 @Composable
-fun OverheadP5(cockpit: CockpitModel, zoom: OverheadZoom, modifier: Modifier = Modifier) {
+fun OverheadP5(cockpit: CockpitModel, scale: Float, modifier: Modifier = Modifier) {
     val p = rememberP5(cockpit)
     val shape = RoundedCornerShape(8.dp)
     BoxWithConstraints(modifier.fillMaxWidth()) {
-        val fit = OverheadP5Rules.fitScale(maxWidth.value.toDouble()).toFloat()
-        val scale = zoom.factor ?: fit
         Box(
             Modifier.fillMaxWidth().background(Color(0xFF121417), shape).border(1.dp, Color(0xFF343A42), shape)
                 .padding(8.dp).horizontalScroll(rememberScrollState()),

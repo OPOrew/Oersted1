@@ -236,3 +236,4 @@
 | components/panel/LiveInstruments.tsx (InstrumentStrip, SystemsCluster) | ui/cockpit/LiveInstrumentsView.kt | none (Compose) | Replaces the text CellGrid in the flight-phase panel |
 | flightLevelCap.ts + FlightLevelInput (FlightPhasePanel.tsx) | sim/ActiveFlightPlan.kt (FlightLevelCap), ui/cockpit/NavigationTrainerView.kt (FlightLevelInput), CockpitModel.cappedPlan | ported |
 | inset shadows (CSS inset box-shadow) | ui/common/InsetShadow.kt; used by ui/glareshield/GlareshieldPanel.kt | glareshield only |
+| (Android-only) flow diagram zoom | `ui/cockpit/ZoomableFlow.kt` (pan + pinch + buttons, used by FlowRoot, ElectricalPowerFlowPanel, NavAutopilotDiagram) | UI only, no sim logic, no unit test |
