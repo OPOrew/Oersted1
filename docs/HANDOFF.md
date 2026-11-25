@@ -1,11 +1,12 @@
 # HANDOFF — Oersted 737 Line Lab → Android
 
 ## CURRENT STATUS (read this first; it supersedes older "not ported" / "placeholder" lines further down)
-The log below is chronological and many early lines are stale. As of PARITY PASS 14 (CI green on 61fd7ec):
+The log below is chronological and many early lines are stale. As of PARITY PASS 17 (CI green on 93a1fbc):
 - **Ported and matching the web layout:** app shell, Hangar, Systems, Library, Procedures, Flight Plan, the Flight deck tab (MIP with glareshield, P5, pedestal, Flight Controls with the 737-200 control stand and six-pack), and every Training Console section (Hydraulics, Electrical, Pneumatic, Air Conditioning, Cabin Pressurization, APU, Fire Protection incl. flame / mist / isolation-valve overlays and the stubborn-bottle toggle, Ice & Rain, Pitot/Static incl. the schematic, Navigation incl. map / situation / weather radar / live instruments, Autopilot, Lights incl. the exterior-lights diagram, Fault Injection, Component Flow). The flow drawings (Hydraulics, Pneumatic, Air Cond, Cabin) scroll sideways below 680dp.
 - **Dropped by decision:** the Realistic* panels, the 360 view. The cockpit tab shows MIP, P5 and P8 only.
 - **Closed in PARITY PASS 15:** the IRS and Transfer panels are dead code on the web (`IrsPanel` / `TransferPanel` in OverheadP5.tsx are defined but never rendered), so not showing them matches the deployment; the transfer *logic* (navXfr / irsXfr / efiXfr) is already ported in RadioStage and the instruments follow it. ADF units checked (pedestal values are kHz, defaults 353 / 316, clamp 190..1750, NDB match tolerance 0.6). `tuneNav1` powerOn checked (only sets navOn true, callers match). The MIP write tolerances (nav solutions, FD command, ADF bearing) are ported (`RadioNav.navWriteNeeded`, `FlightDirector.cmdWriteNeeded`, `MipToleranceTest`). Inset shadows: `ui/common/InsetShadow.kt` (`Modifier.insetShadow`, `drawInsetShadow`), applied to the glareshield housing (40) and both warning clusters (18).
-- **Still open:** the 3D instrument panel (the user said not to do it); inset shadows on the other panels (pedestal, P5 knobs, instruments); nothing verified on a device.
+- **Closed in PARITY PASS 16–17:** inset shadows on the P5, pedestal, gear lever and 737-200 control stand; engine-space reverb/echo (`sim/EngineSpace.kt`); horn / wailer / shaker synth fallbacks (`sim/WarningVoices.kt`); Hangar plan flow dashes, spool and lamp animations and the hover card (`ui/aircraft/AircraftPlan.kt`; spokes deliberately spin at the hub, the web's CSS is broken). Max FL cap input ported.
+- **Still open:** the 3D instrument panel (the user said not to do it); nothing verified on a device (audio never heard).
 - **Nothing here has been run on a device by an agent.** CI proves it compiles and that the pure-Kotlin tests pass; layout, audio and gestures need eyes on the phone.
 
 ## Status by phase
@@ -50,7 +51,7 @@ The log below is chronological and many early lines are stale. As of PARITY PASS
 
 ## Known gaps / risks
 - `derive.ts` relies on `Math.*`, `??`, optional chaining, `Record` lookups, and `Object` spreads. Map these to Kotlin carefully (`?:`, `maps.getOrDefault`, `copy`).
-- Audio is ported (see the Sounds section at the end): software mixer + AudioTrack. It has never been heard: check engine level, loop seams, click latency and underruns on a real device. Not ported: the engine-space reverb/echo and the horn/wailer/shaker synth fallbacks.
+- Audio is ported (see the Sounds section at the end): software mixer + AudioTrack. It has never been heard: check engine level, loop seams, click latency and underruns on a real device. The engine-space reverb/echo and the horn/wailer/shaker synth fallbacks are ported too (PARITY PASS 16).
 - `leaflet`/`react-leaflet` map (`InteractiveNavMap.tsx`) → MapLibre or osmdroid, or a WebView. Not started.
 - Live weather (`liveWeather.ts`) uses `fetch`. Use Ktor or `HttpURLConnection`.
 - `routes/flight-plan.tsx`, `procedures.tsx`, `library.tsx`, `systems.$id.tsx`, `index.tsx` are ported (see PARITY PASS 6 and 7 at the end).
