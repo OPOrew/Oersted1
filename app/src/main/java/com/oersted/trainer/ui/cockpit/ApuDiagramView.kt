@@ -99,7 +99,7 @@ fun ApuDiagram(
     door: Double, fuel: Double, starter: Boolean, rpm: Double, egt: Double, oilPsi: Double, bleed: Double,
     genOnBus: Boolean, masterOff: Boolean, jam: Boolean, modifier: Modifier = Modifier,
 ) {
-    val tm = rememberTextMeasurer()
+    val tm = rememberTextMeasurer(cacheSize = 256)
     val base = ImageBitmap.imageResource(R.drawable.apu_diagram)
     val cold = ImageBitmap.imageResource(R.drawable.apu_diagram_cold)
     val v = R0.view(door, fuel, rpm, egt, oilPsi, masterOff, jam)

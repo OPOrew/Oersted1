@@ -175,7 +175,7 @@ fun ExteriorLightsDiagram(lights: List<LightStatus>) {
 
 @Composable
 private fun ExteriorCanvas(v: D.ViewDef, lights: List<LightStatus>, sel: Int?, zoom: Boolean, onSelect: (Int) -> Unit) {
-    val tm = rememberTextMeasurer()
+    val tm = rememberTextMeasurer(cacheSize = 256)
     val art = ImageBitmap.imageResource(artFor(v.key))
     val tr = rememberInfiniteTransition(label = "ext-flash")
     // SVG <animate values="a;b;a"> is a triangle wave: 0 -> 1 -> 0 over the duration.

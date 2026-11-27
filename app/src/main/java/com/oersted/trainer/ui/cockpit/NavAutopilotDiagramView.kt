@@ -114,7 +114,7 @@ fun NavAutopilotDiagram(cockpit: CockpitModel, focus: String?, modifier: Modifie
     val d by cockpit.derived.collectAsState()
     val m by cockpit.mipState.collectAsState()
     val model = D.build(s, d, m, focus)
-    val tm = rememberTextMeasurer()
+    val tm = rememberTextMeasurer(cacheSize = 256)
     val flow = rememberInfiniteTransition(label = "nad").animateFloat(0f, 18f, infiniteRepeatable(tween(800, easing = LinearEasing), RepeatMode.Restart), label = "flow")
     val border = Color(0xFF30353B)
     Column(modifier.fillMaxWidth().padding(top = 8.dp).background(Color(0xFF0A0C0F), RoundedCornerShape(4.dp)).border(1.dp, border, RoundedCornerShape(4.dp)).padding(6.dp)) {

@@ -231,7 +231,7 @@ private fun DrawScope.windowLayer(tm: TextMeasurer, clock: IceClock, anim: IceRa
 /** Zoomed cockpit-window view for the window-heat card. */
 @Composable
 fun CockpitWindowsDiagram(anim: IceRainModel.IceState, ovht: Map<String, Boolean>, wipers: WiperPhases) {
-    val tm = rememberTextMeasurer(); val clock = rememberIceClock()
+    val tm = rememberTextMeasurer(cacheSize = 256); val clock = rememberIceClock()
     val bg = ImageBitmap.imageResource(R.drawable.front_737)
     DiagramFrame(true) {
         SvgCanvas(1034f, 458f, 262f, 92f, bg) {
@@ -262,7 +262,7 @@ private fun DrawScope.cowl(clock: IceClock, cx: Double, heated: Boolean, ice: Do
 
 @Composable
 fun FrontOverviewDiagram(anim: IceRainModel.IceState, valveOpen: Map<String, Boolean>, cowlHeated: Map<Int, Boolean>, ovht: Map<String, Boolean>) {
-    val tm = rememberTextMeasurer(); val clock = rememberIceClock()
+    val tm = rememberTextMeasurer(cacheSize = 256); val clock = rememberIceClock()
     val bg = ImageBitmap.imageResource(R.drawable.front_737)
     DiagramFrame(false) {
         SvgCanvas(0f, 372f, 2336f, 490f, bg) {
@@ -361,7 +361,7 @@ fun WingAntiIcePlan(
     anim: IceRainModel.IceState, lePos: Double, hotAir: Map<String, Boolean>, lights: Map<String, String>,
     cowlOpen: Map<Int, Boolean>, cowlHeated: Map<Int, Boolean>, inhibited: Boolean = false,
 ) {
-    val tm = rememberTextMeasurer(); val clock = rememberIceClock()
+    val tm = rememberTextMeasurer(cacheSize = 256); val clock = rememberIceClock()
     DiagramFrame(true) {
         SvgCanvas(30f, 76f, 580f, 160f, null) {
             fun wing(top: Float, bottom: Float) = Brush.verticalGradient(listOf(Color(0xFF66727E), Color(0xFF252B32)), startY = top, endY = bottom)

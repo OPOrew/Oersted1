@@ -205,7 +205,7 @@ private fun DrawScope.apuOverlay(tm: TextMeasurer, clock: State<Float>, s: SimSt
 
 @Composable
 fun FireProtectionTrainerView(s: SimState, d: Derived, cockpit: CockpitModel) {
-    val tm = rememberTextMeasurer()
+    val tm = rememberTextMeasurer(cacheSize = 256)
     var test by remember { mutableStateOf(false) }
     var stubborn by remember { mutableStateOf(false) }
     val mist = remember { mutableStateMapOf<String, Long>() }

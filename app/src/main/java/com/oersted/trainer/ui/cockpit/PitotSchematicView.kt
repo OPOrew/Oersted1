@@ -150,7 +150,7 @@ private fun Ctx.flags(x: Int, y: Int, flags: List<String>) {
 
 @Composable
 fun PitotStaticSchematicView(air: PitotStatic.AirData, s: SimState, dc: Boolean, captData: PitotStatic.SideAirData, foData: PitotStatic.SideAirData) {
-    val tm = rememberTextMeasurer()
+    val tm = rememberTextMeasurer(cacheSize = 256)
     val tr = rememberInfiniteTransition(label = "psd")
     val fast = tr.animateFloat(0f, 1f, infiniteRepeatable(tween(800, easing = LinearEasing)), label = "fast")
     val slow = tr.animateFloat(0f, 1f, infiniteRepeatable(tween(2400, easing = LinearEasing)), label = "slow")
@@ -160,6 +160,7 @@ fun PitotStaticSchematicView(air: PitotStatic.AirData, s: SimState, dc: Boolean,
         Modifier.fillMaxWidth().aspectRatio(640f / 410f)
             .background(Color(0xFF0B0D10), RoundedCornerShape(8.dp)).border(1.dp, Color(0xFF2C323D), RoundedCornerShape(8.dp)),
     ) {
+        if (size.width < 8f) return@Canvas // first / collapsed frame: nothing to draw, and no zero-length dash intervals
         val x = Ctx(this, size.width / 640f, tm, fast.value, slow.value, pulse.value)
         with(x) {
             val ram = s.psFlightCasKt > 0

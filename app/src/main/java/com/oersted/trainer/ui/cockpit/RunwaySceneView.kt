@@ -370,7 +370,7 @@ fun RunwayScene(cockpit: CockpitModel, modifier: Modifier = Modifier) {
             model.step(i, nowMs)?.let { v = it }
         }
     }
-    val tm = rememberTextMeasurer()
+    val tm = rememberTextMeasurer(cacheSize = 256)
     val border = Classic737Palette.Border
     Column(modifier.fillMaxWidth().padding(top = 8.dp).background(Classic737Palette.Panel, RoundedCornerShape(4.dp)).border(1.dp, border, RoundedCornerShape(4.dp)).padding(8.dp)) {
         FlowRow(Modifier.fillMaxWidth().padding(bottom = 4.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalArrangement = Arrangement.spacedBy(4.dp)) {
