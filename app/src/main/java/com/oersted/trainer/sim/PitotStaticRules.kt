@@ -189,7 +189,14 @@ object PitotStaticRules {
     // ───────────────────────── trainer view text (PitotStaticTrainer.tsx) ─────────────────────────
 
     /** Current value of one of the flags [flip] accepts. */
-    fun isSet(s: SimState, key: String): Boolean = (FLAGS[key] ?: throw IllegalArgumentException("not a Pitot/Static flag: $key")).get(s)
+    fun isSet(s: SimState, key: String): Boolean = when (key) {
+        // the four normal static ports are read by the view's port buttons (web `s[key]`) but are written by [togglePort], not [flip]
+        "psStaticCaptL" -> s.psStaticCaptL
+        "psStaticCaptR" -> s.psStaticCaptR
+        "psStaticFoL" -> s.psStaticFoL
+        "psStaticFoR" -> s.psStaticFoR
+        else -> (FLAGS[key] ?: throw IllegalArgumentException("not a Pitot/Static flag: $key")).get(s)
+    }
 
     /** web `anyFault` */
     fun anyFault(air: PitotStatic.AirData): Boolean =

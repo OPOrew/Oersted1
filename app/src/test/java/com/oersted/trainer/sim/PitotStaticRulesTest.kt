@@ -103,4 +103,18 @@ class PitotStaticRulesTest {
         assertTrue(covers.psPitotCaptCover && covers.psPitotAux2Cover)
         assertEquals(80.0, covers.psFlightCasKt, 0.0)
     }
+
+    /** The view's port buttons call isSet() with the four static-port keys; it used to throw, which crashed the Pitot / Static section on open. */
+    @Test fun isSetReadsTheFourNormalStaticPorts() {
+        val s = initialSimState()
+        for (k in listOf("psStaticCaptL", "psStaticCaptR", "psStaticFoL", "psStaticFoR")) assertFalse(k, rules.isSet(s, k))
+        val blocked = rules.togglePort(s, "psStaticFoL").first
+        assertTrue(rules.isSet(blocked, "psStaticFoL"))
+        assertFalse(rules.isSet(blocked, "psStaticFoR"))
+    }
+
+    @Test fun isSetResolvesEveryFlipFlag() {
+        val s = initialSimState()
+        for (k in rules.FLAG_NAMES) rules.isSet(s, k)
+    }
 }
